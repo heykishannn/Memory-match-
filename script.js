@@ -46,51 +46,29 @@ const maxLevels = 100;
 
 let isPaused = false;
 
+// Emoji pool
 const emojiPool = [
   '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
   '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
 ];
 
-// AdMob Rewarded Ad variables
-let rewardedAdLoaded = false;
-let rewardedAd = null;
-
-// Initialize AdMob Ads
-function initAdMob() {
-  if (!window.adsbygoogle) return;
-
-  // Load banner ad
-  (adsbygoogle = window.adsbygoogle || []).push({});
-
-  // Initialize rewarded ad (using Google Mobile Ads SDK for web is limited, so this is a placeholder)
-  // For actual Android/iOS apps, integrate AdMob SDK accordingly.
-  // Here we simulate rewarded ad loading and showing.
-
-  // Simulate rewarded ad loaded
-  rewardedAdLoaded = true;
-}
-
-// Show rewarded ad simulation (replace with real AdMob SDK calls in native apps)
-function showRewardedAd(onComplete) {
-  if (!rewardedAdLoaded) {
-    alert('Ad not loaded yet, please try again later.');
-    return;
-  }
-  // Simulate ad watching with confirm dialog
-  const watched = confirm('Watch rewarded ad to continue? Click OK to simulate watching ad.');
-  if (watched) {
-    onComplete();
-  } else {
-    alert('You need to watch the ad to continue.');
-  }
-}
-
-// Stop all sounds
+// Stop all sounds helper
 function stopAllSounds() {
   [flipSound, matchSound, loseSound, pauseSound, restartSound].forEach(audio => {
     audio.pause();
     audio.currentTime = 0;
   });
+}
+
+// Vibrate helper with APK compatibility
+function vibratePattern(duration = 200) {
+  if (vibrationToggle.checked && navigator.vibrate) {
+    try {
+      navigator.vibrate([duration]);
+    } catch(e) {
+      // fallback or ignore errors
+    }
+  }
 }
 
 // Shuffle helper
@@ -175,9 +153,7 @@ function checkForMatch() {
     score += 10;
     scoreDisplay.textContent = score;
 
-    if (vibrationToggle.checked && navigator.vibrate) {
-      navigator.vibrate(150);
-    }
+    vibratePattern(150);
 
     flippedCards = [];
 
@@ -198,6 +174,7 @@ function checkForMatch() {
 
 // Timer countdown
 function startTimer() {
+  clearInterval(timerInterval);
   timerDisplay.textContent = Math.floor(timer);
   timerInterval = setInterval(() => {
     if (isPaused) return;
@@ -205,7 +182,6 @@ function startTimer() {
     timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
       clearInterval(timerInterval);
-      // Show timeout popup instead of normal popup
       showTimeoutPopup();
     }
   }, 1000);
@@ -215,9 +191,15 @@ function startTimer() {
 function showTimeoutPopup() {
   timeoutPopup.classList.remove('hidden');
   gameScreen.style.pointerEvents = 'none';
-  // Hide other popups if open
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
+
+  if (soundToggle.checked) {
+    stopAllSounds();
+    loseSound.currentTime = 0;
+    loseSound.play();
+  }
+  vibratePattern(300);
 }
 
 // Hide timeout popup
@@ -239,8 +221,8 @@ function showPopup(win, message) {
 
   gameContainer.style.pointerEvents = 'none';
 
-  if (vibrationToggle.checked && navigator.vibrate) {
-    navigator.vibrate(300);
+  if (vibrationToggle.checked) {
+    vibratePattern(300);
   }
   if (soundToggle.checked) {
     stopAllSounds();
@@ -341,7 +323,8 @@ function continueGame(progress) {
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
   timeoutPopup.classList.add('hidden');
-  startLevel();
+  isPaused = false;
+  startTimer();
 }
 
 // Pause toggle with pause and restart sounds
@@ -402,7 +385,7 @@ continueBtn.addEventListener('click', () => {
 
 // Timeout popup buttons
 timeoutContinueBtn.addEventListener('click', () => {
-  // Show rewarded ad before continue
+  // Show rewarded ad simulation before continue
   showRewardedAd(() => {
     hideTimeoutPopup(() => {
       continueGame({level, score});
@@ -438,3 +421,25 @@ document.addEventListener('touchstart', (e) => {
 window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
+
+// AdMob Rewarded Ad simulation (replace with real SDK for native apps)
+let rewardedAdLoaded = true; // Simulate ad loaded
+
+function showRewardedAd(onComplete) {
+  if (!rewardedAdLoaded) {
+    alert('Ad not loaded yet, please try again later.');
+    return;
+  }
+  const watched = confirm('Watch rewarded ad to continue? Click OK to simulate watching ad.');
+  if (watched) {
+    onComplete();
+  } else {
+    alert('You need to watch the ad to continue.');
+  }
+}
+
+// Initialize AdMob Banner Ad
+function initAdMob() {
+  if (!window.adsbygoogle) return;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+}
