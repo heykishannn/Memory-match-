@@ -22,6 +22,10 @@ const resumePopup = document.getElementById('resumePopup');
 const newGameBtn = document.getElementById('newGameBtn');
 const continueBtn = document.getElementById('continueBtn');
 
+const timeoutPopup = document.getElementById('timeoutPopup');
+const timeoutContinueBtn = document.getElementById('timeoutContinueBtn');
+const timeoutPlayAgainBtn = document.getElementById('timeoutPlayAgainBtn');
+
 const flipSound = document.getElementById('flipSound');
 const matchSound = document.getElementById('matchSound');
 const loseSound = document.getElementById('loseSound');
@@ -46,6 +50,48 @@ const emojiPool = [
   '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
   '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
 ];
+
+// AdMob Rewarded Ad variables
+let rewardedAdLoaded = false;
+let rewardedAd = null;
+
+// Initialize AdMob Ads
+function initAdMob() {
+  if (!window.adsbygoogle) return;
+
+  // Load banner ad
+  (adsbygoogle = window.adsbygoogle || []).push({});
+
+  // Initialize rewarded ad (using Google Mobile Ads SDK for web is limited, so this is a placeholder)
+  // For actual Android/iOS apps, integrate AdMob SDK accordingly.
+  // Here we simulate rewarded ad loading and showing.
+
+  // Simulate rewarded ad loaded
+  rewardedAdLoaded = true;
+}
+
+// Show rewarded ad simulation (replace with real AdMob SDK calls in native apps)
+function showRewardedAd(onComplete) {
+  if (!rewardedAdLoaded) {
+    alert('Ad not loaded yet, please try again later.');
+    return;
+  }
+  // Simulate ad watching with confirm dialog
+  const watched = confirm('Watch rewarded ad to continue? Click OK to simulate watching ad.');
+  if (watched) {
+    onComplete();
+  } else {
+    alert('You need to watch the ad to continue.');
+  }
+}
+
+// Stop all sounds
+function stopAllSounds() {
+  [flipSound, matchSound, loseSound, pauseSound, restartSound].forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
 
 // Shuffle helper
 function shuffle(array) {
@@ -111,6 +157,7 @@ function flipCard() {
   flippedCards.push(this);
 
   if (soundToggle.checked) {
+    stopAllSounds();
     flipSound.currentTime = 0;
     flipSound.play();
   }
@@ -131,7 +178,6 @@ function checkForMatch() {
     if (vibrationToggle.checked && navigator.vibrate) {
       navigator.vibrate(150);
     }
-    // मैच पर साउंड नहीं बजाएंगे, सिर्फ पॉपअप पर बजाना है
 
     flippedCards = [];
 
@@ -159,12 +205,29 @@ function startTimer() {
     timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
       clearInterval(timerInterval);
-      showPopup(false, 'Time up! Game over.');
+      // Show timeout popup instead of normal popup
+      showTimeoutPopup();
     }
   }, 1000);
 }
 
-// Show popup
+// Show timeout popup
+function showTimeoutPopup() {
+  timeoutPopup.classList.remove('hidden');
+  gameScreen.style.pointerEvents = 'none';
+  // Hide other popups if open
+  popup.classList.add('hidden');
+  resumePopup.classList.add('hidden');
+}
+
+// Hide timeout popup
+function hideTimeoutPopup(callback) {
+  timeoutPopup.classList.add('hidden');
+  gameScreen.style.pointerEvents = 'auto';
+  if (callback) callback();
+}
+
+// Show popup (win or lose)
 function showPopup(win, message) {
   popupTitle.textContent = win ? 'You Won!' : 'Time Out!';
   popupMessage.textContent = message;
@@ -180,6 +243,7 @@ function showPopup(win, message) {
     navigator.vibrate(300);
   }
   if (soundToggle.checked) {
+    stopAllSounds();
     if (win) {
       matchSound.currentTime = 0;
       matchSound.play();
@@ -248,6 +312,7 @@ function startLevel() {
 // Reset game
 function resetGame() {
   clearInterval(timerInterval);
+  stopAllSounds();
   level = 1;
   score = 0;
   flippedCards = [];
@@ -256,6 +321,7 @@ function resetGame() {
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
+  timeoutPopup.classList.add('hidden');
   gameContainer.style.pointerEvents = 'auto';
 }
 
@@ -265,6 +331,7 @@ function showResumePopup(progress) {
   startScreen.classList.add('hidden');
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
+  timeoutPopup.classList.add('hidden');
 }
 
 function continueGame(progress) {
@@ -273,6 +340,7 @@ function continueGame(progress) {
   resumePopup.classList.add('hidden');
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
+  timeoutPopup.classList.add('hidden');
   startLevel();
 }
 
@@ -282,6 +350,7 @@ pauseBtn.addEventListener('click', () => {
   pauseBtn.textContent = isPaused ? '▶' : '❚❚';
 
   if (soundToggle.checked) {
+    stopAllSounds();
     if (isPaused) {
       pauseSound.currentTime = 0;
       pauseSound.play();
@@ -331,8 +400,25 @@ continueBtn.addEventListener('click', () => {
   }
 });
 
+// Timeout popup buttons
+timeoutContinueBtn.addEventListener('click', () => {
+  // Show rewarded ad before continue
+  showRewardedAd(() => {
+    hideTimeoutPopup(() => {
+      continueGame({level, score});
+    });
+  });
+});
+
+timeoutPlayAgainBtn.addEventListener('click', () => {
+  hideTimeoutPopup(() => {
+    startLevel();
+  });
+});
+
 // On load check saved progress
 window.addEventListener('load', () => {
+  initAdMob();
   const progress = loadProgress();
   if (progress) {
     showResumePopup(progress);
@@ -347,3 +433,8 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
+
+// Stop sounds on page unload (game exit)
+window.addEventListener('beforeunload', () => {
+  stopAllSounds();
+});
