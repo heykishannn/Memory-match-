@@ -70,9 +70,10 @@ function generateCards(level) {
   return shuffle(cards);
 }
 
-// Calculate timer
+// Calculate timer based on number of cards (2.5 seconds per card)
 function calculateTimer(level) {
-  return Math.max(15, 60 - (level * 0.5));
+  const tempCards = generateCards(level);
+  return tempCards.length * 2.5; // seconds
 }
 
 // Create board
@@ -130,10 +131,7 @@ function checkForMatch() {
     if (vibrationToggle.checked && navigator.vibrate) {
       navigator.vibrate(150);
     }
-    if (soundToggle.checked) {
-      matchSound.currentTime = 0;
-      matchSound.play();
-    }
+    // मैच पर साउंड नहीं बजाएंगे, सिर्फ पॉपअप पर बजाना है
 
     flippedCards = [];
 
