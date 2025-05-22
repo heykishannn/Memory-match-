@@ -15,31 +15,34 @@
 
   <!-- Game Screen -->
   <div id="game-screen" class="hidden">
+    <header class="game-header">
+      <h1 class="game-title">MEMORY MATCH</h1>
+      <div class="toggles-row">
+        <div class="toggle-wrapper toggle-left">
+          <label class="switch orange-switch">
+            <input type="checkbox" id="soundToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <div class="toggle-label">Sound</div>
+        </div>
+        <div class="toggle-wrapper toggle-right">
+          <label class="switch orange-switch">
+            <input type="checkbox" id="vibrationToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <div class="toggle-label">Vibration</div>
+        </div>
+      </div>
+    </header>
+
     <div class="game-wrapper">
       <div class="game-info">
-        <div>Level: <span id="levelDisplay">1</span></div>
-        <div>Score: <span id="scoreDisplay">0</span></div>
-        <div>Time: <span id="timerDisplay">0</span>s</div>
+        <div class="level-info">Level: <span id="levelDisplay">1</span></div>
+        <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
+        <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
       </div>
 
       <div class="game-container" id="game"></div>
-    </div>
-
-    <div class="toggles-row-centered">
-      <div class="toggle-wrapper">
-        <label class="switch orange-switch">
-          <input type="checkbox" id="soundToggle" checked />
-          <span class="slider"></span>
-        </label>
-        <div class="toggle-label">Sound</div>
-      </div>
-      <div class="toggle-wrapper">
-        <label class="switch orange-switch">
-          <input type="checkbox" id="vibrationToggle" checked />
-          <span class="slider"></span>
-        </label>
-        <div class="toggle-label">Vibration</div>
-      </div>
     </div>
   </div>
 
