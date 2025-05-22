@@ -407,16 +407,18 @@ footer {
   max-width: 360px;
   text-align: center;
   padding: 10px 0;
-  font-size: 0.9rem;
-  color: #000;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff; /* White color */
   user-select: none;
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #add8e6;
+  background: linear-gradient(135deg, #0e87cc, #2575fc); /* गेम बैकग्राउंड के साथ मिक्स */
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   z-index: 999;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
