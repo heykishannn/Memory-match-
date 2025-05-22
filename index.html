@@ -3,48 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Memory Match Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Memory Match</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
+  <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="app">
     <header>
       <h1>Memory Match</h1>
-      <div id="level">Level: 1</div>
-      <div id="toggles">
-        <label class="switch">
-          <span class="switch-label">Sound</span>
-          <input type="checkbox" id="soundToggle" checked>
-          <span class="slider"></span>
-        </label>
-        <label class="switch">
-          <span class="switch-label">Vibration</span>
-          <input type="checkbox" id="vibrateToggle" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
+      <div id="level">Level 1</div>
     </header>
+    <div id="toggles">
+      <label class="switch">
+        <span class="switch-label">Sound</span>
+        <input type="checkbox" id="soundToggle" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
     <div id="status-bar">
-      <div id="score">Score: 0</div>
-      <div id="timer">Time: 60</div>
+      <span id="score">Score: 0</span>
+      <span id="timer">Time: 60s</span>
     </div>
     <div id="game-board"></div>
 
-    <div id="popup" class="popup">
-      <h2>Level Complete!</h2>
-      <p>Great job! Ready for the next level?</p>
-      <button id="next-level">Next</button>
+    <div id="popup">
+      <h2>You Win!</h2>
+      <p>Score: <span id="final-score"></span></p>
+      <p>Time Left: <span id="final-time"></span></p>
+      <button onclick="nextLevel()">Next Level</button>
     </div>
 
-    <div id="lose-popup" class="popup">
-      <h2>Time's Up!</h2>
-      <p>You ran out of time.</p>
-      <button id="restart">Start Over</button>
+    <div id="lose-popup">
+      <h2>Game Over</h2>
+      <p>Try again or watch an ad to continue?</p>
+      <button onclick="restartGame()">Start Over</button>
+      <button onclick="watchAdToContinue()">Continue</button>
     </div>
 
-    <footer>Powered by NAS</footer>
+    <footer>
+      Powered by NAS<br />
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-6948714269796627"
+        data-ad-slot="7517631973"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    </footer>
   </div>
 
+  <audio id="tapSound" src="tap.mp3"></audio>
+  <audio id="winSound" src="win.mp3"></audio>
+  <audio id="loseSound" src="lose.mp3"></audio>
+
   <script src="script.js"></script>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
 </body>
 </html>
