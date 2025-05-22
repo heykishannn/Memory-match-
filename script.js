@@ -12,6 +12,9 @@ const soundToggle = document.getElementById('soundToggle');
 const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
+const popupLevel = document.getElementById('popupLevel');
+const popupScore = document.getElementById('popupScore');
+const popupTime = document.getElementById('popupTime');
 const homeBtn = document.getElementById('homeBtn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 
@@ -51,9 +54,7 @@ function shuffle(array) {
 }
 
 // Generate cards for current level based on difficulty
-// Difficulty increases: more pairs and less time
 function generateCards(level) {
-  // Number of pairs increases every 5 levels, max 10 pairs (20 cards)
   let pairs = Math.min(2 + Math.floor(level / 5), 10);
   let selectedEmojis = shuffle(emojiPool).slice(0, pairs);
 
@@ -66,8 +67,7 @@ function generateCards(level) {
   return shuffle(cards);
 }
 
-// Calculate timer based on level (harder = less time)
-// Starts at 60 seconds, reduces by 0.5 seconds per level, minimum 15 seconds
+// Calculate timer based on level
 function calculateTimer(level) {
   return Math.max(15, 60 - (level * 0.5));
 }
@@ -92,7 +92,6 @@ function createBoard() {
     gameContainer.appendChild(cardElement);
   });
 
-  // Adjust grid columns based on number of cards (pairs)
   let cols = Math.min(5, Math.ceil(Math.sqrt(cardsArray.length)));
   gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   gameContainer.setAttribute('data-cols', cols);
@@ -158,18 +157,19 @@ function startTimer() {
   }, 100);
 }
 
-// Show popup modal with zoom animation
+// Show popup modal with zoom animation and stats
 function showPopup(win, message) {
   popupTitle.textContent = win ? 'You Win!' : 'Time Out!';
   popupMessage.textContent = message;
+  popupLevel.textContent = level;
+  popupScore.textContent = score;
+  popupTime.textContent = timer.toFixed(1);
   popup.classList.remove('hidden');
   popup.style.animation = 'zoomIn 0.3s ease forwards';
 
-  // Disable game interaction
   gameContainer.style.pointerEvents = 'none';
   restartBtn.disabled = true;
 
-  // Vibration and sound on popup
   if (vibrationToggle.checked && navigator.vibrate) {
     navigator.vibrate(300);
   }
@@ -184,7 +184,6 @@ function showPopup(win, message) {
   if (win) {
     saveProgress();
   } else {
-    // On lose/time out, clear progress to force restart
     clearProgress();
   }
 }
@@ -200,13 +199,12 @@ function hidePopup(callback) {
   }, 300);
 }
 
-// Save progress after each level
+// Save/load/clear progress
 function saveProgress() {
   localStorage.setItem('memoryMatchLevel', level);
   localStorage.setItem('memoryMatchScore', score);
 }
 
-// Load saved progress if exists
 function loadProgress() {
   const savedLevel = localStorage.getItem('memoryMatchLevel');
   const savedScore = localStorage.getItem('memoryMatchScore');
@@ -219,13 +217,12 @@ function loadProgress() {
   return null;
 }
 
-// Clear saved progress (on new game or game over)
 function clearProgress() {
   localStorage.removeItem('memoryMatchLevel');
   localStorage.removeItem('memoryMatchScore');
 }
 
-// Start a level
+// Start level
 function startLevel() {
   flippedCards = [];
   matchedCards = [];
@@ -240,7 +237,7 @@ function startLevel() {
   startTimer();
 }
 
-// Reset the entire game
+// Reset game
 function resetGame() {
   clearInterval(timerInterval);
   level = 1;
@@ -256,7 +253,7 @@ function resetGame() {
   clearProgress();
 }
 
-// Show resume popup if progress exists
+// Resume popup
 function showResumePopup(progress) {
   resumePopup.classList.remove('hidden');
   startScreen.classList.add('hidden');
@@ -264,7 +261,6 @@ function showResumePopup(progress) {
   popup.classList.add('hidden');
 }
 
-// Start game from saved progress
 function continueGame(progress) {
   level = progress.level;
   score = progress.score;
@@ -274,7 +270,7 @@ function continueGame(progress) {
   startLevel();
 }
 
-// Event Listeners
+// Event listeners
 startBtn.addEventListener('click', () => {
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
@@ -310,8 +306,7 @@ newGameBtn.addEventListener('click', () => {
 });
 
 continueBtn.addEventListener('click', () => {
-  // Placeholder for showing AdMob reward ad
-  // Replace this alert with your rewarded ad code and call continueGame() after ad finishes
+  // Placeholder for rewarded ad
   alert('Watch ad placeholder - after watching ad, game will continue.');
   const progress = loadProgress();
   if (progress) {
@@ -319,7 +314,7 @@ continueBtn.addEventListener('click', () => {
   }
 });
 
-// On page load, check saved progress
+// On load check saved progress
 window.addEventListener('load', () => {
   const progress = loadProgress();
   if (progress) {
@@ -329,9 +324,10 @@ window.addEventListener('load', () => {
   }
 });
 
-// Disable double tap zoom on mobile for better UX
+// Disable double tap zoom on mobile
 document.addEventListener('touchstart', (e) => {
   if (e.touches.length > 1) {
     e.preventDefault();
   }
 }, { passive: false });
+        
