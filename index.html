@@ -1,45 +1,18 @@
-<!DOCTYPE html>  <html lang="hi">  
-<head>  
-<meta charset="UTF-8" />  
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />  
-<title>Memory Match Game</title>  
-<link rel="stylesheet" href="style.css">  
-</head>  
-<body>  <div id="app" role="main" aria-label="Memory Match Game">    <header>  
-    <h1>Memory Match</h1>  
-    <div id="level" aria-live="polite">Level 1</div>  
-    <div id="toggles" aria-label="Sound and Vibration Controls">  
-      <label class="switch" aria-label="Sound On/Off" tabindex="0">  
-        <input type="checkbox" id="sound-toggle" checked>  
-        <span class="slider"></span>  
-        <span class="switch-label">Sound</span>  
-      </label>  
-      <label class="switch" aria-label="Vibration On/Off" tabindex="0">  
-        <input type="checkbox" id="vibration-toggle" checked>  
-        <span class="slider"></span>  
-        <span class="switch-label">Vibration</span>  
-      </label>  
-    </div>  
-  </header>    <div id="status-bar" aria-label="Game status">  
-    <div id="score" aria-live="polite">Score: 0</div>  
-    <div id="timer" aria-live="polite">Time: 60s</div>  
-  </div>    <div id="game-board" aria-label="Memory cards grid" tabindex="0">  
-    <!-- Cards generated here -->  
-  </div>    <footer>  
-    Powered by NAS  
-  </footer>  <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>    <!-- Win Popup -->    <div id="popup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="popup-title" aria-describedby="popup-desc">  
-    <h2 id="popup-title">Level Complete!</h2>  
-    <p id="popup-desc">Score: <span id="popup-score">0</span></p>  
-    <p>Time Taken: <span id="popup-time">0</span> seconds</p>  
-    <button id="next-level-btn" type="button">Next Level</button>  
-  </div>    <!-- Lose Popup -->    <div id="lose-popup" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="lose-popup-title" aria-describedby="lose-popup-desc">  
-    <h2 id="lose-popup-title">Time's Up!</h2>  
-    <p id="lose-popup-desc">You ran out of time.</p>  
-    <button id="restart-btn" type="button">Start From Beginning</button>  
-    <button id="continue-btn" type="button">Continue (Watch Ad)</button>  
-  </div>  </div>  <!-- Audio Elements -->  <audio id="sound-tap" src="https://heykishannn.github.io/Memory-match-/sounds/tap-notification-180637.mp3" preload="auto"></audio>
-<audio id="sound-win" src="https://heykishannn.github.io/Memory-match-/sounds/short-success-sound-glockenspiel-treasure-video-game-6346.mp3" preload="auto"></audio>
-<audio id="sound-lose" src="https://heykishannn.github.io/Memory-match-/sounds/fiasco-154915.mp3" preload="auto"></audio>
-<audio id="sound-celebration" src="https://assets.mixkit.co/sfx/preview/mixkit-festive-game-level-completed-2695.mp3" preload="auto"></audio>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Memory Match Game</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>Memory Match Game</h1>
+    <div class="game-container" id="game">
+        <!-- Cards dynamically inserted here -->
+    </div>
+    <button id="restartBtn">Restart Game</button>
 
-  
+    <script src="script.js"></script>
+</body>
+</html>
