@@ -24,6 +24,8 @@ const continueBtn = document.getElementById('continueBtn');
 
 const flipSound = document.getElementById('flipSound');
 const matchSound = document.getElementById('matchSound');
+const loseSound = document.getElementById('loseSound');
+const pauseSound = document.getElementById('pauseSound');
 const restartSound = document.getElementById('restartSound');
 
 let level = 1;
@@ -107,7 +109,10 @@ function flipCard() {
   this.classList.add('flipped');
   flippedCards.push(this);
 
-  if (soundToggle.checked) flipSound.play();
+  if (soundToggle.checked) {
+    flipSound.currentTime = 0;
+    flipSound.play();
+  }
 
   if (flippedCards.length === 2) {
     checkForMatch();
@@ -126,6 +131,7 @@ function checkForMatch() {
       navigator.vibrate(150);
     }
     if (soundToggle.checked) {
+      matchSound.currentTime = 0;
       matchSound.play();
     }
 
@@ -177,8 +183,10 @@ function showPopup(win, message) {
   }
   if (soundToggle.checked) {
     if (win) {
+      matchSound.currentTime = 0;
       matchSound.play();
     } else {
+      loseSound.currentTime = 0;
       loseSound.play();
     }
   }
@@ -270,12 +278,19 @@ function continueGame(progress) {
   startLevel();
 }
 
-// Pause toggle with restart sound
+// Pause toggle with pause and restart sounds
 pauseBtn.addEventListener('click', () => {
   isPaused = !isPaused;
   pauseBtn.textContent = isPaused ? '▶' : '❚❚';
-  if (isPaused && soundToggle.checked) {
-    restartSound.play();
+
+  if (soundToggle.checked) {
+    if (isPaused) {
+      pauseSound.currentTime = 0;
+      pauseSound.play();
+    } else {
+      restartSound.currentTime = 0;
+      restartSound.play();
+    }
   }
 });
 
