@@ -1,16 +1,17 @@
-* {
-  box-sizing: border-box;
-}
-body, html {
-  margin: 0; 
-  padding: 0; 
+/* -------------  RESET & BASE ------------- */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   color: #000;
   overflow: hidden;
   user-select: none;
 }
+
+/* -------------  APP WRAPPER ------------- */
 #app {
   max-width: 360px;
   height: 640px;
@@ -20,11 +21,12 @@ body, html {
   flex-direction: column;
   position: relative;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  box-shadow: 0 0 15px rgba(0,0,0,.3);
 }
+
+/* -------------  HEADER ------------- */
 header {
   padding: 12px 16px 6px;
-  background: transparent;
   text-align: center;
 }
 header h1 {
@@ -32,14 +34,16 @@ header h1 {
   font-size: 2rem;
   font-weight: 900;
   color: orange;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,.3);
 }
 #level {
-  font-weight: bold;
-  color: black;
-  font-size: 1.2rem;
   margin: 4px 0 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000;
 }
+
+/* -------------  TOGGLES ------------- */
 #toggles {
   display: flex;
   justify-content: center;
@@ -51,63 +55,57 @@ header h1 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  user-select: none;
   font-weight: 700;
-  color: #333;
   font-size: 1rem;
+  cursor: pointer;
+  color: #333;
 }
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
+/* hide checkbox */
+.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+/* slider */
 .slider {
   position: relative;
   width: 50px;
   height: 26px;
-  background-color: #ccc;
+  background: #ccc;
   border-radius: 26px;
-  transition: background-color 0.4s;
+  transition: background .4s;
 }
 .slider::before {
   content: "";
   position: absolute;
-  height: 20px;
   width: 20px;
+  height: 20px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background: #fff;
   border-radius: 50%;
-  transition: transform 0.4s;
+  transition: transform .4s;
 }
+/* checked */
 .switch input:checked + .slider {
-  background: linear-gradient(135deg, #ffb347, #ffcc33);
+  background: linear-gradient(135deg,#ffb347,#ffcc33);
 }
 .switch input:checked + .slider::before {
   transform: translateX(24px);
 }
+/* focus */
 .switch input:focus + .slider {
-  box-shadow: 0 0 3px 3px rgba(255, 140, 0, 0.7);
+  box-shadow: 0 0 3px 3px rgba(255,140,0,.7);
 }
-.switch-label {
-  user-select: none;
-}
+.switch-label { user-select: none; }
+
+/* -------------  STATUS BAR ------------- */
 #status-bar {
   display: flex;
   justify-content: space-around;
   padding: 6px 0 12px;
   font-size: 1.1rem;
 }
-#score {
-  color: green;
-  font-weight: 600;
-}
-#timer {
-  color: red;
-  font-weight: 600;
-}
+#score  { color: green; font-weight: 600; }
+#timer  { color: red;   font-weight: 600; }
+
+/* -------------  GAME BOARD ------------- */
 #game-board {
   flex: 1;
   display: grid;
@@ -115,107 +113,96 @@ header h1 {
   padding: 8px;
 }
 .card {
-  background: linear-gradient(145deg, #f0f0f0, #cacaca);
+  background: linear-gradient(145deg,#f0f0f0,#cacaca);
   border-radius: 8px;
   cursor: pointer;
   perspective: 600px;
-  position: relative;
 }
 .card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.4s ease;
+  width: 100%; height: 100%;
   transform-style: preserve-3d;
+  transition: transform .4s ease;
 }
-.card.flipped .card-inner {
-  transform: rotateY(180deg);
-}
-.card-front, .card-back {
+.card.flipped .card-inner { transform: rotateY(180deg); }
+.card-front,
+.card-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   border-radius: 8px;
   backface-visibility: hidden;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   font-size: 2rem;
   user-select: none;
 }
 .card-front {
-  background: linear-gradient(135deg, #ffffffcc, #ddddddcc);
-  box-shadow: inset 0 0 8px rgba(255,255,255,0.6);
+  background: linear-gradient(135deg,#ffffffcc,#ddddddcc);
+  box-shadow: inset 0 0 8px rgba(255,255,255,.6);
   color: #333;
 }
 .card-back {
-  background: linear-gradient(135deg, #6a11cbcc, #2575fccc);
-  color: white;
-  transform: rotateY(180deg);
+  background: linear-gradient(135deg,#6a11cbcc,#2575fccc);
+  color: #fff;
   font-weight: 700;
+  transform: rotateY(180deg);
 }
+
+/* -------------  POPUPS (Win / Lose) ------------- */
+.popup {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 280px;
+  padding: 20px;
+  transform: translate(-50%,-50%) scale(0);
+  opacity: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#ffecd2,#fcb69f);
+  box-shadow: 0 0 20px rgba(0,0,0,.3);
+  text-align: center;
+  z-index: 100;
+  transition: transform .4s ease, opacity .4s ease;
+  user-select: none;
+}
+.popup.show {
+  transform: translate(-50%,-50%) scale(1);
+  opacity: 1;
+}
+.popup h2 {
+  margin: 0 0 12px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  text-shadow: 1px 1px 2px #fff;
+}
+.popup p {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  color: #222;
+}
+.popup button {
+  margin-top: 16px;
+  margin-right: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  background: orange;
+  box-shadow: 0 4px 8px rgba(255,140,0,.5);
+  transition: background-color .3s;
+}
+.popup button:hover { background: #e67300; }
+.popup button:last-child { margin-right: 0; }
+
+/* -------------  FOOTER ------------- */
 footer {
   text-align: center;
   padding: 10px 0;
-  font-size: 0.9rem;
+  font-size: .9rem;
   color: #444;
-  position: sticky;
-  bottom: 0;
-  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-  width: 100%;
+  background: linear-gradient(135deg,#a18cd1,#fbc2eb);
   user-select: none;
-}
-#popup, #lose-popup {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 280px;
-  background: linear-gradient(135deg, #ffecd2, #fcb69f);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  z-index: 100;
-  padding: 20px;
-  text-align: center;
-  user-select: none;
-  display: none;
-}
-#popup.show, #lose-popup.show {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  display: block !important;
-}
-#popup h2, #lose-popup h2 {
-  margin: 0 0 12px;
-  font-size: 1.8rem;
-  color: #333;
-  font-weight: 700;
-  text-shadow: 1px 1px 2px #fff;
-}
-#popup p, #lose-popup p {
-  font-size: 1.1rem;
-  margin: 8px 0;
-  color: #222;
-}
-#popup button, #lose-popup button {
-  margin-top: 16px;
-  background: orange;
-  border: none;
-  color: white;
-  font-weight: 700;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  box-shadow: 0 4px 8px rgba(255,140,0,0.5);
-  transition: background-color 0.3s ease;
-  margin-right: 8px;
-}
-#popup button:hover, #lose-popup button:hover {
-  background: #e67300;
-}
-#lose-popup button:last-child {
-  margin-right: 0;
 }
