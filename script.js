@@ -1,4 +1,5 @@
 const startBtn = document.getElementById('startBtn');
+const pauseBtn = document.getElementById('pauseBtn');
 const gameScreen = document.getElementById('game-screen');
 const startScreen = document.getElementById('start-screen');
 const gameContainer = document.getElementById('game');
@@ -37,13 +38,9 @@ let cardsArray = [];
 
 const maxLevels = 100;
 
-// Emoji pool for cards (20 unique emojis max for variety)
-const emojiPool = [
-  '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
-  '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
-];
+let isPaused = false;
 
-// Helper: shuffle array
+// Shuffle helper
 function shuffle(array) {
   for(let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
@@ -52,7 +49,7 @@ function shuffle(array) {
   return array;
 }
 
-// Generate cards for current level based on difficulty
+// Generate cards for current level
 function generateCards(level) {
   let pairs = Math.min(2 + Math.floor(level / 5), 10);
   let selectedEmojis = shuffle(emojiPool).slice(0, pairs);
@@ -66,12 +63,12 @@ function generateCards(level) {
   return shuffle(cards);
 }
 
-// Calculate timer based on level
+// Calculate timer
 function calculateTimer(level) {
   return Math.max(15, 60 - (level * 0.5));
 }
 
-// Create the game board UI
+// Create board
 function createBoard() {
   gameContainer.innerHTML = '';
   cardsArray.forEach(card => {
@@ -98,6 +95,7 @@ function createBoard() {
 
 // Flip card handler
 function flipCard() {
+  if (isPaused) return;
   if (flippedCards.length === 2) return;
   if (this.classList.contains('flipped') || matchedCards.includes(this)) return;
 
@@ -111,7 +109,7 @@ function flipCard() {
   }
 }
 
-// Check if two flipped cards match
+// Check match
 function checkForMatch() {
   const [cardOne, cardTwo] = flippedCards;
   if (cardOne.dataset.name === cardTwo.dataset.name) {
@@ -143,10 +141,11 @@ function checkForMatch() {
   }
 }
 
-// Timer countdown - show only seconds (integer)
+// Timer countdown
 function startTimer() {
   timerDisplay.textContent = Math.floor(timer);
   timerInterval = setInterval(() => {
+    if (isPaused) return;
     timer -= 1;
     timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
@@ -156,7 +155,7 @@ function startTimer() {
   }, 1000);
 }
 
-// Show popup modal with zoom animation and stats
+// Show popup
 function showPopup(win, message) {
   popupTitle.textContent = win ? 'You Won!' : 'Time Out!';
   popupMessage.textContent = message;
@@ -186,7 +185,7 @@ function showPopup(win, message) {
   }
 }
 
-// Hide popup modal with zoom out animation
+// Hide popup
 function hidePopup(callback) {
   popup.style.animation = 'zoomOut 0.3s ease forwards';
   setTimeout(() => {
@@ -196,7 +195,7 @@ function hidePopup(callback) {
   }, 300);
 }
 
-// Save/load/clear progress
+// Save/load progress
 function saveProgress() {
   localStorage.setItem('memoryMatchLevel', level);
   localStorage.setItem('memoryMatchScore', score);
@@ -231,6 +230,7 @@ function startLevel() {
 
   timer = calculateTimer(level);
   clearInterval(timerInterval);
+  isPaused = false;
   startTimer();
 }
 
@@ -265,6 +265,12 @@ function continueGame(progress) {
   startLevel();
 }
 
+// Pause toggle
+pauseBtn.addEventListener('click', () => {
+  isPaused = !isPaused;
+  pauseBtn.textContent = isPaused ? '▶' : '❚❚';
+});
+
 // Event listeners
 startBtn.addEventListener('click', () => {
   startScreen.classList.add('hidden');
@@ -297,7 +303,6 @@ newGameBtn.addEventListener('click', () => {
 });
 
 continueBtn.addEventListener('click', () => {
-  // Placeholder for rewarded ad
   alert('Watch ad placeholder - after watching ad, game will continue.');
   const progress = loadProgress();
   if (progress) {
@@ -321,3 +326,9 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
+
+// Emoji pool
+const emojiPool = [
+  '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
+  '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
+];
