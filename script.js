@@ -1,135 +1,177 @@
-let level = localStorage.getItem("savedLevel") ? parseInt(localStorage.getItem("savedLevel")) : 1;
-let score = 0, time = 60, timerInterval;
-let flipped = [], matched = 0;
+const gameBoard = document.getElementById('game-board');
+const levelDisplay = document.getElementById('level');
+const scoreDisplay = document.getElementById('score');
+const timerDisplay = document.getElementById('timer');
+const soundToggle = document.getElementById('sound-toggle');
+const vibrationToggle = document.getElementById('vibration-toggle');
+
+const popup = document.getElementById('popup');
+const losePopup = document.getElementById('lose-popup');
+const nextLevelBtn = document.getElementById('next-level-btn');
+const restartBtn = document.getElementById('restart-btn');
+const tryAgainBtn = document.getElementById('try-again-btn');
+const restartBtnLose = document.getElementById('restart-btn-lose');
+
+let level = 1;
+let score = 0;
+let timer = 60;
+let timerInterval;
+let flippedCards = [];
+let matchedCount = 0;
 let soundOn = true;
+let vibrationOn = true;
 
-const gameBoard = document.getElementById("game-board");
-const scoreEl = document.getElementById("score");
-const timerEl = document.getElementById("timer");
-const levelEl = document.getElementById("level");
-const popup = document.getElementById("popup");
-const losePopup = document.getElementById("lose-popup");
-const tapSound = document.getElementById("tapSound");
-const winSound = document.getElementById("winSound");
-const loseSound = document.getElementById("loseSound");
+const cardSymbols = ['🍎', '🍌', '🍇', '🍉', '🍓', '🥝', '🍒', '🍍'];
 
-document.getElementById("soundToggle").addEventListener("change", e => soundOn = e.target.checked);
-
-function playSound(sound) {
-  if (soundOn) sound.play();
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-function init() {
-  if (localStorage.getItem("hasPlayed")) {
-    const continueGame = confirm("Continue from last level?");
-    if (!continueGame) level = 1;
-  }
-  localStorage.setItem("hasPlayed", "true");
-  localStorage.setItem("savedLevel", level);
-  score = 0;
-  updateUI();
-  startLevel();
+function createCards(level) {
+  let numPairs = Math.min(level + 1, cardSymbols.length);
+  let cards = [];
+
+  // Pick pairs for current level
+  let selectedSymbols = cardSymbols.slice(0, numPairs);
+
+  // Duplicate and shuffle
+  cards = shuffleArray([...selectedSymbols, ...selectedSymbols]);
+
+  return cards;
 }
 
-function updateUI() {
-  levelEl.textContent = `Level ${level}`;
-  scoreEl.textContent = `Score: ${score}`;
-  timerEl.textContent = `Time: ${time}s`;
-}
+function setupBoard() {
+  gameBoard.innerHTML = '';
 
-function startLevel() {
-  gameBoard.innerHTML = "";
-  let totalCards = Math.min(16 + (level - 1) * 2, 36);
-  let pairs = totalCards / 2;
-  let emojis = "🐶🐱🐭🐹🐰🦊🐻🐼🐨🐯🦁🐮🐷🐸🐵🐔".split("").slice(0, pairs);
-  let cards = [...emojis, ...emojis].sort(() => 0.5 - Math.random());
+  let cards = createCards(level);
+  matchedCount = 0;
 
-  cards.forEach(emoji => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `<div class="card-inner"><div class="card-front">?</div><div class="card-back">${emoji}</div></div>`;
-    card.addEventListener("click", () => handleFlip(card, emoji));
+  // Set grid columns based on number of cards
+  let cols = Math.min(4, cards.length / 2);
+  gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  cards.forEach((symbol, index) => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.symbol = symbol;
+
+    const cardInner = document.createElement('div');
+    cardInner.classList.add('card-inner');
+
+    const cardFront = document.createElement('div');
+    cardFront.classList.add('card-front');
+    cardFront.textContent = symbol;
+
+    const cardBack = document.createElement('div');
+    cardBack.classList.add('card-back');
+    cardBack.textContent = '?';
+
+    cardInner.appendChild(cardFront);
+    cardInner.appendChild(cardBack);
+    card.appendChild(cardInner);
+
+    card.addEventListener('click', () => flipCard(card));
+
     gameBoard.appendChild(card);
   });
+}
 
-  flipped = [];
-  matched = 0;
-  time = 60;
-  updateUI();
+function flipCard(card) {
+  if (
+    flippedCards.length === 2 ||
+    card.classList.contains('flipped') ||
+    popup.classList.contains('show') ||
+    losePopup.classList.contains('show')
+  ) return;
 
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    time--;
-    timerEl.textContent = `Time: ${time}s`;
-    if (time <= 0) {
+  card.classList.add('flipped');
+  flippedCards.push(card);
+
+  if (soundOn) playSound('flip');
+
+  if (flippedCards.length === 2) {
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const [card1, card2] = flippedCards;
+
+  if (card1.dataset.symbol === card2.dataset.symbol) {
+    matchedCount += 2;
+    score += 10;
+    scoreDisplay.textContent = `Score: ${score}`;
+    flippedCards = [];
+
+    if (soundOn) playSound('match');
+    if (vibrationOn) navigator.vibrate(100);
+
+    if (matchedCount === gameBoard.children.length) {
       clearInterval(timerInterval);
-      playSound(loseSound);
-      losePopup.classList.add("show");
+      showPopup();
+    }
+  } else {
+    if (soundOn) playSound('mismatch');
+    if (vibrationOn) navigator.vibrate([100, 50, 100]);
+
+    setTimeout(() => {
+      card1.classList.remove('flipped');
+      card2.classList.remove('flipped');
+      flippedCards = [];
+    }, 1000);
+  }
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timer = 60;
+  timerDisplay.textContent = `Time: ${timer}`;
+
+  timerInterval = setInterval(() => {
+    timer--;
+    timerDisplay.textContent = `Time: ${timer}`;
+
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+      showLosePopup();
     }
   }, 1000);
 }
 
-function handleFlip(card, emoji) {
-  if (flipped.length >= 2 || card.classList.contains("flipped")) return;
+function showPopup() {
+  popup.classList.add('show');
+}
 
-  card.classList.add("flipped");
-  playSound(tapSound);
-  flipped.push({ card, emoji });
+function hidePopup() {
+  popup.classList.remove('show');
+}
 
-  if (flipped.length === 2) {
-    if (flipped[0].emoji === flipped[1].emoji) {
-      matched++;
-      score += 10;
-      flipped = [];
-      updateUI();
-      if (matched === gameBoard.children.length / 2) {
-        clearInterval(timerInterval);
-        playSound(winSound);
-        document.getElementById("final-score").textContent = score;
-        document.getElementById("final-time").textContent = time + "s";
-        popup.classList.add("show");
-      }
-    } else {
-      setTimeout(() => {
-        flipped.forEach(f => f.card.classList.remove("flipped"));
-        flipped = [];
-      }, 800);
-    }
+function showLosePopup() {
+  losePopup.classList.add('show');
+}
+
+function hideLosePopup() {
+  losePopup.classList.remove('show');
+}
+
+function playSound(type) {
+  // Simple beep sounds or you can load audio files
+  let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  let oscillator = audioCtx.createOscillator();
+  oscillator.type = 'square';
+
+  switch (type) {
+    case 'flip':
+      oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+      break;
+    case 'match':
+      oscillator.frequency.setValueAtTime(900, audioCtx.currentTime);
+      break;
+    case 'mismatch':
+      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+      break;
   }
-}
 
-function nextLevel() {
-  popup.classList.remove("show");
-  level++;
-  localStorage.setItem("savedLevel", level);
-  startLevel();
-}
-
-function restartGame() {
-  level = 1;
-  localStorage.setItem("savedLevel", level);
-  losePopup.classList.remove("show");
-  startLevel();
-}
-
-function watchAdToContinue() {
-  losePopup.classList.remove("show");
-
-  if (typeof AdMob !== "undefined") {
-    AdMob.rewardedAd.show().then(() => {
-      startLevel(); // continue from same level
-    });
-  } else {
-    alert("AdMob not available. Continuing...");
-    startLevel();
-  }
-}
-
-// Load on start
-window.onload = () => {
-  if (typeof AdMob !== "undefined") {
-    AdMob.rewardedAd.load({ adUnitId: "ca-app-pub-6948714269796627/6982752841" });
-    AdMob.bannerAd.show({ adUnitId: "ca-app-pub-6948714269796627/7517631973", position: "bottom" });
-  }
-  init();
-};
+  oscillator.connect(audioCtx.destination);
+  oscillator.start();
