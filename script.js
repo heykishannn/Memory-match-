@@ -24,7 +24,7 @@ const continueBtn = document.getElementById('continueBtn');
 
 const flipSound = document.getElementById('flipSound');
 const matchSound = document.getElementById('matchSound');
-const loseSound = document.getElementById('loseSound');
+const restartSound = document.getElementById('restartSound');
 
 let level = 1;
 let score = 0;
@@ -39,6 +39,11 @@ let cardsArray = [];
 const maxLevels = 100;
 
 let isPaused = false;
+
+const emojiPool = [
+  '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
+  '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
+];
 
 // Shuffle helper
 function shuffle(array) {
@@ -265,10 +270,13 @@ function continueGame(progress) {
   startLevel();
 }
 
-// Pause toggle
+// Pause toggle with restart sound
 pauseBtn.addEventListener('click', () => {
   isPaused = !isPaused;
   pauseBtn.textContent = isPaused ? '▶' : '❚❚';
+  if (isPaused && soundToggle.checked) {
+    restartSound.play();
+  }
 });
 
 // Event listeners
@@ -326,9 +334,3 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
-
-// Emoji pool
-const emojiPool = [
-  '🍎','🍌','🍇','🍓','🍉','🍍','🥝','🍒','🍑','🍋',
-  '🥥','🥭','🍐','🍊','🍈','🍏','🥑','🍅','🥕','🌽'
-];
