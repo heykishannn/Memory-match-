@@ -1,158 +1,177 @@
+const gameBoard = document.getElementById('game-board');
+const levelDisplay = document.getElementById('level');
+const scoreDisplay = document.getElementById('score');
+const timerDisplay = document.getElementById('timer');
+const soundToggle = document.getElementById('sound-toggle');
+const vibrationToggle = document.getElementById('vibration-toggle');
+
+const popup = document.getElementById('popup');
+const losePopup = document.getElementById('lose-popup');
+const nextLevelBtn = document.getElementById('next-level-btn');
+const restartBtn = document.getElementById('restart-btn');
+const tryAgainBtn = document.getElementById('try-again-btn');
+const restartBtnLose = document.getElementById('restart-btn-lose');
+
 let level = 1;
 let score = 0;
-let flippedCards = [];
-let lockBoard = false;
-let timeLimit = 60;
+let timer = 60;
 let timerInterval;
+let flippedCards = [];
+let matchedCount = 0;
+let soundOn = true;
+let vibrationOn = true;
 
-const gameBoard = document.getElementById("game-board");
-const levelDisplay = document.getElementById("level");
-const scoreDisplay = document.getElementById("score");
-const timerDisplay = document.getElementById("timer");
-const popup = document.getElementById("popup");
-const losePopup = document.getElementById("lose-popup");
-const soundToggle = document.getElementById("soundToggle");
-const vibrateToggle = document.getElementById("vibrateToggle");
+const cardSymbols = ['🍎', '🍌', '🍇', '🍉', '🍓', '🥝', '🍒', '🍍'];
 
-const tapSound = new Audio("https://www.soundjay.com/buttons/button-16.mp3");
-const winSound = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
-const loseSound = new Audio("https://www.soundjay.com/button/beep-07.wav");
-
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-function generateCards(level) {
-  let pairs = Math.min(6 + Math.floor(level / 2), 16);
-  let totalCards = pairs * 2;
-  let cardValues = [];
+function createCards(level) {
+  let numPairs = Math.min(level + 1, cardSymbols.length);
+  let cards = [];
 
-  for (let i = 0; i < pairs; i++) {
-    let symbol = String.fromCodePoint(0x1F600 + i); // emojis
-    cardValues.push(symbol, symbol);
-  }
+  // Pick pairs for current level
+  let selectedSymbols = cardSymbols.slice(0, numPairs);
 
-  return shuffle(cardValues).slice(0, totalCards);
+  // Duplicate and shuffle
+  cards = shuffleArray([...selectedSymbols, ...selectedSymbols]);
+
+  return cards;
 }
 
-function createCard(value) {
-  const card = document.createElement("div");
-  card.className = "card";
-  const inner = document.createElement("div");
-  inner.className = "card-inner";
-  const front = document.createElement("div");
-  front.className = "card-front";
-  front.textContent = "?";
-  const back = document.createElement("div");
-  back.className = "card-back";
-  back.textContent = value;
+function setupBoard() {
+  gameBoard.innerHTML = '';
 
-  inner.appendChild(front);
-  inner.appendChild(back);
-  card.appendChild(inner);
+  let cards = createCards(level);
+  matchedCount = 0;
 
-  card.addEventListener("click", () => handleCardClick(card, value));
-  return card;
-}
+  // Set grid columns based on number of cards
+  let cols = Math.min(4, cards.length / 2);
+  gameBoard.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-function handleCardClick(card, value) {
-  if (lockBoard || card.classList.contains("flipped")) return;
+  cards.forEach((symbol, index) => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+    card.dataset.symbol = symbol;
 
-  if (soundToggle.checked) tapSound.play();
-  if (vibrateToggle.checked) navigator.vibrate(50);
+    const cardInner = document.createElement('div');
+    cardInner.classList.add('card-inner');
 
-  card.classList.add("flipped");
-  flippedCards.push({ card, value });
+    const cardFront = document.createElement('div');
+    cardFront.classList.add('card-front');
+    cardFront.textContent = symbol;
 
-  if (flippedCards.length === 2) {
-    lockBoard = true;
-    const [first, second] = flippedCards;
-    if (first.value === second.value) {
-      score++;
-      updateStatus();
-      flippedCards = [];
-      lockBoard = false;
+    const cardBack = document.createElement('div');
+    cardBack.classList.add('card-back');
+    cardBack.textContent = '?';
 
-      if (document.querySelectorAll(".card:not(.flipped)").length === 0) {
-        clearInterval(timerInterval);
-        showPopup(popup);
-        if (soundToggle.checked) winSound.play();
-      }
-    } else {
-      setTimeout(() => {
-        first.card.classList.remove("flipped");
-        second.card.classList.remove("flipped");
-        flippedCards = [];
-        lockBoard = false;
-      }, 800);
-    }
-  }
-}
+    cardInner.appendChild(cardFront);
+    cardInner.appendChild(cardBack);
+    card.appendChild(cardInner);
 
-function renderBoard() {
-  gameBoard.innerHTML = "";
-  const cards = generateCards(level);
-  gameBoard.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(cards.length))}, 1fr)`;
-  cards.forEach(value => {
-    gameBoard.appendChild(createCard(value));
+    card.addEventListener('click', () => flipCard(card));
+
+    gameBoard.appendChild(card);
   });
 }
 
-function updateStatus() {
-  levelDisplay.textContent = `Level: ${level}`;
-  scoreDisplay.textContent = `Score: ${score}`;
+function flipCard(card) {
+  if (
+    flippedCards.length === 2 ||
+    card.classList.contains('flipped') ||
+    popup.classList.contains('show') ||
+    losePopup.classList.contains('show')
+  ) return;
+
+  card.classList.add('flipped');
+  flippedCards.push(card);
+
+  if (soundOn) playSound('flip');
+
+  if (flippedCards.length === 2) {
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const [card1, card2] = flippedCards;
+
+  if (card1.dataset.symbol === card2.dataset.symbol) {
+    matchedCount += 2;
+    score += 10;
+    scoreDisplay.textContent = `Score: ${score}`;
+    flippedCards = [];
+
+    if (soundOn) playSound('match');
+    if (vibrationOn) navigator.vibrate(100);
+
+    if (matchedCount === gameBoard.children.length) {
+      clearInterval(timerInterval);
+      showPopup();
+    }
+  } else {
+    if (soundOn) playSound('mismatch');
+    if (vibrationOn) navigator.vibrate([100, 50, 100]);
+
+    setTimeout(() => {
+      card1.classList.remove('flipped');
+      card2.classList.remove('flipped');
+      flippedCards = [];
+    }, 1000);
+  }
 }
 
 function startTimer() {
-  let time = timeLimit;
-  timerDisplay.textContent = `Time: ${time}`;
   clearInterval(timerInterval);
+  timer = 60;
+  timerDisplay.textContent = `Time: ${timer}`;
+
   timerInterval = setInterval(() => {
-    time--;
-    timerDisplay.textContent = `Time: ${time}`;
-    if (time <= 0) {
+    timer--;
+    timerDisplay.textContent = `Time: ${timer}`;
+
+    if (timer <= 0) {
       clearInterval(timerInterval);
-      showPopup(losePopup);
-      if (soundToggle.checked) loseSound.play();
-      if (vibrateToggle.checked) navigator.vibrate([100, 100, 100]);
+      showLosePopup();
     }
   }, 1000);
 }
 
-function showPopup(popupEl) {
-  popupEl.classList.add("show");
+function showPopup() {
+  popup.classList.add('show');
 }
 
-function hidePopups() {
-  popup.classList.remove("show");
-  losePopup.classList.remove("show");
+function hidePopup() {
+  popup.classList.remove('show');
 }
 
-document.getElementById("next-level").addEventListener("click", () => {
-  level++;
-  timeLimit = Math.max(30, 60 - level * 2); // shorter time as level increases
-  hidePopups();
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
+function showLosePopup() {
+  losePopup.classList.add('show');
+}
 
-document.getElementById("restart").addEventListener("click", () => {
-  level = 1;
-  score = 0;
-  timeLimit = 60;
-  hidePopups();
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
+function hideLosePopup() {
+  losePopup.classList.remove('show');
+}
 
-window.addEventListener("load", () => {
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
+function playSound(type) {
+  // Simple beep sounds or you can load audio files
+  let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  let oscillator = audioCtx.createOscillator();
+  oscillator.type = 'square';
+
+  switch (type) {
+    case 'flip':
+      oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+      break;
+    case 'match':
+      oscillator.frequency.setValueAtTime(900, audioCtx.currentTime);
+      break;
+    case 'mismatch':
+      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+      break;
+  }
+
+  oscillator.connect(audioCtx.destination);
+  oscillator.start();
