@@ -82,7 +82,7 @@ function createBoard() {
 
     cardElement.innerHTML = `
       <div class="card-inner">
-        <div class="card-front">?</div>
+        <div class="card-front"></div>
         <div class="card-back">${card.name}</div>
       </div>
     `;
@@ -158,7 +158,7 @@ function startTimer() {
 
 // Show popup modal with zoom animation and stats
 function showPopup(win, message) {
-  popupTitle.textContent = win ? 'You Win!' : 'Time Out!';
+  popupTitle.textContent = win ? 'You Won!' : 'Time Out!';
   popupMessage.textContent = message;
   popupLevel.textContent = level;
   popupScore.textContent = score;
