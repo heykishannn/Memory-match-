@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memory Match Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -13,40 +13,36 @@
       <div id="level">Level: 1</div>
       <div id="toggles">
         <label class="switch">
-          <input type="checkbox" id="sound-toggle" checked />
-          <span class="slider"></span>
           <span class="switch-label">Sound</span>
+          <input type="checkbox" id="soundToggle" checked>
+          <span class="slider"></span>
         </label>
         <label class="switch">
-          <input type="checkbox" id="vibration-toggle" checked />
-          <span class="slider"></span>
           <span class="switch-label">Vibration</span>
+          <input type="checkbox" id="vibrateToggle" checked>
+          <span class="slider"></span>
         </label>
       </div>
-      <div id="status-bar">
-        <div id="score">Score: 0</div>
-        <div id="timer">Time: 60</div>
-      </div>
     </header>
-    <main id="game-board"></main>
+    <div id="status-bar">
+      <div id="score">Score: 0</div>
+      <div id="timer">Time: 60</div>
+    </div>
+    <div id="game-board"></div>
 
-    <div id="popup">
+    <div id="popup" class="popup">
       <h2>Level Complete!</h2>
-      <p>Great job! Ready for next level?</p>
-      <button id="next-level-btn">Next Level</button>
-      <button id="restart-btn">Restart</button>
+      <p>Great job! Ready for the next level?</p>
+      <button id="next-level">Next</button>
     </div>
 
-    <div id="lose-popup">
-      <h2>Game Over!</h2>
-      <p>Try again or restart the game.</p>
-      <button id="try-again-btn">Try Again</button>
-      <button id="restart-btn-lose">Restart</button>
+    <div id="lose-popup" class="popup">
+      <h2>Time's Up!</h2>
+      <p>You ran out of time.</p>
+      <button id="restart">Start Over</button>
     </div>
 
-    <footer>
-      Powered by NAS
-    </footer>
+    <footer>Powered by NAS</footer>
   </div>
 
   <script src="script.js"></script>
