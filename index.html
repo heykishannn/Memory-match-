@@ -15,33 +15,42 @@
 
   <!-- Game Screen -->
   <div id="game-screen" class="hidden">
-    <header>
-      <h1 class="game-title">MEMORY MATCH</h1>
-      <div class="toggles-row">
-        <label class="switch orange-switch toggle-left">
-          <input type="checkbox" id="soundToggle" checked />
-          <span class="slider"></span>
-          <span class="label-text">Sound</span>
-        </label>
-        <label class="switch orange-switch toggle-right">
-          <input type="checkbox" id="vibrationToggle" checked />
-          <span class="slider"></span>
-          <span class="label-text">Vibration</span>
-        </label>
+    <div class="game-wrapper">
+      <div class="game-info">
+        <div>Level: <span id="levelDisplay">1</span></div>
+        <div>Score: <span id="scoreDisplay">0</span></div>
+        <div>Time: <span id="timerDisplay">0</span>s</div>
       </div>
-    </header>
 
-    <div class="status-info">
-      <div>Level: <span id="levelDisplay">1</span></div>
-      <div>Score: <span id="scoreDisplay">0</span></div>
-      <div>Time: <span id="timerDisplay">0</span>s</div>
+      <div class="game-container" id="game"></div>
+
+      <button id="restartBtn" class="btn-primary">Restart Game</button>
     </div>
 
-    <main>
-      <div class="game-container" id="game"></div>
-    </main>
+    <!-- Pause Overlay -->
+    <div id="pauseOverlay" class="pause-overlay hidden">
+      <div class="pause-content">
+        <h2>Game Paused</h2>
+        <button id="resumeBtn" class="btn-primary">Start</button>
+      </div>
+    </div>
 
-    <button id="restartBtn" class="btn-primary">Restart Game</button>
+    <div class="toggles-row-centered">
+      <div class="toggle-wrapper">
+        <label class="switch orange-switch">
+          <input type="checkbox" id="soundToggle" checked />
+          <span class="slider"></span>
+        </label>
+        <div class="toggle-label">Sound</div>
+      </div>
+      <div class="toggle-wrapper">
+        <label class="switch orange-switch">
+          <input type="checkbox" id="vibrationToggle" checked />
+          <span class="slider"></span>
+        </label>
+        <div class="toggle-label">Vibration</div>
+      </div>
+    </div>
   </div>
 
   <!-- Resume Popup Modal -->
