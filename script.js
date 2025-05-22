@@ -1,158 +1,135 @@
-let level = 1;
-let score = 0;
-let flippedCards = [];
-let lockBoard = false;
-let timeLimit = 60;
-let timerInterval;
+let level = localStorage.getItem("savedLevel") ? parseInt(localStorage.getItem("savedLevel")) : 1;
+let score = 0, time = 60, timerInterval;
+let flipped = [], matched = 0;
+let soundOn = true;
 
 const gameBoard = document.getElementById("game-board");
-const levelDisplay = document.getElementById("level");
-const scoreDisplay = document.getElementById("score");
-const timerDisplay = document.getElementById("timer");
+const scoreEl = document.getElementById("score");
+const timerEl = document.getElementById("timer");
+const levelEl = document.getElementById("level");
 const popup = document.getElementById("popup");
 const losePopup = document.getElementById("lose-popup");
-const soundToggle = document.getElementById("soundToggle");
-const vibrateToggle = document.getElementById("vibrateToggle");
+const tapSound = document.getElementById("tapSound");
+const winSound = document.getElementById("winSound");
+const loseSound = document.getElementById("loseSound");
 
-const tapSound = new Audio("https://www.soundjay.com/buttons/button-16.mp3");
-const winSound = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
-const loseSound = new Audio("https://www.soundjay.com/button/beep-07.wav");
+document.getElementById("soundToggle").addEventListener("change", e => soundOn = e.target.checked);
 
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+function playSound(sound) {
+  if (soundOn) sound.play();
+}
+
+function init() {
+  if (localStorage.getItem("hasPlayed")) {
+    const continueGame = confirm("Continue from last level?");
+    if (!continueGame) level = 1;
   }
-  return array;
+  localStorage.setItem("hasPlayed", "true");
+  localStorage.setItem("savedLevel", level);
+  score = 0;
+  updateUI();
+  startLevel();
 }
 
-function generateCards(level) {
-  let pairs = Math.min(6 + Math.floor(level / 2), 16);
-  let totalCards = pairs * 2;
-  let cardValues = [];
-
-  for (let i = 0; i < pairs; i++) {
-    let symbol = String.fromCodePoint(0x1F600 + i); // emojis
-    cardValues.push(symbol, symbol);
-  }
-
-  return shuffle(cardValues).slice(0, totalCards);
+function updateUI() {
+  levelEl.textContent = `Level ${level}`;
+  scoreEl.textContent = `Score: ${score}`;
+  timerEl.textContent = `Time: ${time}s`;
 }
 
-function createCard(value) {
-  const card = document.createElement("div");
-  card.className = "card";
-  const inner = document.createElement("div");
-  inner.className = "card-inner";
-  const front = document.createElement("div");
-  front.className = "card-front";
-  front.textContent = "?";
-  const back = document.createElement("div");
-  back.className = "card-back";
-  back.textContent = value;
+function startLevel() {
+  gameBoard.innerHTML = "";
+  let totalCards = Math.min(16 + (level - 1) * 2, 36);
+  let pairs = totalCards / 2;
+  let emojis = "🐶🐱🐭🐹🐰🦊🐻🐼🐨🐯🦁🐮🐷🐸🐵🐔".split("").slice(0, pairs);
+  let cards = [...emojis, ...emojis].sort(() => 0.5 - Math.random());
 
-  inner.appendChild(front);
-  inner.appendChild(back);
-  card.appendChild(inner);
+  cards.forEach(emoji => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<div class="card-inner"><div class="card-front">?</div><div class="card-back">${emoji}</div></div>`;
+    card.addEventListener("click", () => handleFlip(card, emoji));
+    gameBoard.appendChild(card);
+  });
 
-  card.addEventListener("click", () => handleCardClick(card, value));
-  return card;
+  flipped = [];
+  matched = 0;
+  time = 60;
+  updateUI();
+
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    time--;
+    timerEl.textContent = `Time: ${time}s`;
+    if (time <= 0) {
+      clearInterval(timerInterval);
+      playSound(loseSound);
+      losePopup.classList.add("show");
+    }
+  }, 1000);
 }
 
-function handleCardClick(card, value) {
-  if (lockBoard || card.classList.contains("flipped")) return;
-
-  if (soundToggle.checked) tapSound.play();
-  if (vibrateToggle.checked) navigator.vibrate(50);
+function handleFlip(card, emoji) {
+  if (flipped.length >= 2 || card.classList.contains("flipped")) return;
 
   card.classList.add("flipped");
-  flippedCards.push({ card, value });
+  playSound(tapSound);
+  flipped.push({ card, emoji });
 
-  if (flippedCards.length === 2) {
-    lockBoard = true;
-    const [first, second] = flippedCards;
-    if (first.value === second.value) {
-      score++;
-      updateStatus();
-      flippedCards = [];
-      lockBoard = false;
-
-      if (document.querySelectorAll(".card:not(.flipped)").length === 0) {
+  if (flipped.length === 2) {
+    if (flipped[0].emoji === flipped[1].emoji) {
+      matched++;
+      score += 10;
+      flipped = [];
+      updateUI();
+      if (matched === gameBoard.children.length / 2) {
         clearInterval(timerInterval);
-        showPopup(popup);
-        if (soundToggle.checked) winSound.play();
+        playSound(winSound);
+        document.getElementById("final-score").textContent = score;
+        document.getElementById("final-time").textContent = time + "s";
+        popup.classList.add("show");
       }
     } else {
       setTimeout(() => {
-        first.card.classList.remove("flipped");
-        second.card.classList.remove("flipped");
-        flippedCards = [];
-        lockBoard = false;
+        flipped.forEach(f => f.card.classList.remove("flipped"));
+        flipped = [];
       }, 800);
     }
   }
 }
 
-function renderBoard() {
-  gameBoard.innerHTML = "";
-  const cards = generateCards(level);
-  gameBoard.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(cards.length))}, 1fr)`;
-  cards.forEach(value => {
-    gameBoard.appendChild(createCard(value));
-  });
-}
-
-function updateStatus() {
-  levelDisplay.textContent = `Level: ${level}`;
-  scoreDisplay.textContent = `Score: ${score}`;
-}
-
-function startTimer() {
-  let time = timeLimit;
-  timerDisplay.textContent = `Time: ${time}`;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    time--;
-    timerDisplay.textContent = `Time: ${time}`;
-    if (time <= 0) {
-      clearInterval(timerInterval);
-      showPopup(losePopup);
-      if (soundToggle.checked) loseSound.play();
-      if (vibrateToggle.checked) navigator.vibrate([100, 100, 100]);
-    }
-  }, 1000);
-}
-
-function showPopup(popupEl) {
-  popupEl.classList.add("show");
-}
-
-function hidePopups() {
+function nextLevel() {
   popup.classList.remove("show");
-  losePopup.classList.remove("show");
+  level++;
+  localStorage.setItem("savedLevel", level);
+  startLevel();
 }
 
-document.getElementById("next-level").addEventListener("click", () => {
-  level++;
-  timeLimit = Math.max(30, 60 - level * 2); // shorter time as level increases
-  hidePopups();
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
-
-document.getElementById("restart").addEventListener("click", () => {
+function restartGame() {
   level = 1;
-  score = 0;
-  timeLimit = 60;
-  hidePopups();
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
+  localStorage.setItem("savedLevel", level);
+  losePopup.classList.remove("show");
+  startLevel();
+}
 
-window.addEventListener("load", () => {
-  renderBoard();
-  updateStatus();
-  startTimer();
-});
+function watchAdToContinue() {
+  losePopup.classList.remove("show");
+
+  if (typeof AdMob !== "undefined") {
+    AdMob.rewardedAd.show().then(() => {
+      startLevel(); // continue from same level
+    });
+  } else {
+    alert("AdMob not available. Continuing...");
+    startLevel();
+  }
+}
+
+// Load on start
+window.onload = () => {
+  if (typeof AdMob !== "undefined") {
+    AdMob.rewardedAd.load({ adUnitId: "ca-app-pub-6948714269796627/6982752841" });
+    AdMob.bannerAd.show({ adUnitId: "ca-app-pub-6948714269796627/7517631973", position: "bottom" });
+  }
+  init();
+};
