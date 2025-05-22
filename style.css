@@ -2,7 +2,9 @@
   box-sizing: border-box;
 }
 body, html {
-  margin: 0; padding: 0; height: 100%;
+  margin: 0; 
+  padding: 0; 
+  height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   color: #000;
@@ -223,4 +225,3 @@ footer {
 #lose-popup button:last-child {
   margin-right: 0;
 }
-</style>
