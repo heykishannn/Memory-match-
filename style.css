@@ -5,17 +5,29 @@
   padding: 0;
 }
 
-body {
+html, body {
+  width: 360px;
+  height: 640px;
+  overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #1e272e;
+  background: linear-gradient(135deg, #00a8ff, #9c88ff);
   color: #f5f6fa;
-  min-height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  margin: auto;
+}
+
+body {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px;
-  user-select: none;
+  padding: 10px 0;
+  overflow: hidden;
 }
 
 h1 {
@@ -56,11 +68,13 @@ h1 {
 /* Header */
 header {
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .status-info {
@@ -132,20 +146,23 @@ input:checked + .slider:before {
 
 /* Game container */
 .game-container {
-  max-width: 400px;
+  max-width: 360px;
   margin: 0 auto;
   display: grid;
   gap: 10px;
   justify-content: center;
+  padding: 0 10px 10px 10px;
+  box-sizing: border-box;
 }
 
 /* Cards */
 .card {
-  width: 70px;
-  height: 100px;
+  width: 65px;
+  height: 95px;
   perspective: 800px;
   cursor: pointer;
   user-select: none;
+  border-radius: 10px;
 }
 
 .card-inner {
@@ -189,10 +206,115 @@ input:checked + .slider:before {
   border: 2px solid #0097e6;
 }
 
-/* Responsive grid based on level cards */
-@media (max-width: 400px) {
-  .card {
-    width: 60px;
-    height: 90px;
+/* Responsive grid based on number of cards */
+.game-container[data-cols="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+.game-container[data-cols="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+.game-container[data-cols="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+.game-container[data-cols="5"] {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* Popup Modal */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  background: white;
+  color: #222;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  z-index: 1000;
+  padding: 20px;
+  text-align: center;
+  animation: zoomIn 0.3s ease forwards;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.popup-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+}
+
+.popup-buttons button {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #00a8ff;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.popup-buttons button:hover {
+  background-color: #0097e6;
+}
+
+/* Zoom out animation for popup */
+@keyframes zoomOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+}
+
+/* Zoom in animation for popup */
+@keyframes zoomIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Footer */
+footer {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  color: #dcdde1;
+  user-select: none;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #00a8ff, #9c88ff);
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  z-index: 999;
 }
