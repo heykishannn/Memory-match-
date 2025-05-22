@@ -144,17 +144,17 @@ function checkForMatch() {
   }
 }
 
-// Timer countdown
+// Timer countdown - show only seconds (integer)
 function startTimer() {
-  timerDisplay.textContent = timer.toFixed(1);
+  timerDisplay.textContent = Math.floor(timer);
   timerInterval = setInterval(() => {
-    timer -= 0.1;
-    timerDisplay.textContent = timer.toFixed(1);
+    timer -= 1;
+    timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
       clearInterval(timerInterval);
       showPopup(false, 'Time up! Game over.');
     }
-  }, 100);
+  }, 1000);
 }
 
 // Show popup modal with zoom animation and stats
@@ -163,7 +163,7 @@ function showPopup(win, message) {
   popupMessage.textContent = message;
   popupLevel.textContent = level;
   popupScore.textContent = score;
-  popupTime.textContent = timer.toFixed(1);
+  popupTime.textContent = Math.max(0, Math.floor(timer));
   popup.classList.remove('hidden');
   popup.style.animation = 'zoomIn 0.3s ease forwards';
 
@@ -330,4 +330,3 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
-        
