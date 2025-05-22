@@ -1,18 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Memory Match Game</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>MEMORY MATCH Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Memory Match Game</h1>
-    <div class="game-container" id="game">
-        <!-- Cards dynamically inserted here -->
-    </div>
-    <button id="restartBtn">Restart Game</button>
+  <div id="start-screen" class="center-screen">
+    <h1>Memory Match</h1>
+    <button id="startBtn" class="btn-primary">Start</button>
+  </div>
 
-    <script src="script.js"></script>
+  <div id="game-screen" class="hidden">
+    <header>
+      <div class="status-info">
+        <div>Level: <span id="levelDisplay">1</span></div>
+        <div>Score: <span id="scoreDisplay">0</span></div>
+        <div>Time: <span id="timerDisplay">0</span>s</div>
+      </div>
+      <div class="toggles">
+        <label class="switch">
+          <input type="checkbox" id="vibrationToggle" checked />
+          <span class="slider"></span>
+          <span class="label-text">Vibration</span>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="soundToggle" checked />
+          <span class="slider"></span>
+          <span class="label-text">Sound</span>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <div class="game-container" id="game"></div>
+    </main>
+
+    <button id="restartBtn" class="btn-primary">Restart Game</button>
+  </div>
+
+  <audio id="flipSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+  <audio id="matchSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg" preload="auto"></audio>
+
+  <script src="script.js"></script>
 </body>
 </html>
