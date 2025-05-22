@@ -7,11 +7,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Start Screen -->
   <div id="start-screen" class="center-screen">
     <h1>Memory Match</h1>
     <button id="startBtn" class="btn-primary">Start</button>
   </div>
 
+  <!-- Game Screen -->
   <div id="game-screen" class="hidden">
     <header>
       <div class="status-info">
@@ -40,7 +42,19 @@
     <button id="restartBtn" class="btn-primary">Restart Game</button>
   </div>
 
-  <!-- Popup Modal -->
+  <!-- Resume Popup Modal -->
+  <div id="resumePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Welcome Back!</h2>
+      <p>You have a saved game.</p>
+      <div class="popup-buttons">
+        <button id="newGameBtn" class="btn-primary">Start New Game</button>
+        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win/Lose Popup Modal -->
   <div id="popup" class="popup hidden">
     <div class="popup-content">
       <h2 id="popupTitle">You Win!</h2>
