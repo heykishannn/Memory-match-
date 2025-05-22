@@ -9,14 +9,14 @@
 <body>
   <!-- Start Screen -->
   <div id="start-screen" class="center-screen">
-    <h1>MEMORY MATCH</h1>
+    <h1 class="small-title">MEMORY MATCH</h1>
     <button id="startBtn" class="btn-primary">Start</button>
   </div>
 
   <!-- Game Screen -->
   <div id="game-screen" class="hidden">
     <header class="game-header">
-      <h1 class="game-title">MEMORY MATCH</h1>
+      <h1 class="small-title">MEMORY MATCH</h1>
       <div class="toggles-row">
         <div class="toggle-wrapper toggle-left">
           <label class="switch orange-switch">
@@ -25,6 +25,9 @@
           </label>
           <div class="toggle-label">Sound</div>
         </div>
+
+        <button id="pauseBtn" class="btn-pause" title="Pause Game">❚❚</button>
+
         <div class="toggle-wrapper toggle-right">
           <label class="switch orange-switch">
             <input type="checkbox" id="vibrationToggle" checked />
@@ -61,12 +64,12 @@
   <!-- Win/Lose Popup Modal -->
   <div id="popup" class="popup hidden">
     <div class="popup-content">
-      <h2 id="popupTitle">You Win!</h2>
+      <h2 id="popupTitle">You Won!</h2>
       <p id="popupMessage">Level Complete!</p>
       <div class="popup-stats">
-        <div>Level: <span id="popupLevel"></span></div>
-        <div>Score: <span id="popupScore"></span></div>
-        <div>Time: <span id="popupTime"></span>s</div>
+        <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
+        <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
+        <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
       </div>
       <div class="popup-buttons">
         <button id="homeBtn" class="btn-primary">Home</button>
