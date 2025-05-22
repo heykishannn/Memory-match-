@@ -1,6 +1,4 @@
 const startBtn = document.getElementById('startBtn');
-const restartBtn = document.getElementById('restartBtn');
-const resumeBtn = document.getElementById('resumeBtn');
 const gameScreen = document.getElementById('game-screen');
 const startScreen = document.getElementById('start-screen');
 const gameContainer = document.getElementById('game');
@@ -23,8 +21,6 @@ const resumePopup = document.getElementById('resumePopup');
 const newGameBtn = document.getElementById('newGameBtn');
 const continueBtn = document.getElementById('continueBtn');
 
-const pauseOverlay = document.getElementById('pauseOverlay');
-
 const flipSound = document.getElementById('flipSound');
 const matchSound = document.getElementById('matchSound');
 const loseSound = document.getElementById('loseSound');
@@ -40,8 +36,6 @@ let matchedCards = [];
 let cardsArray = [];
 
 const maxLevels = 100;
-
-let isPaused = true;
 
 // Emoji pool for cards (20 unique emojis max for variety)
 const emojiPool = [
@@ -104,7 +98,6 @@ function createBoard() {
 
 // Flip card handler
 function flipCard() {
-  if (isPaused) return; // Prevent flipping when paused
   if (flippedCards.length === 2) return;
   if (this.classList.contains('flipped') || matchedCards.includes(this)) return;
 
@@ -154,7 +147,6 @@ function checkForMatch() {
 function startTimer() {
   timerDisplay.textContent = Math.floor(timer);
   timerInterval = setInterval(() => {
-    if (isPaused) return;
     timer -= 1;
     timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
@@ -175,9 +167,6 @@ function showPopup(win, message) {
   popup.style.animation = 'zoomIn 0.3s ease forwards';
 
   gameContainer.style.pointerEvents = 'none';
-  restartBtn.disabled = true;
-
-  pauseGame();
 
   if (vibrationToggle.checked && navigator.vibrate) {
     navigator.vibrate(300);
@@ -203,7 +192,6 @@ function hidePopup(callback) {
   setTimeout(() => {
     popup.classList.add('hidden');
     gameContainer.style.pointerEvents = 'auto';
-    restartBtn.disabled = false;
     if (callback) callback();
   }, 300);
 }
@@ -243,19 +231,7 @@ function startLevel() {
 
   timer = calculateTimer(level);
   clearInterval(timerInterval);
-  resumeGame();
   startTimer();
-}
-
-// Pause and resume game helpers
-function pauseGame() {
-  isPaused = true;
-  pauseOverlay.classList.remove('hidden');
-}
-
-function resumeGame() {
-  isPaused = false;
-  pauseOverlay.classList.add('hidden');
 }
 
 // Reset game
@@ -269,11 +245,7 @@ function resetGame() {
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
-  pauseOverlay.classList.add('hidden');
   gameContainer.style.pointerEvents = 'auto';
-  restartBtn.disabled = false;
-  clearProgress();
-  isPaused = true;
 }
 
 // Resume popup
@@ -298,14 +270,6 @@ startBtn.addEventListener('click', () => {
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
   startLevel();
-});
-
-restartBtn.addEventListener('click', () => {
-  resetGame();
-});
-
-resumeBtn.addEventListener('click', () => {
-  resumeGame();
 });
 
 homeBtn.addEventListener('click', () => {
@@ -357,4 +321,4 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
-                              
+    
