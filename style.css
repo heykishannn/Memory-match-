@@ -10,7 +10,7 @@ html, body {
   height: 640px;
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  background: linear-gradient(135deg, #0e87cc, #2575fc);
   position: relative;
   margin: auto;
   display: flex;
@@ -31,7 +31,7 @@ body::before {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: inherit;
-  filter: blur(25px);
+  filter: blur(20px);
   z-index: -1;
 }
 
@@ -114,7 +114,6 @@ h1.small-title {
   margin-top: 0;
 }
 
-/* Toggle wrapper */
 .toggle-wrapper {
   display: flex;
   flex-direction: column;
@@ -125,7 +124,6 @@ h1.small-title {
   font-size: 0.9rem;
 }
 
-/* Position toggles left and right */
 .toggle-left {
   align-items: flex-start;
 }
@@ -208,12 +206,12 @@ h1.small-title {
 }
 
 .score-info {
-  color: #27ae60; /* bold green */
+  color: #27ae60;
   font-weight: 900;
 }
 
 .time-info {
-  color: #e74c3c; /* bold red */
+  color: #e74c3c;
   font-weight: 900;
 }
 
@@ -421,4 +419,4 @@ footer {
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   z-index: 999;
-  }
+}
