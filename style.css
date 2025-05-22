@@ -175,35 +175,6 @@ h1 {
   grid-template-columns: repeat(5, 1fr);
 }
 
-/* Pause overlay */
-.pause-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(44, 62, 80, 0.9);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1500;
-  user-select: none;
-}
-
-.pause-content {
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  padding: 30px 40px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 6px 15px rgba(238, 9, 121, 0.8);
-}
-
-.pause-content h2 {
-  color: white;
-  font-size: 2rem;
-  margin-bottom: 20px;
-}
-
 /* Toggles row centered */
 .toggles-row-centered {
   width: 100%;
