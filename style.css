@@ -10,7 +10,7 @@ html, body {
   height: 640px;
   overflow: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #add8e6; /* Light blue background */
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   position: relative;
   margin: auto;
   display: flex;
@@ -26,11 +26,20 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: inherit;
+  filter: blur(25px);
+  z-index: -1;
+}
+
 h1.small-title {
   font-weight: 700;
   font-size: 1.8rem;
   letter-spacing: 2px;
-  color: #000;
+  color: #fff;
   user-select: none;
   margin-bottom: 10px;
   text-align: center;
@@ -111,7 +120,7 @@ h1.small-title {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #000;
+  color: #fff;
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -243,9 +252,9 @@ h1.small-title {
 
 /* Card front cover gradient with no question mark */
 .card-front {
-  background: linear-gradient(135deg, #34495e, #2c3e50);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   border-radius: 12px;
-  border: 2px solid #2a3a6f;
+  border: 2px solid #3a1c8c;
   backface-visibility: hidden;
   position: absolute;
   width: 100%;
@@ -412,4 +421,4 @@ footer {
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   z-index: 999;
-}
+  }
