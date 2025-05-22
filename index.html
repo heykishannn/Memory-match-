@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Memory Match Game</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Google AdMob SDK -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
   <!-- Start Screen -->
@@ -66,16 +68,36 @@
     <div class="popup-content">
       <h2 id="popupTitle">You Won!</h2>
       <p id="popupMessage">Level Complete!</p>
-      <div class="popup-stats">
+      <div class="popup-stats" id="popupStats">
         <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
         <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
         <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
       </div>
-      <div class="popup-buttons">
+      <div class="popup-buttons" id="popupButtons">
         <button id="homeBtn" class="btn-primary">Home</button>
         <button id="nextLevelBtn" class="btn-primary">Next Level</button>
       </div>
     </div>
+  </div>
+
+  <!-- Timeout Popup Modal -->
+  <div id="timeoutPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Time Out!</h2>
+      <div class="popup-buttons" style="justify-content: center; gap: 15px;">
+        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+        <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Banner Ad -->
+  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+    <!-- Banner Ad will be loaded here -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:360px;height:50px"
+         data-ad-client="ca-pub-6948714269796627"
+         data-ad-slot="7517631973"></ins>
   </div>
 
   <footer>
