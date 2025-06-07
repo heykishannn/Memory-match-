@@ -1,1 +1,48 @@
-
+{
+  "project_info": {
+    "project_number": "1072652510165",
+    "project_id": "neuro-arcade-studios",
+    "storage_bucket": "neuro-arcade-studios.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072652510165:android:f11795f5ddbf694c3fd35c",
+        "android_client_info": {
+          "package_name": "Memory.match11"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqbTCADkRYokuYLdbeaIaWEAxncu5GB98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072652510165:android:4a7181a28427cf6f3fd35c",
+        "android_client_info": {
+          "package_name": "neuroarcadestudios.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqbTCADkRYokuYLdbeaIaWEAxncu5GB98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
