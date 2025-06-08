@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded: Script started.");
+
     // --- DOM Elements for Auth System ---
-    // mainAppContainer is now the fixed-size wrapper
     const mainAppContainer = document.getElementById('main-app-container');
     const authPage = document.getElementById('auth-page');
     const gamePage = document.getElementById('game-page'); // The main container for all game HTML
@@ -104,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- UI State Management for Auth/Game Pages ---
     function showPage(pageId) {
+        console.log(`showPage: Attempting to show ${pageId}`);
         if (pageId === 'auth-page') {
             authPage.classList.remove('hidden');
             gamePage.classList.add('hidden');
@@ -116,13 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
             showLoginForm();
             // Ensure all game-related popups/screens are hidden when returning to auth
             gameScreen.classList.add('hidden');
-            startScreen.classList.add('hidden');
+            startScreen.classList.add('hidden'); // Ensure game start screen is hidden
             popup.classList.add('hidden');
             resumePopup.classList.add('hidden');
             timeoutPopup.classList.add('hidden');
+            console.log("showPage: Auth page visible, game page hidden.");
         } else if (pageId === 'game-page') {
             authPage.classList.add('hidden');
             gamePage.classList.remove('hidden');
+            console.log("showPage: Game page visible, auth page hidden. Initializing game UI...");
             initializeGameUI(); // Initialize game UI after showing game page
         }
     }
@@ -131,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const userEmail = getLoggedInUser();
         if (userEmail) {
             welcomeMessage.textContent = `Welcome, ${userEmail}!`;
+            console.log(`updateLoggedInUserDisplay: Welcome message set for ${userEmail}.`);
+        } else {
+            welcomeMessage.textContent = `Welcome, Guest!`;
+            console.log("updateLoggedInUserDisplay: No logged-in user.");
         }
     }
 
@@ -140,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoginBtn.classList.add('active');
         showSignupBtn.classList.remove('active');
         loginMessage.textContent = ''; // Clear previous messages
+        console.log("Auth forms: Showing login form.");
     }
 
     function showSignupForm() {
@@ -148,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showSignupBtn.classList.add('active');
         showLoginBtn.classList.remove('active');
         signupMessage.textContent = ''; // Clear previous messages
+        console.log("Auth forms: Showing signup form.");
     }
 
     // --- Auth Logic ---
@@ -155,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle Signup
     signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        console.log("Signup form submitted.");
 
         const email = signupEmailInput.value.trim();
         const password = signupPasswordInput.value.trim();
@@ -164,23 +175,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!email || !password || !confirmPassword) {
             signupMessage.textContent = 'Please fill in all fields.';
+            console.log("Signup failed: Missing fields.");
             return;
         }
 
         if (password !== confirmPassword) {
             signupMessage.textContent = 'Passwords do not match.';
+            console.log("Signup failed: Passwords mismatch.");
             return;
         }
 
         // Basic email validation
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             signupMessage.textContent = 'Please enter a valid email address.';
+            console.log("Signup failed: Invalid email format.");
             return;
         }
 
         let users = getUsers();
         if (users[email]) {
             signupMessage.textContent = 'This email is already registered. Please login.';
+            console.log(`Signup failed: Email ${email} already registered.`);
             return;
         }
 
@@ -194,11 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage('game-page'); // Transition to game page
         alert('Signup successful! Welcome to the game.');
         signupForm.reset(); // Clear form fields
+        console.log(`Signup successful for ${email}.`);
     });
 
     // Handle Login
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        console.log("Login form submitted.");
 
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value.trim();
@@ -207,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!email || !password) {
             loginMessage.textContent = 'Please fill in all fields.';
+            console.log("Login failed: Missing fields.");
             return;
         }
 
@@ -215,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!user || user.password !== password) {
             loginMessage.textContent = 'Invalid email or password.';
+            console.log("Login failed: Invalid credentials.");
             return;
         }
 
@@ -223,21 +242,24 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage('game-page'); // Transition to game page
         alert('Login successful! Welcome back.');
         loginForm.reset(); // Clear form fields
+        console.log(`Login successful for ${email}.`);
     });
 
     // Handle Logout
     logoutBtn.addEventListener('click', () => {
+        console.log("Logout button clicked.");
         if (confirm('Are you sure you want to logout?')) {
             clearLoggedInUser();
             resetGame(); // Reset game state and UI to start screen for the next user
             showPage('auth-page'); // Transition back to auth page
             alert('You have been logged out.');
+            console.log("User logged out and game reset.");
         }
     });
 
     // --- Event Listeners for Auth UI Toggles ---
-    showLoginBtn.addEventListener('click', showLoginForm);
-    showSignupBtn.addEventListener('click', showSignupForm);
+    if (showLoginBtn) showLoginBtn.addEventListener('click', showLoginForm);
+    if (showSignupBtn) showSignupBtn.addEventListener('click', showSignupForm);
 
     // --- Game Logic Starts Here ---
 
@@ -249,16 +271,17 @@ document.addEventListener('DOMContentLoaded', () => {
           audio.currentTime = 0;
         }
       });
+      console.log("stopAllSounds: All sounds stopped.");
     }
 
     // Vibrate helper with APK compatibility
     function vibratePattern(duration = 200) {
-      if (vibrationToggle.checked && navigator.vibrate) {
+      if (vibrationToggle && vibrationToggle.checked && navigator.vibrate) {
         try {
           navigator.vibrate([duration]);
+          console.log(`Vibrating for ${duration}ms.`);
         } catch(e) {
           console.warn("Vibration failed:", e);
-          // fallback or ignore errors
         }
       }
     }
@@ -282,14 +305,16 @@ document.addEventListener('DOMContentLoaded', () => {
         cards.push({name: emoji, id: index * 2});
         cards.push({name: emoji, id: index * 2 + 1});
       });
-
+      console.log(`Generated ${cards.length} cards for level ${level}. Pairs: ${pairs}`);
       return shuffle(cards);
     }
 
     // Calculate timer based on number of cards (2.5 seconds per card)
     function calculateTimer(level) {
       const tempCards = generateCards(level);
-      return tempCards.length * 2.5; // seconds
+      const calculatedTime = tempCards.length * 2.5; // seconds
+      console.log(`Calculated timer for level ${level}: ${calculatedTime}s`);
+      return calculatedTime;
     }
 
     // Create board
@@ -315,22 +340,34 @@ document.addEventListener('DOMContentLoaded', () => {
       let cols = Math.min(5, Math.ceil(Math.sqrt(cardsArray.length)));
       gameContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
       gameContainer.setAttribute('data-cols', cols);
+      console.log(`Board created with ${cardsArray.length} cards in ${cols} columns.`);
     }
 
     // Flip card handler
     function flipCard() {
-      if (isPaused) return;
-      if (flippedCards.length === 2) return;
-      if (this.classList.contains('flipped') || matchedCards.includes(this)) return;
+      if (isPaused) {
+        console.log("Flip blocked: Game is paused.");
+        return;
+      }
+      if (flippedCards.length === 2) {
+        console.log("Flip blocked: Two cards already flipped, waiting for match check.");
+        return;
+      }
+      if (this.classList.contains('flipped') || matchedCards.includes(this)) {
+        console.log("Flip blocked: Card already flipped or matched.");
+        return;
+      }
 
       this.classList.add('flipped');
       flippedCards.push(this);
+      console.log(`Card flipped: ${this.dataset.name}, Flipped cards count: ${flippedCards.length}`);
 
       if (soundToggle.checked) {
         stopAllSounds();
         if (flipSound) {
             flipSound.currentTime = 0;
             flipSound.play();
+            console.log("Flip sound played.");
         }
       }
 
@@ -341,8 +378,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check match
     function checkForMatch() {
+      console.log("Checking for match...");
       const [cardOne, cardTwo] = flippedCards;
       if (cardOne.dataset.name === cardTwo.dataset.name) {
+        console.log(`Match found for ${cardOne.dataset.name}!`);
         matchedCards.push(cardOne, cardTwo);
         score += 10;
         scoreDisplay.textContent = score;
@@ -352,12 +391,14 @@ document.addEventListener('DOMContentLoaded', () => {
         flippedCards = [];
 
         if (matchedCards.length === cardsArray.length) {
+          console.log("All cards matched! Level complete.");
           clearInterval(timerInterval);
           setTimeout(() => {
             showPopup(true, `Level ${level} Complete!`);
           }, 500);
         }
       } else {
+        console.log("No match, flipping back.");
         setTimeout(() => {
           cardOne.classList.remove('flipped');
           cardTwo.classList.remove('flipped');
@@ -368,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Timer countdown
     function startTimer() {
+      console.log("Starting timer...");
       clearInterval(timerInterval);
       timerDisplay.textContent = Math.floor(timer);
       timerInterval = setInterval(() => {
@@ -375,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timer -= 1;
         timerDisplay.textContent = Math.max(0, Math.floor(timer));
         if (timer <= 0) {
+          console.log("Timer ran out!");
           clearInterval(timerInterval);
           showTimeoutPopup();
         }
@@ -383,6 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show timeout popup
     function showTimeoutPopup() {
+      console.log("Showing timeout popup.");
       timeoutPopup.classList.remove('hidden');
       gameScreen.style.pointerEvents = 'none'; // Disable interaction with game behind popup
       // Hide other popups if somehow visible
@@ -401,6 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hide timeout popup
     function hideTimeoutPopup(callback) {
+      console.log("Hiding timeout popup.");
       timeoutPopup.classList.add('hidden');
       gameScreen.style.pointerEvents = 'auto'; // Re-enable interaction
       if (callback) callback();
@@ -408,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show popup (win or lose)
     function showPopup(win, message) {
+      console.log(`Showing popup: Win: ${win}, Message: ${message}`);
       popupTitle.textContent = win ? 'You Won!' : 'Time Out!';
       popupMessage.textContent = message;
       popupLevel.textContent = level;
@@ -439,15 +485,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (win) {
         saveProgress();
       } else {
-        // If it's a lose condition from game play, not timeout
-        // (Timeout already calls clearProgress indirectly by resetting on play again)
-        // For direct lose, ensure progress is cleared.
-        clearProgress();
+        clearProgress(); // If it's a direct lose, clear progress
       }
     }
 
     // Hide popup
     function hidePopup(callback) {
+      console.log("Hiding popup.");
       popup.style.animation = 'zoomOut 0.3s ease forwards';
       setTimeout(() => {
         popup.classList.add('hidden');
@@ -460,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveProgress() {
         const userEmail = getLoggedInUser();
         if (!userEmail) {
-            console.warn("No logged in user to save progress for.");
+            console.warn("SaveProgress: No logged in user to save progress for.");
             return;
         }
         const userData = {
@@ -468,26 +512,37 @@ document.addEventListener('DOMContentLoaded', () => {
             score: score
         };
         localStorage.setItem(`gameProgress_${userEmail}`, JSON.stringify(userData));
+        console.log(`SaveProgress: Progress saved for ${userEmail}: Level ${level}, Score ${score}`);
     }
 
     function loadProgress() {
         const userEmail = getLoggedInUser();
         if (!userEmail) {
+            console.log("LoadProgress: No logged in user, cannot load progress.");
             return null; // Not an error, just no user logged in or no progress for guest
         }
         const savedData = localStorage.getItem(`gameProgress_${userEmail}`);
-        return savedData ? JSON.parse(savedData) : null;
+        if (savedData) {
+            console.log(`LoadProgress: Progress loaded for ${userEmail}.`);
+            return JSON.parse(savedData);
+        }
+        console.log(`LoadProgress: No saved progress found for ${userEmail}.`);
+        return null;
     }
 
     function clearProgress() {
         const userEmail = getLoggedInUser();
         if (userEmail) {
             localStorage.removeItem(`gameProgress_${userEmail}`);
+            console.log(`ClearProgress: Progress cleared for ${userEmail}.`);
+        } else {
+            console.log("ClearProgress: No logged in user to clear progress for.");
         }
     }
 
     // Start level
     function startLevel() {
+      console.log(`Starting level: ${level} with current score: ${score}`);
       flippedCards = [];
       matchedCards = [];
       scoreDisplay.textContent = score;
@@ -496,97 +551,4 @@ document.addEventListener('DOMContentLoaded', () => {
       cardsArray = generateCards(level);
       createBoard();
 
-      timer = calculateTimer(level);
-      clearInterval(timerInterval);
-      isPaused = false;
-      startTimer();
-      gameScreen.classList.remove('hidden'); // Show game screen
-      startScreen.classList.add('hidden'); // Hide start screen
-      popup.classList.add('hidden');
-      resumePopup.classList.add('hidden');
-      timeoutPopup.classList.add('hidden');
-      gameContainer.style.pointerEvents = 'auto';
-    }
-
-    // Reset game to initial state (start screen), clears progress for current user
-    function resetGame() {
-      clearInterval(timerInterval);
-      stopAllSounds();
-      level = 1;
-      score = 0;
-      flippedCards = [];
-      matchedCards = [];
-      gameScreen.classList.add('hidden'); // Hide actual game play area
-      startScreen.classList.remove('hidden'); // Show the game's start button
-      popup.classList.add('hidden');
-      resumePopup.classList.add('hidden');
-      timeoutPopup.classList.add('hidden');
-      gameContainer.style.pointerEvents = 'auto';
-      clearProgress(); // Clear saved progress for this user
-    }
-
-    // Show resume popup
-    function showResumePopup() {
-      resumePopup.classList.remove('hidden');
-      startScreen.classList.add('hidden'); // Hide game's start screen
-      gameScreen.classList.add('hidden'); // Hide game play area
-      popup.classList.add('hidden');
-      timeoutPopup.classList.add('hidden');
-    }
-
-    function continueGame(progress) {
-      level = progress.level;
-      score = progress.score;
-      resumePopup.classList.add('hidden'); // Hide resume popup
-      startScreen.classList.add('hidden'); // Ensure start screen is hidden
-      gameScreen.classList.remove('hidden'); // Show the game play area
-      timeoutPopup.classList.add('hidden'); // Ensure timeout popup is hidden
-      isPaused = false;
-      startTimer();
-      // Recreate board with current level's cards
-      cardsArray = generateCards(level);
-      createBoard();
-      // Update displays
-      levelDisplay.textContent = level;
-      scoreDisplay.textContent = score;
-    }
-
-    // Pause toggle with pause and restart sounds
-    pauseBtn.addEventListener('click', () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? '▶' : '❚❚';
-
-      if (soundToggle.checked) {
-        stopAllSounds();
-        if (isPaused) {
-          if (pauseSound) {
-              pauseSound.currentTime = 0;
-              pauseSound.play();
-          }
-        } else {
-          if (restartSound) {
-              restartSound.currentTime = 0;
-              restartSound.play();
-          }
-        }
-      }
-    });
-
-    // Game Event listeners
-    startBtn.addEventListener('click', () => {
-      // Game start always resets and begins new level 1
-      resetGame(); // Ensure clean slate and clear old progress if any
-      startLevel();
-    });
-
-    homeBtn.addEventListener('click', () => {
-      hidePopup(() => {
-        resetGame(); // Go back to start screen (which also clears progress)
-      });
-    });
-
-    nextLevelBtn.addEventListener('click', () => {
-      hidePopup(() => {
-        level++;
-        if(level > maxLevels) {
-          alert(`🎉 Congratulations! You com
+      t
