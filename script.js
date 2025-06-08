@@ -149,7 +149,7 @@ function flipCard() {
 function checkForMatch() {
   const [cardOne, cardTwo] = flippedCards;
   if (cardOne.dataset.name === cardTwo.dataset.name) {
-    matchedCards.push(cardOne, cardTwo);
+    matchedCards.push(cardOne, card Two);
     score += 10;
     scoreDisplay.textContent = score;
 
@@ -375,24 +375,80 @@ newGameBtn.addEventListener('click', () => {
   startScreen.classList.remove('hidden');
 });
 
-// ========== Popunder Ad Trigger Function ==========
-function triggerPopunderAd() {
+// ================== Popunder Ad Logic ==================
+let adTimerInterval = null;
+
+function showRewardedAd(onComplete) {
+  // Trigger popunder ad script on click
   const popunderScript = document.createElement('script');
   popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
   document.head.appendChild(popunderScript);
+
+  // Create or show an ad popup with timer
+  const adPopup = document.createElement('div');
+  adPopup.id = 'rewardedAdPopup';
+  adPopup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    color: white;
+    text-align: center;
+    padding-top: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  `;
+  adPopup.innerHTML = `
+    <h2>Watch Ad 5 Seconds to Continue</h2>
+    <div id="adTimer" style="font-size: 2em; margin: 20px 0;">5</div>
+    <div id="adBack" style="display: none; margin-top: 20px;">
+      <button id="adBackBtn" style="font-size: 24px; background: #4CAF50; border: none; color: white; padding: 10px 30px; border-radius: 5px;">Back to Game</button>
+    </div>
+  `;
+  document.body.appendChild(adPopup);
+
+  // Start timer
+  let seconds = 5;
+  const timerEl = document.getElementById('adTimer');
+  const backEl = document.getElementById('adBack');
+  adTimerInterval = setInterval(() => {
+    seconds--;
+    timerEl.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(adTimerInterval);
+      backEl.style.display = 'block';
+    }
+  }, 1000);
+
+  // Back button handler
+  document.getElementById('adBackBtn').onclick = function() {
+    clearInterval(adTimerInterval);
+    document.body.removeChild(adPopup);
+    // Give 10 seconds extra time in game
+    timer += 10;
+    timerDisplay.textContent = Math.floor(timer);
+    onComplete();
+  };
 }
 
 // ========== Updated Button Click Handlers ==========
 continueBtn.addEventListener('click', () => {
-  triggerPopunderAd();
-  const progress = loadProgress();
-  if (progress) continueGame(progress);
+  showRewardedAd(() => {
+    const progress = loadProgress();
+    if (progress) continueGame(progress);
+  });
 });
 
 timeoutContinueBtn.addEventListener('click', () => {
-  triggerPopunderAd();
-  hideTimeoutPopup(() => {
-    continueGame({level, score});
+  showRewardedAd(() => {
+    hideTimeoutPopup(() => {
+      continueGame({level, score});
+    });
   });
 });
 
@@ -423,4 +479,4 @@ document.addEventListener('touchstart', (e) => {
 window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
-        
+                     
