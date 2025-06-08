@@ -1,32 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Memory Match Game</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Google AdMob SDK -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
-
-  <!-- Login/Signup Screen -->
-  <div id="auth-screen" class="center-screen">
-    <h1 class="small-title">Welcome to Memory Match</h1>
-    <input type="email" id="emailInput" placeholder="Enter your email" class="input-field" />
-    <div class="popup-buttons" style="flex-direction: column; gap: 10px; margin-top: 20px;">
-      <button id="loginBtn" class="btn-primary">Login</button>
-      <button id="signupBtn" class="btn-primary">Sign Up</button>
-    </div>
-  </div>
-
   <!-- Start Screen -->
-  <div id="start-screen" class="center-screen hidden">
+  <div id="start-screen" class="center-screen">
     <h1 class="small-title">MEMORY MATCH</h1>
     <button id="startBtn" class="btn-primary">Start</button>
-  </div>
-
-  <!-- Game Screen -->
-  <div id="game-screen" class="hidden">
+  </div>  <!-- Game Screen -->  <div id="game-screen" class="hidden">
     <header class="game-header">
       <h1 class="small-title">MEMORY MATCH</h1>
       <div class="toggles-row">
@@ -36,33 +22,29 @@
             <span class="slider"></span>
           </label>
           <div class="toggle-label">Sound</div>
-        </div>
+        </div><button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
 
-        <button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
-
-        <div class="toggle-wrapper toggle-right">
-          <label class="switch orange-switch">
-            <input type="checkbox" id="vibrationToggle" checked />
-            <span class="slider"></span>
-          </label>
-          <div class="toggle-label">Vibration</div>
-        </div>
-      </div>
-    </header>
-
-    <div class="game-wrapper">
-      <div class="game-info">
-        <div class="level-info">Level: <span id="levelDisplay">1</span></div>
-        <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
-        <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
-      </div>
-
-      <div class="game-container" id="game"></div>
+    <div class="toggle-wrapper toggle-right">
+      <label class="switch orange-switch">
+        <input type="checkbox" id="vibrationToggle" checked />
+        <span class="slider"></span>
+      </label>
+      <div class="toggle-label">Vibration</div>
     </div>
   </div>
+</header>
 
-  <!-- Resume Popup Modal -->
-  <div id="resumePopup" class="popup hidden">
+<div class="game-wrapper">
+  <div class="game-info">
+    <div class="level-info">Level: <span id="levelDisplay">1</span></div>
+    <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
+    <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
+  </div>
+
+  <div class="game-container" id="game"></div>
+</div>
+
+  </div>  <!-- Resume Popup Modal -->  <div id="resumePopup" class="popup hidden">
     <div class="popup-content">
       <h2>Welcome Back!</h2>
       <p>You have a saved game.</p>
@@ -71,10 +53,7 @@
         <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
       </div>
     </div>
-  </div>
-
-  <!-- Win/Lose Popup Modal -->
-  <div id="popup" class="popup hidden">
+  </div>  <!-- Win/Lose Popup Modal -->  <div id="popup" class="popup hidden">
     <div class="popup-content">
       <h2 id="popupTitle">You Won!</h2>
       <p id="popupMessage">Level Complete!</p>
@@ -88,10 +67,7 @@
         <button id="nextLevelBtn" class="btn-primary">Next Level</button>
       </div>
     </div>
-  </div>
-
-  <!-- Timeout Popup Modal -->
-  <div id="timeoutPopup" class="popup hidden">
+  </div>  <!-- Timeout Popup Modal -->  <div id="timeoutPopup" class="popup hidden">
     <div class="popup-content">
       <h2>Time Out!</h2>
       <div class="popup-buttons" style="justify-content: center; gap: 15px;">
@@ -99,18 +75,13 @@
         <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
       </div>
     </div>
-  </div>
-
-  <!-- Footer with Banner Ad -->
-  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+  </div>  <!-- Footer with Banner Ad -->  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+    <!-- Google AdMob Banner Ad -->
     <ins class="adsbygoogle"
          style="display:inline-block;width:360px;height:50px"
          data-ad-client="ca-pub-6948714269796627"
          data-ad-slot="7517631973"></ins>
-  </div>
-
-  <!-- New Footer Ad Script -->
-  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
+  </div>  <!-- New Footer Ad Script -->  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
     <script type="text/javascript">
       atOptions = {
         'key' : '1401828e48164d6e5d2cfae0724ee0df',
@@ -121,19 +92,10 @@
       };
     </script>
     <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
-  </div>
-
-  <footer>
+  </div>  <footer>
     Powered by NAS
-  </footer>
+  </footer>  <!-- Audio Files --><audio id="flipSound" src="tap.mp3" preload="auto"></audio> <audio id="matchSound" src="win.mp3" preload="auto"></audio> <audio id="loseSound" src="lose.mp3" preload="auto"></audio> <audio id="pauseSound" src="pause.mp3" preload="auto"></audio> <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
 
-  <!-- Audio Files -->
-  <audio id="flipSound" src="tap.mp3" preload="auto"></audio>
-  <audio id="matchSound" src="win.mp3" preload="auto"></audio>
-  <audio id="loseSound" src="lose.mp3" preload="auto"></audio>
-  <audio id="pauseSound" src="pause.mp3" preload="auto"></audio>
-  <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
+  <script src="script.js"></script></body>
+</html>Ye lo html code hai or css or js code dunga or tumko isme ek login or signup page add Krna hai game se pehle or koi user ek email se signup or login krta hai uska data save ho jayega local storage me email ke sath or game start hone per uss user ka automatically logged hoke game on ho or game ka ui design se match karke login signup page bnake add kro ab css or js code dunga usme bhi add kr dena jo hoga usme Krna baki ye html me kr do jo hoga
 
-  <script src="script.js"></script>
-</body>
-</html>
