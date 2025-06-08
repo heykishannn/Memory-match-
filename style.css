@@ -178,7 +178,7 @@ body::before {
     justify-content: flex-start; /* Game content aligns to top */
     box-sizing: border-box;
     padding-top: 10px; /* Space from top edge */
-    padding-bottom: 100px; /* Space for ads and footer */
+    padding-bottom: 100px; /* Space for ads and footer (50px for banner, 50px for other ad/footer) */
     z-index: 1000; /* Below auth page */
     background-color: transparent; /* Allow body's background to show through */
 }
@@ -618,17 +618,17 @@ h1.small-title {
 
 /* Footer & Ads - positioned relative to #game-page */
 #bannerAdContainer {
-    position: absolute; /* Relative to #game-page */
-    width: 360px; /* fixed width */
+    position: absolute; /* Relative to #main-app-container (which is #game-page's parent) */
+    width: 360px;
     height: 50px;
     bottom: 90px; /* Position above new footer ad */
-    left: 0; /* Align to left edge of game-page */
+    left: 0;
     z-index: 1000; /* Above game content, same as popups */
 }
 
 /* New Footer Ad Script container */
-.new-footer-ad-container { /* Added a class for styling */
-    position: absolute; /* Relative to #game-page */
+.new-footer-ad-container {
+    position: absolute; /* Relative to #main-app-container */
     width: 320px;
     height: 50px;
     bottom: 40px; /* Just above the game's footer */
@@ -646,7 +646,7 @@ footer {
   font-weight: 700;
   color: #fff;
   user-select: none;
-  position: absolute; /* Relative to #game-page */
+  position: absolute; /* Relative to #main-app-container */
   bottom: 0;
   left: 0;
   background: linear-gradient(135deg, #0e87cc, #2575fc);
@@ -655,4 +655,4 @@ footer {
   border-top-right-radius: 12px;
   z-index: 999; /* Below ads and popups */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
+}
