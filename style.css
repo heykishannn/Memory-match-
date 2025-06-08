@@ -6,45 +6,41 @@
 }
 
 html, body {
-  /* Game's fixed viewport dimensions */
-  width: 360px;
-  height: 640px;
-  overflow: hidden; /* Important for fixed size */
+  width: 100vw; /* Occupy full viewport width */
+  height: 100vh; /* Occupy full viewport height */
+  display: flex; /* Use flexbox to center the main container */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0e87cc, #2575fc); /* Game's background */
-  position: relative;
-  margin: auto; /* Center the body on larger screens */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* Centers the #main-app-container */
+  background: linear-gradient(135deg, #0e87cc, #2575fc); /* Game's background on the whole screen */
   color: #000;
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  overflow: hidden; /* Prevent body scroll if content somehow overflows */
 }
 
+/* Background blur effect for the entire page */
 body::before {
   content: "";
-  position: fixed;
+  position: fixed; /* Fixed to viewport */
   top: 0; left: 0; right: 0; bottom: 0;
-  background: inherit;
+  background: inherit; /* Inherits the gradient from body */
   filter: blur(20px);
-  z-index: -1;
+  z-index: -1; /* Behind all content */
 }
 
-/* Main Application Container - wraps both auth and game pages */
+/* Main Application Container - Fixed viewport for the entire game/auth UI */
 #main-app-container {
-    width: 100%; /* Fills 360px width */
-    height: 100%; /* Fills 640px height */
-    position: relative; /* For absolutely positioned children like popups */
-    display: flex; /* To center its immediate children (auth-page or game-page) */
-    flex-direction: column; /* Allows content to stack */
-    align-items: center; /* Horizontally centers children */
-    justify-content: center; /* Vertically centers children */
-    box-sizing: border-box;
+    width: 360px; /* Fixed width */
+    height: 640px; /* Fixed height */
+    position: relative; /* All children (auth, game, popups, ads, footer) will be positioned relative to this */
+    overflow: hidden; /* Hide any content that overflows this container */
+    background-color: transparent; /* Let body's background show through */
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Optional: add a shadow to the game frame */
+    border-radius: 10px; /* Optional: rounded corners for the game frame */
 }
 
 /* Utility Class */
@@ -54,21 +50,20 @@ body::before {
 
 /* --- AUTH PAGE STYLES --- */
 #auth-page {
+    position: absolute; /* Positioned within main-app-container */
+    top: 0; left: 0;
+    width: 100%; /* Fills main-app-container width */
+    height: 100%; /* Fills main-app-container height */
     background-color: #ffffff; /* White background for auth form area */
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 90%; /* Responsive width */
-    max-width: 340px; /* Fits within 360px body with padding */
-    text-align: center;
     box-sizing: border-box;
-    display: flex;
+    display: flex; /* Use flex to center content within auth-page */
     flex-direction: column;
-    justify-content: center; /* Centers content vertically within auth-page */
-    align-items: center; /* Centers content horizontally within auth-page */
-    min-height: 400px; /* A sensible minimum height for the form to look good */
-    height: auto; /* Allow height to adjust to content */
-    flex-shrink: 0; /* Prevent it from shrinking if other content is tall */
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    text-align: center;
+    z-index: 2000; /* Ensure it's on top when visible */
 }
 
 #auth-page h1 { /* Specificity for auth page title */
@@ -110,6 +105,7 @@ body::before {
 .auth-form {
     text-align: left;
     width: 100%; /* Make form fill auth-page width */
+    max-width: 300px; /* Limit form width for better appearance */
 }
 
 .auth-form h2 {
@@ -172,17 +168,19 @@ body::before {
 
 /* --- GAME PAGE STYLES --- */
 #game-page {
-    /* This will contain all the user's game HTML */
-    width: 100%; /* Fill the main-app-container width (360px) */
-    height: 100%; /* Fill the main-app-container height (640px) */
+    position: absolute; /* Positioned within main-app-container */
+    top: 0; left: 0;
+    width: 100%; /* Fills main-app-container width (360px) */
+    height: 100%; /* Fills main-app-container height (640px) */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start; /* Game content aligns to top */
     box-sizing: border-box;
-    padding: 10px 0 50px 0; /* Padding around game content to account for header/footer */
-    position: relative; /* Important for absolute positioning of ads/footer */
-    overflow-y: auto; /* In case game content exceeds height, allow scrolling */
+    padding-top: 10px; /* Space from top edge */
+    padding-bottom: 100px; /* Space for ads and footer */
+    z-index: 1000; /* Below auth page */
+    background-color: transparent; /* Allow body's background to show through */
 }
 
 /* General H1 for game and common titles */
@@ -201,7 +199,7 @@ h1.small-title {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%; /* Fills parent's height */
+  flex-grow: 1; /* Allows it to take available vertical space */
   width: 100%; /* Fills parent's width */
 }
 
@@ -498,7 +496,7 @@ h1.small-title {
 
 /* Popup Modal with blue-purple gradient background */
 .popup {
-  position: fixed; /* Keep fixed to overlay everything */
+  position: absolute; /* Positioned within main-app-container */
   top: 50%;
   left: 50%;
   width: 280px; /* Fixed width for popup */
@@ -508,7 +506,7 @@ h1.small-title {
   box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
-  z-index: 1000;
+  z-index: 1000; /* On top of game content */
   padding: 25px 20px 20px 20px;
   text-align: center;
   animation: zoomIn 0.3s ease forwards;
@@ -618,27 +616,24 @@ h1.small-title {
   }
 }
 
-/* Footer & Ads */
+/* Footer & Ads - positioned relative to #game-page */
 #bannerAdContainer {
+    position: absolute; /* Relative to #game-page */
     width: 360px; /* fixed width */
     height: 50px;
-    margin: 0 auto;
-    position: fixed; /* Adheres to viewport */
     bottom: 90px; /* Position above new footer ad */
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0; /* Align to left edge of game-page */
     z-index: 1000; /* Above game content, same as popups */
 }
 
 /* New Footer Ad Script container */
 .new-footer-ad-container { /* Added a class for styling */
+    position: absolute; /* Relative to #game-page */
     width: 320px;
     height: 50px;
-    margin: 0 auto;
-    position: fixed;
     bottom: 40px; /* Just above the game's footer */
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%); /* Center horizontally */
     z-index: 1001; /* Above banner ad and popups */
 }
 
@@ -651,14 +646,13 @@ footer {
   font-weight: 700;
   color: #fff;
   user-select: none;
-  position: fixed; /* Adheres to viewport */
+  position: absolute; /* Relative to #game-page */
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   background: linear-gradient(135deg, #0e87cc, #2575fc);
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   z-index: 999; /* Below ads and popups */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+  }
