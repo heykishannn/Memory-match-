@@ -429,7 +429,12 @@ function showRewardedAd(onComplete) {
     return;
   }
 
-  // Create or show an ad popup
+  // Trigger popunder ad script on click
+  const popunderScript = document.createElement('script');
+  popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
+  document.head.appendChild(popunderScript);
+
+  // Create or show an ad popup with timer
   const adPopup = document.createElement('div');
   adPopup.id = 'rewardedAdPopup';
   adPopup.style.cssText = `
@@ -451,8 +456,8 @@ function showRewardedAd(onComplete) {
   adPopup.innerHTML = `
     <h2>Watch Ad 5 Seconds to Continue</h2>
     <div id="adTimer" style="font-size: 2em; margin: 20px 0;">5</div>
-    <div id="adClose" style="display: none; margin-top: 20px;">
-      <button id="adCloseBtn" style="font-size: 24px; background: none; border: none; color: white;">❌</button>
+    <div id="adBack" style="display: none; margin-top: 20px;">
+      <button id="adBackBtn" style="font-size: 24px; background: #4CAF50; border: none; color: white; padding: 10px 30px; border-radius: 5px;">Back to Game</button>
     </div>
   `;
   document.body.appendChild(adPopup);
@@ -460,29 +465,23 @@ function showRewardedAd(onComplete) {
   // Start timer
   let seconds = 5;
   const timerEl = document.getElementById('adTimer');
-  const closeEl = document.getElementById('adClose');
+  const backEl = document.getElementById('adBack');
   const timerInterval = setInterval(() => {
     seconds--;
     timerEl.textContent = seconds;
     if (seconds <= 0) {
       clearInterval(timerInterval);
-      closeEl.style.display = 'block';
+      backEl.style.display = 'block';
     }
   }, 1000);
 
-  // Close button handler
-  document.getElementById('adCloseBtn').onclick = function() {
+  // Back button handler
+  document.getElementById('adBackBtn').onclick = function() {
     clearInterval(timerInterval);
     document.body.removeChild(adPopup);
     // Give 10 seconds extra time in game
     timer += 10;
     timerDisplay.textContent = Math.floor(timer);
-    // Optionally, trigger popunder ad script here if needed
-    // (Most popunder scripts auto-trigger on page load)
-    // If manual trigger needed, uncomment below:
-    // const popunderScript = document.createElement('script');
-    // popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
-    // document.head.appendChild(popunderScript);
     onComplete();
   };
 }
@@ -491,5 +490,5 @@ function showRewardedAd(onComplete) {
 function initAdMob() {
   if (!window.adsbygoogle) return;
   (adsbygoogle = window.adsbygoogle || []).push({});
-                       }
-    
+}
+  
