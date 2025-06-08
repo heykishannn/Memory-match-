@@ -7,10 +7,136 @@
   <link rel="stylesheet" href="style.css" />
   <!-- Google AdMob SDK -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <style>
+    /* Login/Signup Styles */
+    .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f6f6f6;
+      flex-direction: column;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 2000;
+    }
+    .auth-box {
+      background: #fff;
+      padding: 32px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+      min-width: 310px;
+      width: 90%;
+      max-width: 340px;
+      text-align: center;
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .auth-title {
+      font-size: 1.7rem;
+      color: #ff7a00;
+      font-weight: bold;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .auth-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .auth-toggle button {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      color: #888;
+      cursor: pointer;
+      padding: 6px 16px;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .auth-toggle .active {
+      color: #fff;
+      background: #ff7a00;
+      font-weight: bold;
+    }
+    .auth-input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .auth-input:focus {
+      border: 1.5px solid #ff7a00;
+    }
+    .auth-btn {
+      width: 100%;
+      padding: 11px 0;
+      background: #ff7a00;
+      color: #fff;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.2s;
+    }
+    .auth-btn:hover {
+      background: #e86d00;
+    }
+    .auth-link {
+      margin-top: 12px;
+      font-size: 0.97rem;
+      color: #888;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .auth-error {
+      color: #ff3b3b;
+      font-size: 0.93rem;
+      margin-bottom: 8px;
+      min-height: 18px;
+    }
+    @media (max-width: 400px) {
+      .auth-box { min-width: unset; width: 98%; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Login/Signup Screen -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-box">
+      <div class="auth-title">MEMORY MATCH</div>
+      <div class="auth-toggle">
+        <button id="loginTab" class="active">Login</button>
+        <button id="signupTab">Sign Up</button>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+      <!-- Login Form -->
+      <form id="loginForm">
+        <input type="email" class="auth-input" id="loginEmail" placeholder="Email" required />
+        <input type="password" class="auth-input" id="loginPassword" placeholder="Password" required />
+        <button type="submit" class="auth-btn">Login</button>
+      </form>
+      <!-- Signup Form -->
+      <form id="signupForm" style="display:none;">
+        <input type="text" class="auth-input" id="signupName" placeholder="Full Name" required />
+        <input type="email" class="auth-input" id="signupEmail" placeholder="Email" required />
+        <input type="password" class="auth-input" id="signupPassword" placeholder="Password" required />
+        <input type="password" class="auth-input" id="signupConfirm" placeholder="Confirm Password" required />
+        <button type="submit" class="auth-btn">Sign Up</button>
+      </form>
+    </div>
+    <div style="color:#aaa;font-size:0.98rem;">Powered by NAS</div>
+  </div>
+
   <!-- Start Screen -->
-  <div id="start-screen" class="center-screen">
+  <div id="start-screen" class="center-screen hidden">
     <h1 class="small-title">MEMORY MATCH</h1>
     <button id="startBtn" class="btn-primary">Start</button>
   </div>
@@ -27,9 +153,7 @@
           </label>
           <div class="toggle-label">Sound</div>
         </div>
-
         <button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
-
         <div class="toggle-wrapper toggle-right">
           <label class="switch orange-switch">
             <input type="checkbox" id="vibrationToggle" checked />
@@ -39,14 +163,12 @@
         </div>
       </div>
     </header>
-
     <div class="game-wrapper">
       <div class="game-info">
         <div class="level-info">Level: <span id="levelDisplay">1</span></div>
         <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
         <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
       </div>
-
       <div class="game-container" id="game"></div>
     </div>
   </div>
@@ -125,6 +247,59 @@
   <audio id="pauseSound" src="pause.mp3" preload="auto"></audio>
   <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
 
+  <script>
+    // Auth Screen Logic
+    const authScreen = document.getElementById('auth-screen');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const authError = document.getElementById('auth-error');
+    const startScreen = document.getElementById('start-screen');
+
+    loginTab.onclick = function() {
+      loginTab.classList.add('active');
+      signupTab.classList.remove('active');
+      loginForm.style.display = '';
+      signupForm.style.display = 'none';
+      authError.textContent = '';
+    };
+    signupTab.onclick = function() {
+      signupTab.classList.add('active');
+      loginTab.classList.remove('active');
+      signupForm.style.display = '';
+      loginForm.style.display = 'none';
+      authError.textContent = '';
+    };
+
+    // Dummy Auth (Replace with real backend logic)
+    loginForm.onsubmit = function(e) {
+      e.preventDefault();
+      // Simple demo: accept any email/password
+      authError.textContent = '';
+      setTimeout(() => {
+        authScreen.style.display = 'none';
+        startScreen.classList.remove('hidden');
+      }, 500);
+    };
+    signupForm.onsubmit = function(e) {
+      e.preventDefault();
+      const pass = document.getElementById('signupPassword').value;
+      const confirm = document.getElementById('signupConfirm').value;
+      if (pass !== confirm) {
+        authError.textContent = 'Passwords do not match!';
+        return;
+      }
+      authError.textContent = '';
+      setTimeout(() => {
+        authScreen.style.display = 'none';
+        startScreen.classList.remove('hidden');
+      }, 500);
+    };
+
+    // Optionally, hide auth screen if already logged in (e.g., via localStorage)
+    // if(localStorage.getItem('user')) { authScreen.style.display='none'; startScreen.classList.remove('hidden'); }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
