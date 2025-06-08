@@ -13,7 +13,7 @@ const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
 const popupLevel = document.getElementById('popupLevel');
-const popupScore = document.getElementById('popupScore');
+const popupScore = document.getElementById('popupScore");
 const popupTime = document.getElementById('popupTime');
 const homeBtn = document.getElementById('homeBtn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
@@ -149,7 +149,7 @@ function flipCard() {
 function checkForMatch() {
   const [cardOne, cardTwo] = flippedCards;
   if (cardOne.dataset.name === cardTwo.dataset.name) {
-    matchedCards.push(cardOne, card Two);
+    matchedCards.push(cardOne, cardTwo);
     score += 10;
     scoreDisplay.textContent = score;
 
@@ -375,14 +375,13 @@ newGameBtn.addEventListener('click', () => {
   startScreen.classList.remove('hidden');
 });
 
-// ================== Popunder Ad Logic ==================
+// ================== Custom Ad Logic ==================
 let adTimerInterval = null;
 
 function showRewardedAd(onComplete) {
-  // Trigger popunder ad script on click
-  const popunderScript = document.createElement('script');
-  popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
-  document.head.appendChild(popunderScript);
+  // Open your blog link in a new tab
+  const blogLink = 'https://nas-1-8l2v.onrender.com'; // Aapka blog ka link
+  window.open(blogLink, '_blank');
 
   // Create or show an ad popup with timer
   const adPopup = document.createElement('div');
@@ -479,4 +478,4 @@ document.addEventListener('touchstart', (e) => {
 window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
-                     
+      
