@@ -215,7 +215,7 @@ function showPopup(win, message) {
   popupMessage.textContent = message;
   popupLevel.textContent = level;
   popupScore.textContent = score;
-  popupTime.textContent = Math.max(0, Math.floor(timer));
+  popupTime.textContent = Math.max(0, Math.floor(timer);
   popup.classList.remove('hidden');
   popup.style.animation = 'zoomIn 0.3s ease forwards';
 
@@ -399,7 +399,7 @@ timeoutPlayAgainBtn.addEventListener('click', () => {
 
 // On load check saved progress
 window.addEventListener('load', () => {
-  initAdMob();
+  // initAdMob() removed as per your request
   const progress = loadProgress();
   if (progress) {
     showResumePopup(progress);
@@ -420,7 +420,7 @@ window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
 
-// AdMob Rewarded Ad simulation (REPLACED WITH POPUNDER AD LOGIC + TIMER)
+// ========== REWARDED/POPUNDER AD LOGIC (AdMob removed) ==========
 let rewardedAdLoaded = true; // Simulate ad loaded
 
 function showRewardedAd(onComplete) {
@@ -485,10 +485,3 @@ function showRewardedAd(onComplete) {
     onComplete();
   };
 }
-
-// Initialize AdMob Banner Ad
-function initAdMob() {
-  if (!window.adsbygoogle) return;
-  (adsbygoogle = window.adsbygoogle || []).push({});
-}
-  
