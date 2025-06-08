@@ -13,7 +13,7 @@ const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
 const popupLevel = document.getElementById('popupLevel');
-const popupScore = document.getElementById('popupScore");
+const popupScore = document.getElementById('popupScore');
 const popupTime = document.getElementById('popupTime');
 const homeBtn = document.getElementById('homeBtn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
@@ -375,75 +375,17 @@ newGameBtn.addEventListener('click', () => {
   startScreen.classList.remove('hidden');
 });
 
-// ================== Custom Ad Logic ==================
-let adTimerInterval = null;
-
-function showRewardedAd(onComplete) {
-  // Open your blog link in a new tab
-  const blogLink = 'https://nas-1-8l2v.onrender.com'; // Aapka blog ka link
-  window.open(blogLink, '_blank');
-
-  // Create or show an ad popup with timer
-  const adPopup = document.createElement('div');
-  adPopup.id = 'rewardedAdPopup';
-  adPopup.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 9999;
-    color: white;
-    text-align: center;
-    padding-top: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  `;
-  adPopup.innerHTML = `
-    <h2>Watch Ad 5 Seconds to Continue</h2>
-    <div id="adTimer" style="font-size: 2em; margin: 20px 0;">5</div>
-    <div id="adBack" style="display: none; margin-top: 20px;">
-      <button id="adBackBtn" style="font-size: 24px; background: #4CAF50; border: none; color: white; padding: 10px 30px; border-radius: 5px;">Back to Game</button>
-    </div>
-  `;
-  document.body.appendChild(adPopup);
-
-  // Start timer
-  let seconds = 5;
-  const timerEl = document.getElementById('adTimer');
-  const backEl = document.getElementById('adBack');
-  adTimerInterval = setInterval(() => {
-    seconds--;
-    timerEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(adTimerInterval);
-      backEl.style.display = 'block';
-    }
-  }, 1000);
-
-  // Back button handler
-  document.getElementById('adBackBtn').onclick = function() {
-    clearInterval(adTimerInterval);
-    document.body.removeChild(adPopup);
-    // Give 10 seconds extra time in game
-    timer += 10;
-    timerDisplay.textContent = Math.floor(timer);
-    onComplete();
-  };
-}
-
-// ========== Updated Button Click Handlers ==========
 continueBtn.addEventListener('click', () => {
-  showRewardedAd(() => {
-    const progress = loadProgress();
-    if (progress) continueGame(progress);
-  });
+  alert('Watch ad placeholder - after watching ad, game will continue.');
+  const progress = loadProgress();
+  if (progress) {
+    continueGame(progress);
+  }
 });
 
+// Timeout popup buttons
 timeoutContinueBtn.addEventListener('click', () => {
+  // Show rewarded ad simulation before continue
   showRewardedAd(() => {
     hideTimeoutPopup(() => {
       continueGame({level, score});
@@ -459,6 +401,7 @@ timeoutPlayAgainBtn.addEventListener('click', () => {
 
 // On load check saved progress
 window.addEventListener('load', () => {
+  initAdMob();
   const progress = loadProgress();
   if (progress) {
     showResumePopup(progress);
@@ -478,4 +421,26 @@ document.addEventListener('touchstart', (e) => {
 window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
-               
+
+// AdMob Rewarded Ad simulation (replace with real SDK for native apps)
+let rewardedAdLoaded = true; // Simulate ad loaded
+
+function showRewardedAd(onComplete) {
+  if (!rewardedAdLoaded) {
+    alert('Ad not loaded yet, please try again later.');
+    return;
+  }
+  const watched = confirm('Watch rewarded ad to continue? Click OK to simulate watching ad.');
+  if (watched) {
+    onComplete();
+  } else {
+    alert('You need to watch the ad to continue.');
+  }
+}
+
+// Initialize AdMob Banner Ad
+function initAdMob() {
+  if (!window.adsbygoogle) return;
+  (adsbygoogle = window.adsbygoogle || []).push({});
+  }
+    
