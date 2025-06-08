@@ -215,7 +215,7 @@ function showPopup(win, message) {
   popupMessage.textContent = message;
   popupLevel.textContent = level;
   popupScore.textContent = score;
-  popupTime.textContent = Math.max(0, Math.floor(timer);
+  popupTime.textContent = Math.max(0, Math.floor(timer));
   popup.classList.remove('hidden');
   popup.style.animation = 'zoomIn 0.3s ease forwards';
 
@@ -375,19 +375,24 @@ newGameBtn.addEventListener('click', () => {
   startScreen.classList.remove('hidden');
 });
 
+// ========== Popunder Ad Trigger Function ==========
+function triggerPopunderAd() {
+  const popunderScript = document.createElement('script');
+  popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
+  document.head.appendChild(popunderScript);
+}
+
+// ========== Updated Button Click Handlers ==========
 continueBtn.addEventListener('click', () => {
-  showRewardedAd(() => {
-    const progress = loadProgress();
-    if (progress) continueGame(progress);
-  });
+  triggerPopunderAd();
+  const progress = loadProgress();
+  if (progress) continueGame(progress);
 });
 
-// Timeout popup buttons
 timeoutContinueBtn.addEventListener('click', () => {
-  showRewardedAd(() => {
-    hideTimeoutPopup(() => {
-      continueGame({level, score});
-    });
+  triggerPopunderAd();
+  hideTimeoutPopup(() => {
+    continueGame({level, score});
   });
 });
 
@@ -399,7 +404,6 @@ timeoutPlayAgainBtn.addEventListener('click', () => {
 
 // On load check saved progress
 window.addEventListener('load', () => {
-  // initAdMob() removed as per your request
   const progress = loadProgress();
   if (progress) {
     showResumePopup(progress);
@@ -419,69 +423,4 @@ document.addEventListener('touchstart', (e) => {
 window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
-
-// ========== REWARDED/POPUNDER AD LOGIC (AdMob removed) ==========
-let rewardedAdLoaded = true; // Simulate ad loaded
-
-function showRewardedAd(onComplete) {
-  if (!rewardedAdLoaded) {
-    alert('Ad not loaded yet, please try again later.');
-    return;
-  }
-
-  // Trigger popunder ad script on click
-  const popunderScript = document.createElement('script');
-  popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
-  document.head.appendChild(popunderScript);
-
-  // Create or show an ad popup with timer
-  const adPopup = document.createElement('div');
-  adPopup.id = 'rewardedAdPopup';
-  adPopup.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 9999;
-    color: white;
-    text-align: center;
-    padding-top: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  `;
-  adPopup.innerHTML = `
-    <h2>Watch Ad 5 Seconds to Continue</h2>
-    <div id="adTimer" style="font-size: 2em; margin: 20px 0;">5</div>
-    <div id="adBack" style="display: none; margin-top: 20px;">
-      <button id="adBackBtn" style="font-size: 24px; background: #4CAF50; border: none; color: white; padding: 10px 30px; border-radius: 5px;">Back to Game</button>
-    </div>
-  `;
-  document.body.appendChild(adPopup);
-
-  // Start timer
-  let seconds = 5;
-  const timerEl = document.getElementById('adTimer');
-  const backEl = document.getElementById('adBack');
-  const timerInterval = setInterval(() => {
-    seconds--;
-    timerEl.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(timerInterval);
-      backEl.style.display = 'block';
-    }
-  }, 1000);
-
-  // Back button handler
-  document.getElementById('adBackBtn').onclick = function() {
-    clearInterval(timerInterval);
-    document.body.removeChild(adPopup);
-    // Give 10 seconds extra time in game
-    timer += 10;
-    timerDisplay.textContent = Math.floor(timer);
-    onComplete();
-  };
-}
+        
