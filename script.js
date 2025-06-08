@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements for Auth System ---
+    // mainAppContainer is now the fixed-size wrapper
     const mainAppContainer = document.getElementById('main-app-container');
     const authPage = document.getElementById('auth-page');
     const gamePage = document.getElementById('game-page'); // The main container for all game HTML
@@ -228,8 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to logout?')) {
             clearLoggedInUser();
-            showPage('auth-page'); // Transition back to auth page
             resetGame(); // Reset game state and UI to start screen for the next user
+            showPage('auth-page'); // Transition back to auth page
             alert('You have been logged out.');
         }
     });
@@ -439,6 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
         saveProgress();
       } else {
         // If it's a lose condition from game play, not timeout
+        // (Timeout already calls clearProgress indirectly by resetting on play again)
+        // For direct lose, ensure progress is cleared.
         clearProgress();
       }
     }
@@ -457,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveProgress() {
         const userEmail = getLoggedInUser();
         if (!userEmail) {
-            console.error("No logged in user to save progress for.");
+            console.warn("No logged in user to save progress for.");
             return;
         }
         const userData = {
@@ -470,8 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadProgress() {
         const userEmail = getLoggedInUser();
         if (!userEmail) {
-            // console.error("No logged in user to load progress for."); // This can happen on first load, so just return null
-            return null;
+            return null; // Not an error, just no user logged in or no progress for guest
         }
         const savedData = localStorage.getItem(`gameProgress_${userEmail}`);
         return savedData ? JSON.parse(savedData) : null;
@@ -573,8 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Game Event listeners
     startBtn.addEventListener('click', () => {
       // Game start always resets and begins new level 1
-      level = 1;
-      score = 0;
+      resetGame(); // Ensure clean slate and clear old progress if any
       startLevel();
     });
 
@@ -588,8 +589,4 @@ document.addEventListener('DOMContentLoaded', () => {
       hidePopup(() => {
         level++;
         if(level > maxLevels) {
-          alert(`🎉 Congratulations! You completed all ${maxLevels} levels! Your score: ${score}`);
-          resetGame(); // Go back to start screen after all levels
-        } else {
-          startLevel();
-       
+          alert(`🎉 Congratulations! You com
