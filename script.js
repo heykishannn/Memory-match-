@@ -442,5 +442,4 @@ function showRewardedAd(onComplete) {
 function initAdMob() {
   if (!window.adsbygoogle) return;
   (adsbygoogle = window.adsbygoogle || []).push({});
-  }
-    
+    }
