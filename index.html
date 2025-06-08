@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- IMPORTANT: Viewport meta for fixed size -->
   <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Memory Match Game</title>
   <link rel="stylesheet" href="style.css" />
@@ -10,170 +9,114 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
-    <!-- Main container for the entire application (fixed 360x640px viewport) -->
-    <div id="main-app-container">
-        <!-- Login/Signup Page -->
-        <div id="auth-page" class="hidden">
-            <h1>Welcome to the Game!</h1>
-            <div class="auth-toggle">
-                <button id="show-login" class="active">Login</button>
-                <button id="show-signup">Sign Up</button>
-            </div>
+  <!-- Start Screen -->
+  <div id="start-screen" class="center-screen">
+    <h1 class="small-title">MEMORY MATCH</h1>
+    <button id="startBtn" class="btn-primary">Start</button>
+  </div>
 
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form">
-                <h2>Login</h2>
-                <div class="form-group">
-                    <label for="login-email">Email:</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password:</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit">Login</button>
-                <p id="login-message" class="message error"></p>
-            </form>
-
-            <!-- Signup Form -->
-            <form id="signup-form" class="auth-form hidden">
-                <h2>Sign Up</h2>
-                <div class="form-group">
-                    <label for="signup-email">Email:</label>
-                    <input type="email" id="signup-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password:</label>
-                    <input type="password" id="signup-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password:</label>
-                    <input type="password" id="confirm-password" required>
-                </div>
-                <button type="submit">Sign Up</button>
-                <p id="signup-message" class="message error"></p>
-            </form>
+  <!-- Game Screen -->
+  <div id="game-screen" class="hidden">
+    <header class="game-header">
+      <h1 class="small-title">MEMORY MATCH</h1>
+      <div class="toggles-row">
+        <div class="toggle-wrapper toggle-left">
+          <label class="switch orange-switch">
+            <input type="checkbox" id="soundToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <div class="toggle-label">Sound</div>
         </div>
 
-        <!-- Game Page (Contains all game specific HTML) -->
-        <div id="game-page" class="hidden">
-            <!-- Game Header (contains welcome message, logout, game toggles) -->
-            <header class="game-header">
-                <!-- Welcome/Logout Row -->
-                <div id="game-page-logout-header">
-                    <h1 id="welcome-message">Welcome, User!</h1>
-                    <button id="logout-btn">Logout</button>
-                </div>
-                <!-- Game Title (from original game HTML) -->
-                <h1 class="small-title">MEMORY MATCH</h1>
-                <!-- Toggles Row (from original game HTML) -->
-                <div class="toggles-row">
-                    <div class="toggle-wrapper toggle-left">
-                        <label class="switch orange-switch">
-                            <input type="checkbox" id="soundToggle" checked />
-                            <span class="slider"></span>
-                        </label>
-                        <div class="toggle-label">Sound</div>
-                    </div>
+        <button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
 
-                    <button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
-
-                    <div class="toggle-wrapper toggle-right">
-                        <label class="switch orange-switch">
-                            <input type="checkbox" id="vibrationToggle" checked />
-                            <span class="slider"></span>
-                        </label>
-                        <div class="toggle-label">Vibration</div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Start Screen (moved inside game-page) -->
-            <div id="start-screen" class="center-screen hidden">
-                <h1 class="small-title">MEMORY MATCH</h1>
-                <button id="startBtn" class="btn-primary">Start</button>
-            </div>
-
-            <!-- Game Screen (moved inside game-page) -->
-            <div id="game-screen" class="hidden">
-                <div class="game-wrapper">
-                    <div class="game-info">
-                        <div class="level-info">Level: <span id="levelDisplay">1</span></div>
-                        <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
-                        <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
-                    </div>
-                    <div class="game-container" id="game"></div>
-                </div>
-            </div>
-
-            <!-- Resume Popup Modal -->
-            <div id="resumePopup" class="popup hidden">
-                <div class="popup-content">
-                    <h2>Welcome Back!</h2>
-                    <p>You have a saved game.</p>
-                    <div class="popup-buttons">
-                        <button id="newGameBtn" class="btn-primary">Start New Game</button>
-                        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Win/Lose Popup Modal -->
-            <div id="popup" class="popup hidden">
-                <div class="popup-content">
-                    <h2 id="popupTitle">You Won!</h2>
-                    <p id="popupMessage">Level Complete!</p>
-                    <div class="popup-stats" id="popupStats">
-                        <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
-                        <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
-                        <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
-                    </div>
-                    <div class="popup-buttons" id="popupButtons">
-                        <button id="homeBtn" class="btn-primary">Home</button>
-                        <button id="nextLevelBtn" class="btn-primary">Next Level</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Timeout Popup Modal -->
-            <div id="timeoutPopup" class="popup hidden">
-                <div class="popup-content">
-                    <h2>Time Out!</h2>
-                    <div class="popup-buttons" style="justify-content: center; gap: 15px;">
-                        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
-                        <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer with Banner Ad -->
-            <div id="bannerAdContainer">
-                <!-- Google AdMob Banner Ad -->
-                <ins class="adsbygoogle"
-                    style="display:inline-block;width:360px;height:50px"
-                    data-ad-client="ca-pub-6948714269796627"
-                    data-ad-slot="7517631973"></ins>
-            </div>
-
-            <!-- New Footer Ad Script -->
-            <div class="new-footer-ad-container">
-                <script type="text/javascript">
-                atOptions = {
-                    'key' : '1401828e48164d6e5d2cfae0724ee0df',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
-            </div>
-
-            <footer>
-                Powered by NAS
-            </footer>
+        <div class="toggle-wrapper toggle-right">
+          <label class="switch orange-switch">
+            <input type="checkbox" id="vibrationToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <div class="toggle-label">Vibration</div>
         </div>
+      </div>
+    </header>
+
+    <div class="game-wrapper">
+      <div class="game-info">
+        <div class="level-info">Level: <span id="levelDisplay">1</span></div>
+        <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
+        <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
+      </div>
+
+      <div class="game-container" id="game"></div>
     </div>
+  </div>
+
+  <!-- Resume Popup Modal -->
+  <div id="resumePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Welcome Back!</h2>
+      <p>You have a saved game.</p>
+      <div class="popup-buttons">
+        <button id="newGameBtn" class="btn-primary">Start New Game</button>
+        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win/Lose Popup Modal -->
+  <div id="popup" class="popup hidden">
+    <div class="popup-content">
+      <h2 id="popupTitle">You Won!</h2>
+      <p id="popupMessage">Level Complete!</p>
+      <div class="popup-stats" id="popupStats">
+        <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
+        <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
+        <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
+      </div>
+      <div class="popup-buttons" id="popupButtons">
+        <button id="homeBtn" class="btn-primary">Home</button>
+        <button id="nextLevelBtn" class="btn-primary">Next Level</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeout Popup Modal -->
+  <div id="timeoutPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Time Out!</h2>
+      <div class="popup-buttons" style="justify-content: center; gap: 15px;">
+        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+        <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Banner Ad -->
+  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+    <!-- Google AdMob Banner Ad -->
+    <ins class="adsbygoogle"
+         style="display:inline-block;width:360px;height:50px"
+         data-ad-client="ca-pub-6948714269796627"
+         data-ad-slot="7517631973"></ins>
+  </div>
+
+  <!-- New Footer Ad Script -->
+  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '1401828e48164d6e5d2cfae0724ee0df',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
+  </div>
+
+  <footer>
+    Powered by NAS
+  </footer>
 
   <!-- Audio Files -->
   <audio id="flipSound" src="tap.mp3" preload="auto"></audio>
