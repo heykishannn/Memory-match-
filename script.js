@@ -376,16 +376,14 @@ newGameBtn.addEventListener('click', () => {
 });
 
 continueBtn.addEventListener('click', () => {
-  alert('Watch ad placeholder - after watching ad, game will continue.');
-  const progress = loadProgress();
-  if (progress) {
-    continueGame(progress);
-  }
+  showRewardedAd(() => {
+    const progress = loadProgress();
+    if (progress) continueGame(progress);
+  });
 });
 
 // Timeout popup buttons
 timeoutContinueBtn.addEventListener('click', () => {
-  // Show rewarded ad simulation before continue
   showRewardedAd(() => {
     hideTimeoutPopup(() => {
       continueGame({level, score});
@@ -422,7 +420,7 @@ window.addEventListener('beforeunload', () => {
   stopAllSounds();
 });
 
-// AdMob Rewarded Ad simulation (replace with real SDK for native apps)
+// AdMob Rewarded Ad simulation (REPLACED WITH POPUNDER AD LOGIC + TIMER)
 let rewardedAdLoaded = true; // Simulate ad loaded
 
 function showRewardedAd(onComplete) {
@@ -430,16 +428,68 @@ function showRewardedAd(onComplete) {
     alert('Ad not loaded yet, please try again later.');
     return;
   }
-  const watched = confirm('Watch rewarded ad to continue? Click OK to simulate watching ad.');
-  if (watched) {
+
+  // Create or show an ad popup
+  const adPopup = document.createElement('div');
+  adPopup.id = 'rewardedAdPopup';
+  adPopup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    color: white;
+    text-align: center;
+    padding-top: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  `;
+  adPopup.innerHTML = `
+    <h2>Watch Ad 5 Seconds to Continue</h2>
+    <div id="adTimer" style="font-size: 2em; margin: 20px 0;">5</div>
+    <div id="adClose" style="display: none; margin-top: 20px;">
+      <button id="adCloseBtn" style="font-size: 24px; background: none; border: none; color: white;">❌</button>
+    </div>
+  `;
+  document.body.appendChild(adPopup);
+
+  // Start timer
+  let seconds = 5;
+  const timerEl = document.getElementById('adTimer');
+  const closeEl = document.getElementById('adClose');
+  const timerInterval = setInterval(() => {
+    seconds--;
+    timerEl.textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(timerInterval);
+      closeEl.style.display = 'block';
+    }
+  }, 1000);
+
+  // Close button handler
+  document.getElementById('adCloseBtn').onclick = function() {
+    clearInterval(timerInterval);
+    document.body.removeChild(adPopup);
+    // Give 10 seconds extra time in game
+    timer += 10;
+    timerDisplay.textContent = Math.floor(timer);
+    // Optionally, trigger popunder ad script here if needed
+    // (Most popunder scripts auto-trigger on page load)
+    // If manual trigger needed, uncomment below:
+    // const popunderScript = document.createElement('script');
+    // popunderScript.src = '//pl26683667.profitableratecpm.com/38/ec/58/38ec58b42ef220b94b4f25b7b1ca6d0a.js';
+    // document.head.appendChild(popunderScript);
     onComplete();
-  } else {
-    alert('You need to watch the ad to continue.');
-  }
+  };
 }
 
 // Initialize AdMob Banner Ad
 function initAdMob() {
   if (!window.adsbygoogle) return;
   (adsbygoogle = window.adsbygoogle || []).push({});
-}
+                       }
+    
