@@ -25,12 +25,22 @@
       <p class="page-subtitle">Login or Sign Up to Play</p>
       <div class="form-container">
         <input type="email" id="emailInput" class="input-field" placeholder="Enter your email" />
-        <button id="loginBtn" class="btn-primary">Login</button>
-        <button id="signupBtn" class="btn-primary">Sign Up</button>
+        <button id="watchAdBtn" class="btn-primary">Watch Ad to Continue</button>
       </div>
       <p id="authMessage" class="auth-message"></p>
     </div>
   </div>
+
+  <!-- Ad Simulation Screen -->
+  <div id="ad-simulation-screen" class="hidden">
+    <div class="ad-content">
+      <h2>Playing Ad</h2>
+      <p>Please wait while the ad finishes...</p>
+      <div id="adTimerDisplay" class="ad-timer">5s</div>
+      <div class="spinner"></div>
+    </div>
+  </div>
+
   <!-- Start Screen -->
   <div id="start-screen" class="center-screen hidden">
     <h1 class="small-title">MEMORY MATCH</h1>

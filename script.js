@@ -19,6 +19,11 @@ const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const authMessage = document.getElementById('authMessage');
 
+// Ad Simulation Screen Elements
+const adSimulationScreen = document.getElementById('ad-simulation-screen');
+const adTimerDisplay = document.getElementById('adTimerDisplay');
+const watchAdBtn = document.getElementById('watchAdBtn');
+
 const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
@@ -418,47 +423,57 @@ function isValidEmail(email) {
 // Function to handle successful login/signup
 function handleSuccessfulAuth(email) {
   localStorage.setItem('userEmail', email); // Store email
-  if (authMessage) authMessage.textContent = 'Success!';
-  if (authMessage) authMessage.style.color = '#d4edda'; // Greenish for success
 
-  // Hide login/signup screen and show main game screen (start-screen)
-  setTimeout(() => {
-    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
-    if (startScreen) startScreen.classList.remove('hidden');
-    // Potentially load game progress here if that's the desired flow after login
-    // For now, just show the start screen. Saved game state will be checked on load.
-  }, 1000); // Short delay to show success message
+  // No success message needed on authMessage as we are past that screen
+  // if (authMessage) authMessage.textContent = 'Success!';
+  // if (authMessage) authMessage.style.color = '#d4edda';
+
+  // Hide login/signup screen (already hidden) and ad screen (already hidden by timer)
+  // Show main game screen (start-screen)
+  // No timeout needed here as the ad itself was the "delay"
+  if (startScreen) startScreen.classList.remove('hidden');
+
+  // Check for saved game progress (this part is new for this function but uses existing logic)
+  const progress = loadProgress();
+  if (progress) {
+    showResumePopup(progress);
+  }
 }
 
-// Event Listener for Login Button
-if (loginBtn) {
-  loginBtn.addEventListener('click', () => {
+// if (loginBtn) { ... } // Commented out
+// if (signupBtn) { ... } // Commented out
+
+if (watchAdBtn) {
+  watchAdBtn.addEventListener('click', () => {
     const email = emailInput.value.trim();
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(email)) { // isValidEmail function should already exist
       if (authMessage) authMessage.textContent = 'Please enter a valid email address.';
       if (authMessage) authMessage.style.color = '#f8d7da'; // Reddish for error
       return;
     }
-    // For demo purposes, login is always successful if email is valid
-    // In a real app, you'd verify credentials against a backend
-    console.log('Login attempt with:', email);
-    handleSuccessfulAuth(email);
-  });
-}
 
-// Event Listener for Sign Up Button
-if (signupBtn) {
-  signupBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim();
-    if (!isValidEmail(email)) {
-      if (authMessage) authMessage.textContent = 'Please enter a valid email address for signup.';
-      if (authMessage) authMessage.style.color = '#f8d7da'; // Reddish for error
-      return;
-    }
-    // For demo purposes, signup is always successful if email is valid
-    // In a real app, you'd create a new user account with a backend
-    console.log('Signup attempt with:', email);
-    handleSuccessfulAuth(email); // Same handling as login for this demo
+    // Valid email, proceed to ad simulation
+    if (authMessage) authMessage.textContent = ''; // Clear any previous error
+
+    if (loginSignupScreen) loginSignupScreen.classList.add('hidden'); // Hide login form
+    if (adSimulationScreen) adSimulationScreen.classList.remove('hidden'); // Show ad screen
+
+    let adTimeRemaining = 5;
+    if (adTimerDisplay) adTimerDisplay.textContent = adTimeRemaining + 's';
+
+    const adTimerInterval = setInterval(() => {
+      adTimeRemaining--;
+      if (adTimerDisplay) adTimerDisplay.textContent = adTimeRemaining + 's';
+      if (adTimeRemaining <= 0) {
+        clearInterval(adTimerInterval);
+        if (adSimulationScreen) adSimulationScreen.classList.add('hidden');
+
+        // Call the function that handles storing email and showing the main game screen
+        // This function was previously named handleSuccessfulAuth.
+        // Ensure it's defined and does what's needed.
+        handleSuccessfulAuth(email);
+      }
+    }, 1000);
   });
 }
 
@@ -475,6 +490,7 @@ window.addEventListener('load', () => {
     // Hide splash and login screens immediately
     if (splashScreen) splashScreen.classList.add('hidden');
     if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+    if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
 
     // Show the main game screen (start-screen)
     if (startScreen) startScreen.classList.remove('hidden');
@@ -494,6 +510,7 @@ window.addEventListener('load', () => {
     // (HTML defaults should handle this, but good to be sure)
     if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
     if (startScreen) startScreen.classList.add('hidden');
+    if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
     if (splashScreen) splashScreen.classList.remove('hidden'); // Make sure splash is visible
 
     setTimeout(() => {

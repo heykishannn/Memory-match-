@@ -562,3 +562,59 @@ footer {
   color: #ffdddd; /* Light red for error messages, can be changed by JS */
   min-height: 20px; /* Reserve space for messages */
 }
+
+/* Ad Simulation Screen Styles */
+#ad-simulation-screen {
+  display: flex; /* Changed by JS to flex when shown */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.85); /* Dark overlay */
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2001; /* Highest z-index to cover everything */
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Ensure .hidden correctly hides it */
+#ad-simulation-screen.hidden {
+   display: none;
+}
+
+.ad-content h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.ad-content p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.ad-timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #ffc107; /* Amber color for timer */
+}
+
+/* Basic spinner animation */
+.spinner {
+  border: 6px solid #f3f3f3; /* Light grey */
+  border-top: 6px solid #ff6a00; /* Orange */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto; /* Center the spinner */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
