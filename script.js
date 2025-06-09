@@ -14,6 +14,7 @@ const splashScreen = document.getElementById('splash-screen');
 const loginSignupScreen = document.getElementById('login-signup-screen');
 
 // Login/Signup Screen Elements
+const usernameInput = document.getElementById('usernameInput');
 const emailInput = document.getElementById('emailInput');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
@@ -22,7 +23,6 @@ const authMessage = document.getElementById('authMessage');
 // Ad Simulation Screen Elements
 const adSimulationScreen = document.getElementById('ad-simulation-screen');
 const adTimerDisplay = document.getElementById('adTimerDisplay');
-const watchAdBtn = document.getElementById('watchAdBtn');
 
 const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
@@ -37,9 +37,9 @@ const resumePopup = document.getElementById('resumePopup');
 const newGameBtn = document.getElementById('newGameBtn');
 const continueBtn = document.getElementById('continueBtn');
 
-const timeoutPopup = document.getElementById('timeoutPopup');
-const timeoutContinueBtn = document.getElementById('timeoutContinueBtn');
-const timeoutPlayAgainBtn = document.getElementById('timeoutPlayAgainBtn');
+const losePopupWindow = document.getElementById('losePopupWindow'); // Renamed
+const losePlayAgainBtn = document.getElementById('losePlayAgainBtn'); // New
+const loseHomeBtn = document.getElementById('loseHomeBtn'); // New
 
 const flipSound = document.getElementById('flipSound');
 const matchSound = document.getElementById('matchSound');
@@ -200,30 +200,38 @@ function startTimer() {
     timerDisplay.textContent = Math.max(0, Math.floor(timer));
     if (timer <= 0) {
       clearInterval(timerInterval);
-      showTimeoutPopup();
+      showLoseWindow(); // Renamed
     }
   }, 1000);
 }
 
-// Show timeout popup
-function showTimeoutPopup() {
-  timeoutPopup.classList.remove('hidden');
+// Show lose window
+function showLoseWindow() { // Renamed
+  losePopupWindow.classList.remove('hidden'); // Use new ID
+  // Ensure other popups/screens are not interactive or hidden
   gameScreen.style.pointerEvents = 'none';
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
 
   if (soundToggle.checked) {
-    stopAllSounds();
+    stopAllSounds(); // Stop other sounds first
     loseSound.currentTime = 0;
-    loseSound.play();
+    loseSound.play(); // Play lose sound
   }
-  vibratePattern(300);
+  vibratePattern(300); // Optional: keep vibration
 }
 
-// Hide timeout popup
-function hideTimeoutPopup(callback) {
-  timeoutPopup.classList.add('hidden');
+// Hide lose window
+function hideLoseWindow(callback) { // Renamed
+  losePopupWindow.classList.add('hidden'); // Use new ID
   gameScreen.style.pointerEvents = 'auto';
+
+  // Stop the lose sound
+  if (soundToggle.checked || !loseSound.paused) { // Check if it was playing
+      loseSound.pause();
+      loseSound.currentTime = 0;
+  }
+
   if (callback) callback();
 }
 
@@ -321,17 +329,18 @@ function resetGame() {
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
-  timeoutPopup.classList.add('hidden');
+  if (losePopupWindow) losePopupWindow.classList.add('hidden'); // Ensure losePopupWindow is hidden
   gameContainer.style.pointerEvents = 'auto';
 }
 
 // Resume popup
-function showResumePopup(progress) {
+function showResumePopup(progress) { // progress parameter is important
   resumePopup.classList.remove('hidden');
   startScreen.classList.add('hidden');
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
-  timeoutPopup.classList.add('hidden');
+  if (losePopupWindow) losePopupWindow.classList.add('hidden'); // Ensure losePopupWindow is also hidden
+  loginSignupScreen.classList.add('hidden'); // Ensure login screen is hidden
 }
 
 function continueGame(progress) {
@@ -340,7 +349,7 @@ function continueGame(progress) {
   resumePopup.classList.add('hidden');
   startScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
-  timeoutPopup.classList.add('hidden');
+  if (losePopupWindow) losePopupWindow.classList.add('hidden'); // Ensure losePopupWindow is hidden
   isPaused = false;
   startTimer();
 }
@@ -394,28 +403,39 @@ newGameBtn.addEventListener('click', () => {
 });
 
 continueBtn.addEventListener('click', () => {
-  alert('Watch ad placeholder - after watching ad, game will continue.');
   const progress = loadProgress();
   if (progress) {
+    // Ensure resumePopup is hidden and game screen is shown by continueGame or here
+    resumePopup.classList.add('hidden');
+    gameScreen.classList.remove('hidden'); // Ensure game screen is shown
+    startScreen.classList.add('hidden'); // Ensure start screen is hidden
     continueGame(progress);
+  } else {
+    // Fallback if progress somehow is null, though showResumePopup usually ensures it's not
+    resumePopup.classList.add('hidden');
+    startScreen.classList.remove('hidden');
   }
 });
 
-// Timeout popup buttons
-timeoutContinueBtn.addEventListener('click', () => {
-  // Show rewarded ad simulation before continue
-  showRewardedAd(() => {
-    hideTimeoutPopup(() => {
-      continueGame({level, score});
+if (losePlayAgainBtn) {
+  losePlayAgainBtn.addEventListener('click', () => {
+    hideLoseWindow(() => { // Pass callback to ensure sound stops before action
+      score = 0; // Reset score for the current level attempt or handle as per game rules
+      // It should restart the current level.
+      // Re-initialize or reset aspects of the current level.
+      // For instance, if `startLevel()` resets and starts the current `level`:
+      startLevel();
     });
   });
-});
+}
 
-timeoutPlayAgainBtn.addEventListener('click', () => {
-  hideTimeoutPopup(() => {
-    startLevel();
+if (loseHomeBtn) {
+  loseHomeBtn.addEventListener('click', () => {
+    hideLoseWindow(() => { // Pass callback
+      resetGame(); // resetGame() typically takes user to home/start screen
+    });
   });
-});
+}
 
 // Function to validate email (basic)
 function isValidEmail(email) {
@@ -424,7 +444,8 @@ function isValidEmail(email) {
 }
 
 // Function to handle successful login/signup
-function handleSuccessfulAuth(email) {
+function handleSuccessfulAuth(username, email) {
+  localStorage.setItem('username', username); // Store username
   localStorage.setItem('userEmail', email); // Store email
 
   // No success message needed on authMessage as we are past that screen
@@ -434,6 +455,9 @@ function handleSuccessfulAuth(email) {
   // Hide login/signup screen (already hidden) and ad screen (already hidden by timer)
   // Show main game screen (start-screen)
   // No timeout needed here as the ad itself was the "delay"
+  if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+  if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
+
   if (startScreen) startScreen.classList.remove('hidden');
 
   // Check for saved game progress (this part is new for this function but uses existing logic)
@@ -443,42 +467,58 @@ function handleSuccessfulAuth(email) {
   }
 }
 
-// if (loginBtn) { ... } // Commented out
-// if (signupBtn) { ... } // Commented out
-
-if (watchAdBtn) {
-  watchAdBtn.addEventListener('click', () => {
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
-    if (!isValidEmail(email)) { // isValidEmail function should already exist
+
+    if (!username) {
+      if (authMessage) authMessage.textContent = 'Please enter a username.';
+      if (authMessage) authMessage.style.color = '#f8d7da';
+      return;
+    }
+    if (!isValidEmail(email)) {
       if (authMessage) authMessage.textContent = 'Please enter a valid email address.';
-      if (authMessage) authMessage.style.color = '#f8d7da'; // Reddish for error
+      if (authMessage) authMessage.style.color = '#f8d7da';
       return;
     }
 
-    // Valid email, proceed to ad simulation
     if (authMessage) authMessage.textContent = ''; // Clear any previous error
-
-    if (loginSignupScreen) loginSignupScreen.classList.add('hidden'); // Hide login form
-    if (adSimulationScreen) adSimulationScreen.classList.remove('hidden'); // Show ad screen
-
-    let adTimeRemaining = 5;
-    if (adTimerDisplay) adTimerDisplay.textContent = adTimeRemaining + 's';
-
-    const adTimerInterval = setInterval(() => {
-      adTimeRemaining--;
-      if (adTimerDisplay) adTimerDisplay.textContent = adTimeRemaining + 's';
-      if (adTimeRemaining <= 0) {
-        clearInterval(adTimerInterval);
-        if (adSimulationScreen) adSimulationScreen.classList.add('hidden');
-
-        // Call the function that handles storing email and showing the main game screen
-        // This function was previously named handleSuccessfulAuth.
-        // Ensure it's defined and does what's needed.
-        handleSuccessfulAuth(email);
-      }
-    }, 1000);
+    handleSuccessfulAuth(username, email);
   });
 }
+
+if (signupBtn) {
+  signupBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+
+    if (!username) {
+      if (authMessage) authMessage.textContent = 'Please enter a username.';
+      if (authMessage) authMessage.style.color = '#f8d7da';
+      return;
+    }
+    if (!isValidEmail(email)) {
+      if (authMessage) authMessage.textContent = 'Please enter a valid email address.';
+      if (authMessage) authMessage.style.color = '#f8d7da';
+      return;
+    }
+
+    if (authMessage) authMessage.textContent = ''; // Clear any previous error
+    handleSuccessfulAuth(username, email);
+    // In a real app, signup might have slightly different logic,
+    // like checking if user already exists, but for now, it's the same as login.
+  });
+}
+
+// Remove or comment out the old watchAdBtn listener:
+/*
+if (watchAdBtn) {
+  watchAdBtn.addEventListener('click', () => {
+    // ... old logic ...
+  });
+}
+*/
 
 // On load check saved progress
 window.addEventListener('load', () => {
@@ -499,11 +539,11 @@ window.addEventListener('load', () => {
   }
 
   const userEmail = localStorage.getItem('userEmail');
-  // splashScreen, loginSignupScreen, startScreen are already defined globally
+  const username = localStorage.getItem('username'); // Check for username
 
-  if (userEmail) {
+  if (username && userEmail) { // Condition updated
     // User email exists, auto-login:
-    console.log('User email found in localStorage:', userEmail);
+    console.log('Username and email found in localStorage:', username, userEmail);
     // Hide splash and login screens immediately
     if (splashScreen) splashScreen.classList.add('hidden');
     if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
