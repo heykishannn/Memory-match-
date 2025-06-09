@@ -19,8 +19,10 @@
       <h1 class="small-title">Welcome!</h1>
       <p class="page-subtitle">Login or Sign Up to Play</p>
       <div class="form-container">
+      <input type="text" id="usernameInput" class="input-field" placeholder="Enter your username" />
         <input type="email" id="emailInput" class="input-field" placeholder="Enter your email" />
-        <button id="watchAdBtn" class="btn-primary">Watch Ad to Continue</button>
+      <button id="loginBtn" class="btn-primary">Login</button>
+      <button id="signupBtn" class="btn-primary">Signup</button>
       </div>
       <p id="authMessage" class="auth-message"></p>
     </div>
@@ -65,10 +67,10 @@
   </div>  <!-- Resume Popup Modal -->  <div id="resumePopup" class="popup hidden">
     <div class="popup-content">
       <h2>Welcome Back!</h2>
-      <p>You have a saved game.</p>
+      <p>Do you want to continue from where you left off?</p>
       <div class="popup-buttons">
-        <button id="newGameBtn" class="btn-primary">Start New Game</button>
-        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+        <button id="newGameBtn" class="btn-primary">Restart from Level 1</button>
+        <button id="continueBtn" class="btn-primary">Continue from Last Level</button>
       </div>
     </div>
   </div>  <!-- Win/Lose Popup Modal -->  <div id="popup" class="popup hidden">
@@ -85,12 +87,13 @@
         <button id="nextLevelBtn" class="btn-primary">Next Level</button>
       </div>
     </div>
-  </div>  <!-- Timeout Popup Modal -->  <div id="timeoutPopup" class="popup hidden">
+  </div>  <!-- Lose Popup Modal -->  <div id="losePopupWindow" class="popup hidden"> <!-- ID changed -->
     <div class="popup-content">
-      <h2>Time Out!</h2>
+      <h2>Level Failed!</h2> <!-- Text changed -->
       <div class="popup-buttons" style="justify-content: center; gap: 15px;">
-        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad 5 sec)</small></button>
-        <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
+        <!-- Buttons changed -->
+        <button id="losePlayAgainBtn" class="btn-primary">Play Again</button>
+        <button id="loseHomeBtn" class="btn-primary">Home</button>
       </div>
     </div>
   </div>  <!-- New Footer Ad Script -->  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
@@ -109,3 +112,4 @@
   </footer>  <!-- Audio Files --><audio id="flipSound" src="tap.mp3" preload="auto"></audio> <audio id="matchSound" src="win.mp3" preload="auto"></audio> <audio id="loseSound" src="lose.mp3" preload="auto"></audio> <audio id="pauseSound" src="pause.mp3" preload="auto"></audio> <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
 
   <script src="script.js"></script></body>
+</html>
