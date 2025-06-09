@@ -1,4 +1,3 @@
-// DOM Elements
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const gameScreen = document.getElementById('game-screen');
@@ -32,13 +31,6 @@ const matchSound = document.getElementById('matchSound');
 const loseSound = document.getElementById('loseSound');
 const pauseSound = document.getElementById('pauseSound');
 const restartSound = document.getElementById('restartSound');
-
-// Auth Elements (new)
-const authScreen = document.getElementById('auth-screen');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const loginBtn = document.getElementById('loginBtn');
-const signupBtn = document.getElementById('signupBtn');
 
 let level = 1;
 let score = 0;
@@ -260,32 +252,27 @@ function hidePopup(callback) {
   }, 300);
 }
 
-// Save/load progress (updated for user-specific data)
+// Save/load progress
 function saveProgress() {
-  const email = localStorage.getItem('currentUser');
-  if (email) {
-    const userData = {
-      level,
-      score,
-      timestamp: new Date().getTime()
-    };
-    localStorage.setItem(`user_${email}`, JSON.stringify(userData));
-  }
+  localStorage.setItem('memoryMatchLevel', level);
+  localStorage.setItem('memoryMatchScore', score);
 }
 
 function loadProgress() {
-  const email = localStorage.getItem('currentUser');
-  if (!email) return null;
-  
-  const userData = JSON.parse(localStorage.getItem(`user_${email}`));
-  return userData ? {
-    level: userData.level,
-    score: userData.score
-  } : null;
+  const savedLevel = localStorage.getItem('memoryMatchLevel');
+  const savedScore = localStorage.getItem('memoryMatchScore');
+  if (savedLevel && savedScore) {
+    return {
+      level: parseInt(savedLevel, 10),
+      score: parseInt(savedScore, 10)
+    };
+  }
+  return null;
 }
 
 function clearProgress() {
-  // No need to clear user progress here, as it's per user
+  localStorage.removeItem('memoryMatchLevel');
+  localStorage.removeItem('memoryMatchScore');
 }
 
 // Start level
@@ -306,12 +293,13 @@ function startLevel() {
 
 // Reset game
 function resetGame() {
-  localStorage.removeItem('currentUser');
+  clearInterval(timerInterval);
+  stopAllSounds();
   level = 1;
   score = 0;
   flippedCards = [];
   matchedCards = [];
-  startScreen.classList.add('hidden');
+  startScreen.classList.remove('hidden');
   gameScreen.classList.add('hidden');
   popup.classList.add('hidden');
   resumePopup.classList.add('hidden');
@@ -329,9 +317,6 @@ function showResumePopup(progress) {
 }
 
 function continueGame(progress) {
-  const email = localStorage.getItem('currentUser');
-  if (!email) return resetGame();
-  
   level = progress.level;
   score = progress.score;
   resumePopup.classList.add('hidden');
@@ -414,64 +399,14 @@ timeoutPlayAgainBtn.addEventListener('click', () => {
   });
 });
 
-// Auth Screen Logic (new)
-function handleAuth(isLogin) {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-
-  if (!email || !password) {
-    alert('Please enter email and password');
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const user = users.find(u => u.email === email);
-
-  if (isLogin) {
-    if (!user || user.password !== password) {
-      alert('Wrong email/password');
-      return;
-    }
-  } else { // Signup
-    if (user) {
-      alert('This email is already registered');
-      return;
-    }
-    users.push({ email, password, level: 1, score: 0 });
-  }
-
-  localStorage.setItem('users', JSON.stringify(users));
-  localStorage.setItem('currentUser', email);
-  
-  authScreen.classList.add('hidden');
-  checkSavedProgress();
-}
-
-loginBtn.addEventListener('click', () => handleAuth(true));
-signupBtn.addEventListener('click', () => handleAuth(false));
-
-// Check saved progress on auth success
-function checkSavedProgress() {
+// On load check saved progress
+window.addEventListener('load', () => {
+  initAdMob();
   const progress = loadProgress();
   if (progress) {
     showResumePopup(progress);
   } else {
     startScreen.classList.remove('hidden');
-  }
-}
-
-// On load check saved progress (updated)
-window.addEventListener('load', () => {
-  initAdMob();
-  const currentUser = localStorage.getItem('currentUser');
-  
-  if (currentUser) {
-    authScreen.classList.add('hidden');
-    checkSavedProgress();
-  } else {
-    startScreen.classList.add('hidden');
-    // Splash screen is shown by default, then auth screen after timeout
-    // The splash screen logic is in HTML (see previous answer)
   }
 });
 
@@ -508,4 +443,3 @@ function initAdMob() {
   if (!window.adsbygoogle) return;
   (adsbygoogle = window.adsbygoogle || []).push({});
 }
-  
