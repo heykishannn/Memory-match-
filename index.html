@@ -1,99 +1,187 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Memory Match Game</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Google AdMob SDK -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-</head>
-<body>
-  <!-- Start Screen -->
-  <div id="start-screen" class="center-screen">
-    <h1 class="small-title">MEMORY MATCH</h1>
-    <button id="startBtn" class="btn-primary">Start</button>
-  </div>  <!-- Game Screen -->  <div id="game-screen" class="hidden">
-    <header class="game-header">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Memory Match Game</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Google AdMob SDK -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  </head>
+  <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="center-screen">
       <h1 class="small-title">MEMORY MATCH</h1>
-      <div class="toggles-row">
-        <div class="toggle-wrapper toggle-left">
-          <label class="switch orange-switch">
-            <input type="checkbox" id="soundToggle" checked />
-            <span class="slider"></span>
-          </label>
-          <div class="toggle-label">Sound</div>
-        </div><button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
-
-    <div class="toggle-wrapper toggle-right">
-      <label class="switch orange-switch">
-        <input type="checkbox" id="vibrationToggle" checked />
-        <span class="slider"></span>
-      </label>
-      <div class="toggle-label">Vibration</div>
-    </div>
-  </div>
-</header>
-
-<div class="game-wrapper">
-  <div class="game-info">
-    <div class="level-info">Level: <span id="levelDisplay">1</span></div>
-    <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
-    <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
-  </div>
-
-  <div class="game-container" id="game"></div>
-</div>
-
-  </div>  <!-- Resume Popup Modal -->  <div id="resumePopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Welcome Back!</h2>
-      <p>You have a saved game.</p>
-      <div class="popup-buttons">
-        <button id="newGameBtn" class="btn-primary">Start New Game</button>
-        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+      <div class="loading-bar">
+        <div class="loading-bar-fill"></div>
       </div>
     </div>
-  </div>  <!-- Win/Lose Popup Modal -->  <div id="popup" class="popup hidden">
-    <div class="popup-content">
-      <h2 id="popupTitle">You Won!</h2>
-      <p id="popupMessage">Level Complete!</p>
-      <div class="popup-stats" id="popupStats">
-        <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
-        <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
-        <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
-      </div>
-      <div class="popup-buttons" id="popupButtons">
-        <button id="homeBtn" class="btn-primary">Home</button>
-        <button id="nextLevelBtn" class="btn-primary">Next Level</button>
+
+    <!-- Auth (Login/Signup) Screen -->
+    <div id="auth-screen" class="center-screen hidden">
+      <h1 class="small-title">MEMORY MATCH</h1>
+      <div class="auth-form">
+        <input type="text" id="username" placeholder="Username" />
+        <input type="password" id="password" placeholder="Password" />
+        <button id="loginBtn" class="btn-primary">Login</button>
+        <button id="signupBtn" class="btn-primary">Sign Up</button>
       </div>
     </div>
-  </div>  <!-- Timeout Popup Modal -->  <div id="timeoutPopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Time Out!</h2>
-      <div class="popup-buttons" style="justify-content: center; gap: 15px;">
-        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
-        <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="center-screen hidden">
+      <h1 class="small-title">MEMORY MATCH</h1>
+      <button id="startBtn" class="btn-primary">Start</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden">
+      <header class="game-header">
+        <h1 class="small-title">MEMORY MATCH</h1>
+        <div class="toggles-row">
+          <div class="toggle-wrapper toggle-left">
+            <label class="switch orange-switch">
+              <input type="checkbox" id="soundToggle" checked />
+              <span class="slider"></span>
+            </label>
+            <div class="toggle-label">Sound</div>
+          </div>
+          <button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
+          <div class="toggle-wrapper toggle-right">
+            <label class="switch orange-switch">
+              <input type="checkbox" id="vibrationToggle" checked />
+              <span class="slider"></span>
+            </label>
+            <div class="toggle-label">Vibration</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="game-wrapper">
+        <div class="game-info">
+          <div class="level-info">Level: <span id="levelDisplay">1</span></div>
+          <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
+          <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
+        </div>
+        <div class="game-container" id="game"></div>
       </div>
     </div>
-  </div>  <!-- Footer with Banner Ad -->  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
-    <!-- Google AdMob Banner Ad -->
-    <ins class="adsbygoogle"
-         style="display:inline-block;width:360px;height:50px"
-         data-ad-client="ca-pub-6948714269796627"
-         data-ad-slot="7517631973"></ins>
-  </div>  <!-- New Footer Ad Script -->  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
-    <script type="text/javascript">
-      atOptions = {
-        'key' : '1401828e48164d6e5d2cfae0724ee0df',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
+
+    <!-- Resume Popup Modal -->
+    <div id="resumePopup" class="popup hidden">
+      <div class="popup-content">
+        <h2>Welcome Back!</h2>
+        <p>You have a saved game.</p>
+        <div class="popup-buttons">
+          <button id="newGameBtn" class="btn-primary">Start New Game</button>
+          <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Win/Lose Popup Modal -->
+    <div id="popup" class="popup hidden">
+      <div class="popup-content">
+        <h2 id="popupTitle">You Won!</h2>
+        <p id="popupMessage">Level Complete!</p>
+        <div class="popup-stats" id="popupStats">
+          <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
+          <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
+          <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
+        </div>
+        <div class="popup-buttons" id="popupButtons">
+          <button id="homeBtn" class="btn-primary">Home</button>
+          <button id="nextLevelBtn" class="btn-primary">Next Level</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeout Popup Modal -->
+    <div id="timeoutPopup" class="popup hidden">
+      <div class="popup-content">
+        <h2>Time Out!</h2>
+        <div class="popup-buttons" style="justify-content: center; gap: 15px;">
+          <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad - 5s to continue)</small></button>
+          <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer with Banner Ad -->
+    <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+      <!-- Google AdMob Banner Ad -->
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:360px;height:50px"
+           data-ad-client="ca-pub-6948714269796627"
+           data-ad-slot="7517631973"></ins>
+    </div>
+
+    <!-- New Footer Ad Script -->
+    <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '1401828e48164d6e5d2cfae0724ee0df',
+          'format' : 'iframe',
+          'height' : 50,
+          'width' : 320,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
+    </div>
+
+    <footer>
+      Powered by NAS
+    </footer>
+
+    <!-- Audio Files -->
+    <audio id="flipSound" src="tap.mp3" preload="auto"></audio>
+    <audio id="matchSound" src="win.mp3" preload="auto"></audio>
+    <audio id="loseSound" src="lose.mp3" preload="auto"></audio>
+    <audio id="pauseSound" src="pause.mp3" preload="auto"></audio>
+    <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
+
+    <script>
+      // Splash Screen Logic
+      setTimeout(function() {
+        document.getElementById('splash-screen').classList.add('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+      }, 2500);
+
+      // Auth Screen Logic
+      document.getElementById('loginBtn').addEventListener('click', function() {
+        // Add your login logic here
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+      });
+
+      document.getElementById('signupBtn').addEventListener('click', function() {
+        // Add your signup logic here
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+      });
+
+      // Timeout Popup: Watch Ad with Countdown
+      document.getElementById('timeoutContinueBtn').addEventListener('click', function() {
+        var btn = this;
+        var counter = 5;
+        btn.disabled = true;
+        btn.textContent = 'Continue (' + counter + 's)';
+        var interval = setInterval(function() {
+          counter--;
+          if (counter > 0) {
+            btn.textContent = 'Continue (' + counter + 's)';
+          } else {
+            btn.textContent = 'Continue';
+            btn.disabled = false;
+            clearInterval(interval);
+            // Add your logic to proceed after countdown
+          }
+        }, 1000);
+      });
+
+      // Your existing script.js logic can go here or in script.js
     </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
-  </div>  <footer>
-    Powered by NAS
-  </footer>  <!-- Audio Files --><audio id="flipSound" src="tap.mp3" preload="auto"></audio> <audio id="matchSound" src="win.mp3" preload="auto"></audio> <audio id="loseSound" src="lose.mp3" preload="auto"></audio> <audio id="pauseSound" src="pause.mp3" preload="auto"></audio> <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
-
-  <script src="script.js"></script></body>
+    <script src="script.js"></script>
+  </body>
+</html>
