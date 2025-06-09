@@ -499,7 +499,7 @@ window.addEventListener('load', () => {
     setTimeout(() => {
       if (splashScreen) splashScreen.classList.add('hidden');
       if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
-    }, 4000); // Splash screen duration
+    }, 3000); // Splash screen duration
   }
 });
 
