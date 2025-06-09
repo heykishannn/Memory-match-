@@ -9,6 +9,16 @@ const timerDisplay = document.getElementById('timerDisplay');
 const vibrationToggle = document.getElementById('vibrationToggle');
 const soundToggle = document.getElementById('soundToggle');
 
+// Add these with other element selectors
+const splashScreen = document.getElementById('splash-screen');
+const loginSignupScreen = document.getElementById('login-signup-screen');
+
+// Login/Signup Screen Elements
+const emailInput = document.getElementById('emailInput');
+const loginBtn = document.getElementById('loginBtn');
+const signupBtn = document.getElementById('signupBtn');
+const authMessage = document.getElementById('authMessage');
+
 const popup = document.getElementById('popup');
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
@@ -399,14 +409,97 @@ timeoutPlayAgainBtn.addEventListener('click', () => {
   });
 });
 
+// Function to validate email (basic)
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Function to handle successful login/signup
+function handleSuccessfulAuth(email) {
+  localStorage.setItem('userEmail', email); // Store email
+  if (authMessage) authMessage.textContent = 'Success!';
+  if (authMessage) authMessage.style.color = '#d4edda'; // Greenish for success
+
+  // Hide login/signup screen and show main game screen (start-screen)
+  setTimeout(() => {
+    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+    if (startScreen) startScreen.classList.remove('hidden');
+    // Potentially load game progress here if that's the desired flow after login
+    // For now, just show the start screen. Saved game state will be checked on load.
+  }, 1000); // Short delay to show success message
+}
+
+// Event Listener for Login Button
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    if (!isValidEmail(email)) {
+      if (authMessage) authMessage.textContent = 'Please enter a valid email address.';
+      if (authMessage) authMessage.style.color = '#f8d7da'; // Reddish for error
+      return;
+    }
+    // For demo purposes, login is always successful if email is valid
+    // In a real app, you'd verify credentials against a backend
+    console.log('Login attempt with:', email);
+    handleSuccessfulAuth(email);
+  });
+}
+
+// Event Listener for Sign Up Button
+if (signupBtn) {
+  signupBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    if (!isValidEmail(email)) {
+      if (authMessage) authMessage.textContent = 'Please enter a valid email address for signup.';
+      if (authMessage) authMessage.style.color = '#f8d7da'; // Reddish for error
+      return;
+    }
+    // For demo purposes, signup is always successful if email is valid
+    // In a real app, you'd create a new user account with a backend
+    console.log('Signup attempt with:', email);
+    handleSuccessfulAuth(email); // Same handling as login for this demo
+  });
+}
+
 // On load check saved progress
 window.addEventListener('load', () => {
-  initAdMob();
-  const progress = loadProgress();
-  if (progress) {
-    showResumePopup(progress);
+  initAdMob(); // Keep AdMob initialization
+
+  const userEmail = localStorage.getItem('userEmail');
+  // splashScreen, loginSignupScreen, startScreen are already defined globally
+
+  if (userEmail) {
+    // User email exists, auto-login:
+    console.log('User email found in localStorage:', userEmail);
+    // Hide splash and login screens immediately
+    if (splashScreen) splashScreen.classList.add('hidden');
+    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+
+    // Show the main game screen (start-screen)
+    if (startScreen) startScreen.classList.remove('hidden');
+
+    // Now, integrate the existing game progress loading logic
+    const progress = loadProgress(); // loadProgress() is an existing function
+    if (progress) {
+      // If there's saved game progress, show the resume popup
+      showResumePopup(progress); // showResumePopup() is an existing function
+    }
+    // If no progress, the start-screen (main menu) will just be visible.
+
   } else {
-    startScreen.classList.remove('hidden');
+    // No user email, proceed with splash screen -> login/signup flow:
+    console.log('No user email found. Starting splash screen flow.');
+    // Ensure login/signup and start screens are hidden, splash is visible initially
+    // (HTML defaults should handle this, but good to be sure)
+    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+    if (startScreen) startScreen.classList.add('hidden');
+    if (splashScreen) splashScreen.classList.remove('hidden'); // Make sure splash is visible
+
+    setTimeout(() => {
+      if (splashScreen) splashScreen.classList.add('hidden');
+      if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
+    }, 4000); // Splash screen duration
   }
 });
 
