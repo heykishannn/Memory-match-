@@ -479,7 +479,21 @@ if (watchAdBtn) {
 
 // On load check saved progress
 window.addEventListener('load', () => {
-  initAdMob(); // Keep AdMob initialization
+  console.log('Load event triggered.');
+  try {
+    initAdMob();
+  } catch (e) {
+    console.error("Error during initAdMob():", e);
+  }
+
+  // splashScreen and loginSignupScreen are global constants, defined at the top.
+  // Check if they were successfully retrieved from the DOM.
+  if (!splashScreen) {
+    console.error("CRITICAL: splashScreen element is null. Check HTML ID 'splash-screen'.");
+  }
+  if (!loginSignupScreen) {
+    console.error("CRITICAL: loginSignupScreen element is null. Check HTML ID 'login-signup-screen'.");
+  }
 
   const userEmail = localStorage.getItem('userEmail');
   // splashScreen, loginSignupScreen, startScreen are already defined globally
@@ -505,6 +519,7 @@ window.addEventListener('load', () => {
 
   } else {
     // No user email, proceed with splash screen -> login/signup flow:
+    console.log('New user path initiated.');
     console.log('No user email found. Starting splash screen flow.');
     // Ensure login/signup and start screens are hidden, splash is visible initially
     // (HTML defaults should handle this, but good to be sure)
@@ -514,6 +529,9 @@ window.addEventListener('load', () => {
     if (splashScreen) splashScreen.classList.remove('hidden'); // Make sure splash is visible
 
     setTimeout(() => {
+      console.log('Splash timeout reached, attempting to switch screens.');
+      console.log('Splash screen found:', splashScreen);
+      console.log('Login screen found:', loginSignupScreen);
       if (splashScreen) splashScreen.classList.add('hidden');
       if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
     }, 3000); // Splash screen duration
