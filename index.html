@@ -24,8 +24,10 @@
       <h1 class="small-title">Welcome!</h1>
       <p class="page-subtitle">Login or Sign Up to Play</p>
       <div class="form-container">
+        <input type="text" id="usernameInput" class="input-field" placeholder="Enter your username">
         <input type="email" id="emailInput" class="input-field" placeholder="Enter your email" />
-        <button id="watchAdBtn" class="btn-primary">Watch Ad to Continue</button>
+        <button id="loginBtn" class="btn-primary">Login</button>
+        <button id="signupBtn" class="btn-primary">Sign Up</button>
       </div>
       <p id="authMessage" class="auth-message"></p>
     </div>
@@ -77,15 +79,6 @@
   <div class="game-container" id="game"></div>
 </div>
 
-  </div>  <!-- Resume Popup Modal -->  <div id="resumePopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Welcome Back!</h2>
-      <p>You have a saved game.</p>
-      <div class="popup-buttons">
-        <button id="newGameBtn" class="btn-primary">Start New Game</button>
-        <button id="continueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
-      </div>
-    </div>
   </div>  <!-- Win/Lose Popup Modal -->  <div id="popup" class="popup hidden">
     <div class="popup-content">
       <h2 id="popupTitle">You Won!</h2>
@@ -103,12 +96,24 @@
   </div>  <!-- Timeout Popup Modal -->  <div id="timeoutPopup" class="popup hidden">
     <div class="popup-content">
       <h2>Time Out!</h2>
-      <div class="popup-buttons" style="justify-content: center; gap: 15px;">
-        <button id="timeoutContinueBtn" class="btn-primary">Continue <br/><small>(Watch Ad)</small></button>
+      <div class="popup-buttons"> <!-- Style will be adjusted in CSS to center single button -->
         <button id="timeoutPlayAgainBtn" class="btn-primary">Play Again</button>
       </div>
     </div>
-  </div>  <!-- Footer with Banner Ad -->  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+  </div>
+
+  <!-- Resume Game Window -->
+  <div id="resume-game-window" class="popup hidden"> <!-- Reuse 'popup' class for base styling, 'hidden' to hide by default -->
+    <div class="popup-content"> <!-- Reuse 'popup-content' for consistent styling -->
+      <h2>Welcome Back!</h2>
+      <p>Do you want to continue from where you left off?</p>
+      <div class="popup-buttons"> <!-- Reuse 'popup-buttons' for button layout -->
+        <button id="restartGameBtn" class="btn-primary">Restart Level 1</button>
+        <button id="continueLastLevelBtn" class="btn-primary">Continue Last Level</button>
+      </div>
+    </div>
+  </div>
+  <!-- Footer with Banner Ad -->  <div id="bannerAdContainer" style="width: 360px; height: 50px; margin: 0 auto; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 1000;">
     <!-- Google AdMob Banner Ad -->
     <ins class="adsbygoogle"
          style="display:inline-block;width:360px;height:50px"

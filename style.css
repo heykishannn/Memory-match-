@@ -551,7 +551,7 @@ footer {
 
 /* Adjusting .btn-primary for this context if needed, or use as is */
 .form-container .btn-primary {
-  margin-top: 5px; /* Small top margin for buttons */
+  /* margin-top: 5px; */ /* Rely on gap for spacing between items */
   padding: 12px 20px; /* Slightly adjusted padding */
   font-size: 1.1rem;
 }
@@ -617,4 +617,22 @@ footer {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Specific adjustments for Resume Game Window buttons */
+#resume-game-window .popup-buttons button {
+  white-space: normal; /* Allow text to wrap */
+  padding: 10px 5px;   /* Adjust padding for potentially wrapped text */
+  line-height: 1.3;   /* Improve readability for wrapped text */
+  text-align: center; /* Ensure text is centered if it wraps */
+}
+
+/* Adjustments for Timeout Popup with single button */
+#timeoutPopup .popup-buttons {
+  justify-content: center; /* Center the single 'Play Again' button */
+}
+
+#timeoutPopup .popup-buttons button {
+  flex: 0 1 auto; /* Allow button to size based on content, not grow to fill */
+  min-width: 120px; /* Ensure a reasonable minimum width */
 }
