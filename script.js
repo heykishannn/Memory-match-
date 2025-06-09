@@ -449,12 +449,19 @@ function handleSuccessfulAuth(username, email) {
   // if (authMessage) authMessage.textContent = 'Success!';
   // if (authMessage) authMessage.style.color = '#d4edda';
 
-  // Hide login/signup screen (already hidden) and ad screen (already hidden by timer)
-  // Show main game screen (start-screen)
-  // No timeout needed here as the ad itself was the "delay"
+  // Ensure login and splash are hidden
   if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
-  if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
+  if (splashScreen) splashScreen.classList.add('hidden'); // Explicitly hide splash
 
+  // Hide other potentially visible popups/screens as a cleanup
+  if (adSimulationScreen) adSimulationScreen.classList.add('hidden');
+  if (gameScreen) gameScreen.classList.add('hidden'); // Game screen should not be visible yet
+  if (resumePopup) resumePopup.classList.add('hidden');
+  if (losePopupWindow) losePopupWindow.classList.add('hidden');
+  if (popup) popup.classList.add('hidden');
+
+
+  // Show the main game start screen
   if (startScreen) startScreen.classList.remove('hidden');
 
   // Check for saved game progress (this part is new for this function but uses existing logic)
@@ -517,64 +524,44 @@ if (watchAdBtn) {
 }
 */
 
-// On load check saved progress
 window.addEventListener('load', () => {
-  console.log('Load event triggered.');
-  try {
-    initAdMob();
-  } catch (e) {
-    console.error("Error during initAdMob():", e);
-  }
-
-  // splashScreen and loginSignupScreen are global constants, defined at the top.
-  // Check if they were successfully retrieved from the DOM.
-  if (!splashScreen) {
-    console.error("CRITICAL: splashScreen element is null. Check HTML ID 'splash-screen'.");
-  }
-  if (!loginSignupScreen) {
-    console.error("CRITICAL: loginSignupScreen element is null. Check HTML ID 'login-signup-screen'.");
-  }
-
+  console.log('Load event triggered. Checking for user data.');
   const userEmail = localStorage.getItem('userEmail');
-  const username = localStorage.getItem('username'); // Check for username
+  const username = localStorage.getItem('username');
 
-  if (username && userEmail) { // Condition updated
-    // User email exists, auto-login:
-    console.log('Username and email found in localStorage:', username, userEmail);
-    // Hide splash and login screens immediately
-    if (splashScreen) splashScreen.classList.add('hidden');
-    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
-    if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
+  // Ensure all screens are hidden by default before deciding which one to show,
+  // except for the splash screen which might be initially visible via CSS/HTML.
+  if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+  if (startScreen) startScreen.classList.add('hidden');
+  if (gameScreen) gameScreen.classList.add('hidden'); // Also hide game screen initially
+  if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Keep ad screen hidden
+  if (resumePopup) resumePopup.classList.add('hidden');
+  if (losePopupWindow) losePopupWindow.classList.add('hidden');
+  if (popup) popup.classList.add('hidden');
 
-    // Show the main game screen (start-screen)
-    if (startScreen) startScreen.classList.remove('hidden');
 
-    // Now, integrate the existing game progress loading logic
-    const progress = loadProgress(); // loadProgress() is an existing function
+  if (username && userEmail) {
+    // User is already logged in (data found in localStorage)
+    console.log('User data found. Skipping splash and login. User:', username);
+    if (splashScreen) splashScreen.classList.add('hidden'); // Ensure splash is hidden immediately
+    // loginSignupScreen is already hidden
+
+    if (startScreen) startScreen.classList.remove('hidden'); // Show start screen
+    const progress = loadProgress(); // Check for saved game
     if (progress) {
-      // If there's saved game progress, show the resume popup
-      showResumePopup(progress); // showResumePopup() is an existing function
+      showResumePopup(progress); // If progress, show resume popup (which hides startScreen)
     }
-    // If no progress, the start-screen (main menu) will just be visible.
-
   } else {
-    // No user email, proceed with splash screen -> login/signup flow:
-    console.log('New user path initiated.');
-    console.log('No user email found. Starting splash screen flow.');
-    // Ensure login/signup and start screens are hidden, splash is visible initially
-    // (HTML defaults should handle this, but good to be sure)
-    if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
-    if (startScreen) startScreen.classList.add('hidden');
-    if (adSimulationScreen) adSimulationScreen.classList.add('hidden'); // Ensure ad screen is hidden
-    if (splashScreen) splashScreen.classList.remove('hidden'); // Make sure splash is visible
+    // No user data found - this is a first-time launch (or localStorage cleared)
+    console.log('No user data found. Starting splash screen flow.');
+    // loginSignupScreen and startScreen are already hidden
+    if (splashScreen) splashScreen.classList.remove('hidden'); // Make splash visible
 
     setTimeout(() => {
-      console.log('Splash timeout reached, attempting to switch screens.');
-      console.log('Splash screen found:', splashScreen);
-      console.log('Login screen found:', loginSignupScreen);
+      console.log('Splash timeout reached. Hiding splash, showing login/signup.');
       if (splashScreen) splashScreen.classList.add('hidden');
-      if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
-    }, 3000); // Splash screen duration
+      if (loginSignupScreen) loginSignupScreen.classList.remove('hidden'); // Show login/signup
+    }, 3000); // Splash screen duration: 3 seconds
   }
 });
 
