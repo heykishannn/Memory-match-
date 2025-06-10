@@ -296,67 +296,70 @@ footer span span {
 .card {
   width: 100%; /* Make card fill its grid cell */
   aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 100px; /* Max size for desktop, will shrink on mobile */
-  max-height: 100px; /* Max size for desktop */
+  max-width: 120px; /* Larger max size for desktop */
+  max-height: 120px; /* Larger max size for desktop */
   border: 2px solid black; /* Black border */
   border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2.3rem;
+  display: flex; /* For centering front/back content */
+  justify-content: center; /* For centering front/back content */
+  align-items: center; /* For centering front/back content */
+  font-size: 2.8rem; /* Larger emoji size */
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
   user-select: none;
-  perspective: 600px;
+  perspective: 600px; /* For 3D transform */
   position: relative;
-  transition: background 0.3s, transform 0.2s;
+  /* Transition for the entire card flip */
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+  transform-style: preserve-3d; /* Enable 3D transform on the card itself */
 }
-.card-inner {
-  width: 100%; height: 100%;
-  border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.3rem;
-  color: #fff;
-  transition: transform 0.5s cubic-bezier(.4,2,.6,1); /* Smooth flip animation */
-  transform-style: preserve-3d;
-  position: relative;
+
+/* When flipped, rotate the entire card */
+.card.flipped {
+  transform: rotateY(180deg);
 }
-.card.cover .card-inner { background: linear-gradient(135deg, #6a11cb, #2575fc);} /* Purple gradient back (covered) */
-.card.flipped .card-inner { transform: rotateY(180deg);}
+
+/* Front and Back sides should be absolute and fill the card, and handle backface-visibility */
+.card .front, .card .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px; /* Consistent with card radius */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden; /* Hide the back of the element when rotated */
+}
 
 /* Front side (emoji side) color to light green gradient */
 .card .front {
   background: linear-gradient(to right, #a8ff78, #78ffd6); /* Light green gradient */
   color: #fff;
-  position: absolute; width: 100%; height: 100%;
-  border-radius: 20px;
-  backface-visibility: hidden; /* Ensures only one side is seen during flip */
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.3rem;
+  /* This is the side that shows when FLIPPED, so it starts rotated */
+  transform: rotateY(180deg);
 }
+
 /* Back side color (when unflipped) to purple gradient */
 .card .back {
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient */
   color: #fff;
-  position: absolute; width: 100%; height: 100%;
-  border-radius: 20px;
-  backface-visibility: hidden; /* Ensures only one side is seen during flip */
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.3rem;
-  transform: rotateY(180deg);
+  /* This is the side that shows when UNFLIPPED, so it faces forward initially */
+  /* Default transform is rotateY(0deg) */
 }
+
 /* Removed glow animation on matched cards as requested */
-.card.matched .card-inner {
+.card.matched { /* Apply to .card directly */
   box-shadow: none; /* Removed glow effect */
   animation: none; /* Removed glow animation */
 }
 /* Kept the active state for visual feedback on tap */
-.card:active:not(.matched):not(.flipped) .card-inner {
+.card:active:not(.matched):not(.flipped) { /* Apply to .card directly */
   box-shadow: 0 0 20px 8px rgba(250, 113, 205, 0.4); /* Retained subtle box shadow for tap feedback */
-  transform: scale(1.05);
+  transform: scale(1.05); /* Scales the whole card */
 }
+
 @media (max-width: 600px) {
-  .card { width: 100%; height: auto; max-width: 70px; max-height: 70px; font-size: 1.8rem; border-radius: 18px;} /* Smaller max-size for mobile */
+  .card { width: 100%; height: auto; max-width: 80px; max-height: 80px; font-size: 2.2rem; border-radius: 18px;} /* Larger cards on mobile */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
@@ -366,4 +369,4 @@ footer span span {
   .switch-label input:checked + .switch-slider { transform: translateX(15px); }
   .toggle-text { font-size: 0.75rem; margin-top: 3px; }
   .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
-}
+  }
