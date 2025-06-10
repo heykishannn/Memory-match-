@@ -16,7 +16,19 @@ const game = document.getElementById('game');
 const board = document.getElementById('board');
 const winPopup = document.getElementById('winPopup');
 const winDesc = document.getElementById('winDesc');
-const restartBtn = document.getElementById('restartBtn');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
+const homeBtn1 = document.getElementById('homeBtn1');
+const losePopup = document.getElementById('losePopup');
+const loseDesc = document.getElementById('loseDesc');
+const loseHomeBtn = document.getElementById('loseHomeBtn');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const watchAdBtn = document.getElementById('watchAdBtn');
+const adPopup = document.getElementById('adPopup');
+const adTimer = document.getElementById('adTimer');
+const resumePopup = document.getElementById('resumePopup');
+const resumeBtn = document.getElementById('resumeBtn');
+const restartFrom1Btn = document.getElementById('restartFrom1Btn');
+
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -24,9 +36,17 @@ const passwordInput = document.getElementById('password');
 const levelDisplay = document.getElementById('levelDisplay');
 const timerDisplay = document.getElementById('timerDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
-const soundBtn = document.getElementById('soundBtn');
-const vibrationBtn = document.getElementById('vibrationBtn');
-const pauseBtn = document.getElementById('pauseBtn');
+const soundSwitch = document.getElementById('soundSwitch');
+const vibrationSwitch = document.getElementById('vibrationSwitch');
+const pauseSwitch = document.getElementById('pauseSwitch');
+const soundIcon = document.getElementById('soundIcon');
+const vibrationIcon = document.getElementById('vibrationIcon');
+const pauseIcon = document.getElementById('pauseIcon');
+
+// Sounds
+const audioMatch = document.getElementById('audio-match');
+const audioWin = document.getElementById('audio-win');
+const audioLose = document.getElementById('audio-lose');
 
 // State
 let state = {
@@ -42,6 +62,8 @@ let state = {
   flippedIndices: [],
   matchedCount: 0,
   busy: false,
+  resumeData: null,
+  adTimeout: null
 };
 
 // --- Splash Animation Cards ---
@@ -81,7 +103,9 @@ function vibrate() {
 }
 function playSound(type) {
   if(!state.soundOn) return;
-  // Optionally add sound here
+  if(type==="match") audioMatch.currentTime=0, audioMatch.play();
+  if(type==="win") audioWin.currentTime=0, audioWin.play();
+  if(type==="lose") audioLose.currentTime=0, audioLose.play();
 }
 
 // --- Splash Screen ---
@@ -89,6 +113,9 @@ function showSplash() {
   splash.classList.remove('hidden');
   auth.classList.add('hidden');
   game.classList.add('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  resumePopup.classList.add('hidden');
   createSplashAnimCards();
   setTimeout(() => {
     splash.classList.add('hidden');
@@ -101,8 +128,14 @@ function checkLogin() {
   const savedUser = JSON.parse(localStorage.getItem('memorymatch_current_user'));
   if(savedUser && savedUser.email) {
     state.user = savedUser;
-    loadProgress();
-    showGame();
+    const progress = JSON.parse(localStorage.getItem(progressKey(savedUser.email)));
+    if(progress && progress.level && progress.level > 1) {
+      state.resumeData = progress;
+      showResumePopup();
+    } else {
+      loadProgress();
+      showGame();
+    }
   } else {
     showAuth();
   }
@@ -111,6 +144,9 @@ function showAuth() {
   auth.classList.remove('hidden');
   game.classList.add('hidden');
   splash.classList.add('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  resumePopup.classList.add('hidden');
   emailInput.value = '';
   passwordInput.value = '';
 }
@@ -122,8 +158,14 @@ loginBtn.onclick = () => {
   if(userData && userData.password === password) {
     state.user = {email,password};
     localStorage.setItem('memorymatch_current_user', JSON.stringify(state.user));
-    loadProgress();
-    showGame();
+    const progress = JSON.parse(localStorage.getItem(progressKey(email)));
+    if(progress && progress.level && progress.level > 1) {
+      state.resumeData = progress;
+      showResumePopup();
+    } else {
+      loadProgress();
+      showGame();
+    }
   } else {
     alert('Invalid credentials or user does not exist.');
   }
@@ -140,6 +182,27 @@ signupBtn.onclick = () => {
   state.user = {email,password};
   localStorage.setItem('memorymatch_current_user', JSON.stringify(state.user));
   state.level = 1; state.score = 0;
+  saveProgress();
+  showGame();
+};
+
+// --- Resume Popup ---
+function showResumePopup() {
+  resumePopup.classList.remove('hidden');
+}
+resumeBtn.onclick = () => {
+  resumePopup.classList.add('hidden');
+  showAd(()=> {
+    state.level = state.resumeData.level;
+    state.score = state.resumeData.score;
+    saveProgress();
+    showGame();
+  });
+};
+restartFrom1Btn.onclick = () => {
+  resumePopup.classList.add('hidden');
+  state.level = 1;
+  state.score = 0;
   saveProgress();
   showGame();
 };
@@ -167,25 +230,36 @@ function showGame() {
   auth.classList.add('hidden');
   splash.classList.add('hidden');
   game.classList.remove('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  resumePopup.classList.add('hidden');
   updateHUD();
-  setupControls();
+  setupSwitches();
   startLevel(state.level);
 }
 
 function getGridSize(level) {
-  // Increase grid: 2x2, 2x3, 3x4, 4x4, 4x5, 5x6, ... up to 10x10
+  // Level 1: 2x2, Level 2: 2x3, Level 3: 3x3, Level 4: 3x4, Level 5: 4x4, up to 10x10
   let size = Math.min(2 + Math.floor((level-1)/10), 10);
   let cols = size, rows = size;
-  // For first few levels, use rectangular grids for more gradual difficulty
-  if(level <= 2) { rows=2; cols=2+level-1; }
-  else if(level <= 5) { rows=2+level-2; cols=3+level-2; }
+  if(level === 1) { rows=2; cols=2; }
+  else if(level === 2) { rows=2; cols=3; }
+  else if(level === 3) { rows=3; cols=3; }
+  else if(level === 4) { rows=3; cols=4; }
+  else if(level === 5) { rows=4; cols=4; }
   return {rows,cols};
+}
+
+function getCardFontSize(cols, rows) {
+  if(cols>=8 || rows>=8) return "0.8rem";
+  if(cols>=6 || rows>=6) return "1rem";
+  return "1.4rem";
 }
 
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  pauseBtn.textContent = '⏸️';
+  pauseSwitch.checked = false;
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -206,6 +280,7 @@ function startLevel(level) {
   board.style.gridTemplateColumns = `repeat(${cols},1fr)`;
   board.style.gridTemplateRows = `repeat(${rows},1fr)`;
   board.innerHTML = '';
+  const cardFontSize = getCardFontSize(cols,rows);
   state.cards.forEach((card,i)=>{
     const cardEl = document.createElement('div');
     cardEl.className = 'card';
@@ -213,6 +288,7 @@ function startLevel(level) {
     cardEl.dataset.index = i;
     const inner = document.createElement('div');
     inner.className = 'card-inner';
+    inner.style.fontSize = cardFontSize;
     const front = document.createElement('div');
     front.className = 'front';
     front.textContent = '❓';
@@ -228,7 +304,7 @@ function startLevel(level) {
     board.appendChild(cardEl);
   });
 
-  state.timeLeft = totalPairs*5;
+  state.timeLeft = Math.ceil((totalCards/2)*2.5);
   updateHUD();
   startTimer();
 }
@@ -241,7 +317,7 @@ function onCardClick(index) {
   state.flippedIndices.push(index);
   if(state.flippedIndices.length===2) {
     state.busy = true;
-    setTimeout(checkMatch, 700);
+    setTimeout(checkMatch, 550);
   }
 }
 
@@ -268,12 +344,12 @@ function checkMatch() {
     board.children[i1].classList.add('matched');
     board.children[i2].classList.add('matched');
     updateHUD();
-    if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 600);
+    if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 500);
   } else {
-    playSound('wrong'); vibrate();
+    playSound('lose'); vibrate();
     setTimeout(()=>{
       unflipCard(i1); unflipCard(i2);
-    }, 700);
+    }, 500);
   }
   state.flippedIndices = [];
   state.busy = false;
@@ -284,14 +360,42 @@ function winLevel() {
   state.score += state.timeLeft*2;
   saveProgress();
   updateHUD();
-  winDesc.textContent = `Level ${state.level} complete!\nScore: ${state.score}\nTime left: ${state.timeLeft}s`;
+  playSound('win');
+  winDesc.innerHTML = `Level ${state.level} complete!<br>Score: ${state.score}<br>Time left: ${state.timeLeft}s`;
   winPopup.classList.remove('hidden');
 }
-restartBtn.onclick = () => {
+nextLevelBtn.onclick = () => {
   winPopup.classList.add('hidden');
   if(state.level<MAX_LEVEL) state.level++;
   else { state.level=1; state.score=0; }
   startLevel(state.level);
+};
+homeBtn1.onclick = () => {
+  winPopup.classList.add('hidden');
+  state.level = 1; state.score = 0;
+  saveProgress();
+  showAuth();
+};
+
+function loseLevel() {
+  clearInterval(state.timerId);
+  playSound('lose');
+  loseDesc.innerHTML = `Level ${state.level} failed!<br>Score: ${state.score}`;
+  losePopup.classList.remove('hidden');
+}
+loseHomeBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  state.level = 1; state.score = 0;
+  saveProgress();
+  showAuth();
+};
+playAgainBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  startLevel(state.level);
+};
+watchAdBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  showAd(()=>startLevel(state.level));
 };
 
 function updateHUD() {
@@ -307,20 +411,51 @@ function startTimer() {
       updateHUD();
       if(state.timeLeft<=0) {
         clearInterval(state.timerId);
-        alert('Time is up! Restarting level.');
-        startLevel(state.level);
+        loseLevel();
       }
     }
   },1000);
 }
-function setupControls() {
-  soundBtn.textContent = state.soundOn?'🔊':'🔇';
-  vibrationBtn.textContent = state.vibrationOn?'📳':'📴';
-  pauseBtn.textContent = state.paused?'▶️':'⏸️';
-  soundBtn.onclick = ()=>{ state.soundOn=!state.soundOn; soundBtn.textContent=state.soundOn?'🔊':'🔇'; };
-  vibrationBtn.onclick = ()=>{ state.vibrationOn=!state.vibrationOn; vibrationBtn.textContent=state.vibrationOn?'📳':'📴'; };
-  pauseBtn.onclick = ()=>{ state.paused=!state.paused; pauseBtn.textContent=state.paused?'▶️':'⏸️'; };
+function setupSwitches() {
+  soundSwitch.checked = state.soundOn;
+  vibrationSwitch.checked = state.vibrationOn;
+  pauseSwitch.checked = state.paused;
+  soundIcon.textContent = state.soundOn ? "🔊" : "🔇";
+  vibrationIcon.textContent = state.vibrationOn ? "📳" : "📴";
+  pauseIcon.textContent = state.paused ? "▶️" : "⏸️";
+  soundSwitch.onchange = ()=> {
+    state.soundOn = soundSwitch.checked;
+    soundIcon.textContent = state.soundOn ? "🔊" : "🔇";
+  };
+  vibrationSwitch.onchange = ()=> {
+    state.vibrationOn = vibrationSwitch.checked;
+    vibrationIcon.textContent = state.vibrationOn ? "📳" : "📴";
+  };
+  pauseSwitch.onchange = ()=> {
+    state.paused = pauseSwitch.checked;
+    pauseIcon.textContent = state.paused ? "▶️" : "⏸️";
+  };
+}
+
+// --- Fake Ad ---
+function showAd(callback) {
+  adPopup.classList.remove('hidden');
+  let t = 5;
+  adTimer.textContent = t;
+  state.adTimeout && clearTimeout(state.adTimeout);
+  function tick() {
+    t--;
+    adTimer.textContent = t;
+    if(t<=0) {
+      adPopup.classList.add('hidden');
+      callback && callback();
+    } else {
+      state.adTimeout = setTimeout(tick,1000);
+    }
+  }
+  state.adTimeout = setTimeout(tick,1000);
 }
 
 // --- Initialization ---
 showSplash();
+      
