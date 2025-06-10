@@ -96,3 +96,101 @@ body {
 #main-game-screen #logout-btn:hover {
     background-color: #c0392b;
 }
+
+/* Game Screen Specific Styles */
+#game-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    margin-bottom: 15px;
+}
+
+#timer, #score {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+}
+
+#restart-btn {
+    background-color: #3498db; /* Blue */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    width: auto; /* Override full width from general button style */
+}
+
+#restart-btn:hover {
+    background-color: #2980b9;
+}
+
+#score-board {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #555;
+}
+
+#game-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6x6 grid */
+    gap: 10px;
+    width: 100%;
+    max-width: 500px; /* Adjust as needed */
+    margin: 0 auto; /* Center the grid */
+}
+
+.card {
+    width: 100%; /* Make card responsive within grid cell */
+    aspect-ratio: 1 / 1; /* Maintain square shape */
+    background-color: #ddd; /* Default card back color */
+    border: 2px solid #aaa;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em; /* Emoji size */
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+}
+
+.card .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px; /* Match card's border-radius */
+}
+
+.card .card-front {
+    background-color: #ccc; /* Color of the card's "back" face */
+    color: #ccc; /* Hide text by matching color */
+}
+
+.card .card-back {
+    background-color: #fff; /* Color of the card's "front" face (where emoji is) */
+    transform: rotateY(180deg);
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+/* Specific style for logout button if it needs to be different from restart */
+#main-game-screen #logout-btn {
+    background-color: #e74c3c; /* Red for logout */
+    margin-top: 20px; /* Add some space above logout */
+}
+
+#main-game-screen #logout-btn:hover {
+    background-color: #c0392b;
+}
