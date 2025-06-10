@@ -9,7 +9,18 @@
 <body>
   <!-- Splash -->
   <div id="splash">
+    <h1>Memory Match</h1>
     <div class="splash-cards"></div>
+  </div>
+  <!-- Login/Signup -->
+  <div id="auth" class="popup hidden">
+    <div class="popup-content square popup-zoom">
+      <h2>Login / Signup</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn" id="loginBtn">Login</button>
+      <button class="btn" id="signupBtn">Sign Up</button>
+    </div>
   </div>
   <!-- Home -->
   <div id="home">
@@ -20,20 +31,11 @@
   </div>
   <!-- Resume Popup -->
   <div id="resumePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>Continue?</h2>
       <button class="btn" id="resumeHomeBtn">Home</button>
       <button class="btn" id="watchAdResumeBtn">Watch Ad (5s) to Continue</button>
       <button class="btn" id="restartFrom1Btn">Restart from Level 1</button>
-    </div>
-  </div>
-  <!-- Auth -->
-  <div id="auth" class="popup hidden">
-    <div class="popup-content square popup-zoom">
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <button class="btn" id="loginBtn">Login</button>
-      <button class="btn" id="signupBtn">Sign Up</button>
     </div>
   </div>
   <!-- Game -->
@@ -55,7 +57,7 @@
   </div>
   <!-- Win Popup -->
   <div id="winPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>You Win!</h2>
       <button class="btn" id="nextLevelBtn">Next Level</button>
       <button class="btn" id="homeBtn1">Home</button>
@@ -63,7 +65,7 @@
   </div>
   <!-- Lose Popup -->
   <div id="losePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>You Lost!</h2>
       <button class="btn" id="playAgainBtn">Play Again</button>
       <button class="btn" id="loseHomeBtn">Home</button>
@@ -72,7 +74,7 @@
   </div>
   <!-- Ad Popup -->
   <div id="adPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>Ad</h2>
       <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
     </div>
