@@ -528,9 +528,7 @@ if (watchAdBtn) {
 */
 
 window.addEventListener('load', () => {
-  // Ensure all screens are hidden by default before deciding which one to show,
-  // This is a good practice to avoid screen flashes.
-  // Splash screen's visibility will be controlled explicitly by the logic below.
+  // Ensure all other screens are hidden by default initially
   if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
   if (startScreen) startScreen.classList.add('hidden');
   if (gameScreen) gameScreen.classList.add('hidden');
@@ -539,47 +537,42 @@ window.addEventListener('load', () => {
   if (losePopupWindow) losePopupWindow.classList.add('hidden');
   if (popup) popup.classList.add('hidden');
 
-  const splashScreenShownPreviously = localStorage.getItem('splashScreenShownPreviously');
-
-  // This function contains the logic to run after splash screen (if any)
   const proceedWithAppLogic = () => {
     const userEmail = localStorage.getItem('userEmail');
     const username = localStorage.getItem('username');
 
     if (username && userEmail) {
-      // User is already logged in
       console.log('User data found. Showing start screen. User:', username);
-      if (splashScreen) splashScreen.classList.add('hidden'); // Ensure splash is hidden
-      if (loginSignupScreen) loginSignupScreen.classList.add('hidden'); // Ensure login is hidden
+      // Ensure login is hidden (splash is already gone or will be)
+      if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
 
       if (startScreen) startScreen.classList.remove('hidden');
       const progress = loadProgress();
       if (progress) {
-        showResumePopup(progress); // This will hide startScreen again if progress exists
+        showResumePopup(progress);
       }
     } else {
-      // No user data found, show login screen
       console.log('No user data found. Showing login/signup screen.');
-      if (splashScreen) splashScreen.classList.add('hidden'); // Ensure splash is hidden
-      if (startScreen) startScreen.classList.add('hidden'); // Ensure start screen is hidden
+      // Ensure start screen is hidden (splash is already gone or will be)
+      if (startScreen) startScreen.classList.add('hidden');
       if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
     }
   };
 
-  if (splashScreenShownPreviously === 'true') {
-    console.log('Splash screen was shown previously. Hiding it and proceeding.');
-    if (splashScreen) splashScreen.classList.add('hidden');
-    proceedWithAppLogic();
-  } else {
-    console.log('Splash screen not shown previously. Displaying splash screen.');
-    if (splashScreen) splashScreen.classList.remove('hidden'); // Show splash screen
-    localStorage.setItem('splashScreenShownPreviously', 'true');
+  // Check if splashScreen element exists
+  if (splashScreen) {
+    console.log('Splash screen found. Displaying for 3 seconds.');
+    // It's visible by default via CSS
 
     setTimeout(() => {
-      console.log('Splash timeout reached. Hiding splash and proceeding.');
-      if (splashScreen) splashScreen.classList.add('hidden');
-      proceedWithAppLogic();
+      console.log('Splash timeout reached. Removing splash screen from DOM.');
+      splashScreen.remove(); // Remove from DOM
+      proceedWithAppLogic(); // Proceed after splash is removed
     }, 3000); // Splash screen duration: 3 seconds
+  } else {
+    // If splash screen element isn't found for some reason, proceed directly
+    console.log('Splash screen element not found. Proceeding without splash.');
+    proceedWithAppLogic();
   }
 });
 
