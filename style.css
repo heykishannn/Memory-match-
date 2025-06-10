@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
   color: white;
   margin: 0;
   height: 100vh;
@@ -14,17 +14,17 @@ footer {
   width: 100vw;
   text-align: center;
   z-index: 200;
-  font-family: 'Poppins', 'Arial', sans-serif;
-  font-size: 1.1rem;
+  font-family: 'Arial', sans-serif;
+  font-size: 1.18rem;
   letter-spacing: 1.5px;
   color: #fff;
-  text-shadow: 0 2px 10px #26d0ce, 0 0 12px #8e2de2, 0 0 20px #fff;
-  font-weight: 600;
+  text-shadow: 0 2px 10px #2196f3, 0 0 12px #fff, 0 0 20px #fff;
+  font-weight: bold;
 }
 footer span span {
   color: #fff;
   font-weight: bold;
-  font-family: 'Poppins', cursive, sans-serif;
+  font-family: 'Arial', sans-serif;
   letter-spacing: 2px;
   font-size: 1.13em;
   filter: drop-shadow(0 0 10px #fff);
@@ -33,7 +33,7 @@ footer span span {
 .btn {
   background: linear-gradient(to right, #ff8008, #ffc837);
   border: none;
-  padding: 14px 0;
+  padding: 15px 0;
   border-radius: 25px;
   color: white;
   font-weight: bold;
@@ -42,7 +42,7 @@ footer span span {
   font-size: 1.18rem;
   box-shadow: 0 4px 15px rgba(255, 128, 8, 0.2);
   width: 90%;
-  max-width: 200px;
+  max-width: 220px;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -51,24 +51,24 @@ footer span span {
 
 #splash {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 10;
   animation: fadeIn 0.5s;
 }
 #splash h1 {
-  font-size: 2.2rem;
-  margin-bottom: 1.2rem;
+  font-size: 2.8rem;
+  margin-bottom: 2.6rem;
   text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
   letter-spacing: 2px;
 }
 .splash-cards {
-  display: flex; gap: 22px; justify-content: center;
+  display: flex; gap: 42px; justify-content: center;
 }
 .splash-card {
-  width: 70px; height: 70px;
-  background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  border-radius: 18px;
+  width: 130px; height: 180px;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0 80%);
+  border-radius: 28px;
   box-shadow: 0 2px 16px #0002;
   margin: 0 8px;
   animation: splashFlip 1.5s infinite alternate;
@@ -82,19 +82,51 @@ footer span span {
 #home {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
   z-index: 5;
 }
 .home-content {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .home-content h1 {
-  font-size: 2.2rem;
-  margin-bottom: 1.2rem;
+  font-size: 2.6rem;
+  margin-bottom: 1.7rem;
   text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
   letter-spacing: 2px;
 }
 .home-content button { margin-top: 0.2rem; }
+
+#auth {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
+  z-index: 20;
+}
+.auth-content {
+  background: linear-gradient(135deg, #8e2de2, #4a00e0 80%);
+  padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+  border-radius: 22px;
+  width: 96vw;
+  max-width: 360px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 32px #0003;
+}
+.auth-content h2 { font-size: 1.5rem; margin-bottom: 1.2rem;}
+.auth-content input {
+  width: 97%;
+  padding: 15px;
+  margin: 0.7rem 0;
+  border-radius: 11px;
+  border: none;
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
+  color: #fff;
+  font-size: 1.15rem;
+  outline: none;
+}
+.auth-btns { display: flex; gap: 1.1rem; margin-top: 0.7rem; }
 
 .popup {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -104,12 +136,12 @@ footer span span {
 }
 .popup-content.square {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  padding: 0.7rem 0.4rem;
-  border-radius: 14px;
+  padding: 1.8rem 1.1rem;
+  border-radius: 22px;
   text-align: center;
-  width: 80vw;
-  max-width: 170px;
-  min-width: 100px;
+  width: 90vw;
+  max-width: 380px;
+  min-width: 160px;
   aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
@@ -117,23 +149,25 @@ footer span span {
   box-shadow: 0 8px 32px #0003;
   animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
 }
-.small-popup { max-width: 140px; min-width: 80px; }
+.big-popup { max-width: 380px; min-width: 160px; }
 @keyframes popupZoom {
   0% { transform: scale(0.7); opacity:0; }
   100% { transform: scale(1); opacity:1; }
 }
-.popup-content h2, .popup-content h1 { font-size: 1.1rem; margin-bottom: 0.5rem;}
-.popup-content button { margin: 0.3rem auto; }
+.popup-content h2, .popup-content h1 { font-size: 1.4rem; margin-bottom: 0.8rem;}
+.popup-content button { margin: 0.5rem auto; }
+.result { margin-bottom: 0.6rem; }
+.result span { display: block; font-size: 1.13rem; margin: 0.18rem 0; }
 
 .game-header {
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 0.5rem;
+  margin-top: 0.7rem;
 }
 .game-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   text-align: center;
   margin-bottom: 0.2rem;
   text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
@@ -141,16 +175,59 @@ footer span span {
 .game-controls {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 18px;
   margin-bottom: 0.3rem;
+  align-items: center;
+}
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #263159;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 16px;
+  font-size: 1.12rem;
+  font-weight: 600;
+}
+.switch-label input[type="checkbox"] {
+  display: none;
+}
+.switch-slider {
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+  border-radius: 20px;
+  background: #bbb;
+  position: relative;
+  vertical-align: middle;
+  margin-left: 8px;
+  transition: background 0.2s;
+}
+.switch-label input:checked + .switch-slider {
+  background: #ffc837;
+}
+.switch-slider:before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.2s;
+}
+.switch-label input:checked + .switch-slider:before {
+  left: 21px;
 }
 .ctrl-btn {
-  width: 70px;
-  height: 70px;
-  border-radius: 18px;
+  width: 90px;
+  height: 44px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.13rem;
   border: none;
   box-shadow: 0 2px 8px #0002;
   display: flex;
@@ -158,35 +235,36 @@ footer span span {
   justify-content: center;
   cursor: pointer;
   transition: background 0.2s;
+  font-weight: bold;
 }
 .ctrl-btn:active { background: linear-gradient(135deg, #fa71cd, #4a00e0);}
 .stats {
-  margin: 0.4rem 0 0.1rem 0;
+  margin: 0.6rem 0 0.1rem 0;
   width: 100vw;
   display: flex;
   justify-content: space-around;
-  font-size: 1rem;
+  font-size: 1.13rem;
   font-weight: bold;
   text-shadow: 0 0 6px #4a00e0;
 }
 #board {
   display: grid;
-  gap: 8px;
+  gap: 22px;
   justify-content: center;
   align-content: center;
   margin: 0 auto;
-  margin-top: 10px;
+  margin-top: 24px;
   transition: grid-template-columns 0.3s;
 }
 .card {
-  width: 70px;
-  height: 70px;
+  width: 120px;
+  height: 120px;
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  border-radius: 18px;
+  border-radius: 22px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.4rem;
+  font-size: 2.3rem;
   cursor: pointer;
   box-shadow: 0 2px 8px #0002;
   user-select: none;
@@ -196,9 +274,9 @@ footer span span {
 }
 .card-inner {
   width: 100%; height: 100%;
-  border-radius: 18px;
+  border-radius: 22px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem;
+  font-size: 2.3rem;
   color: #fff;
   transition: transform 0.5s cubic-bezier(.4,2,.6,1);
   transform-style: preserve-3d;
@@ -210,19 +288,19 @@ footer span span {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 18px;
+  border-radius: 22px;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem;
+  font-size: 2.3rem;
 }
 .card .back {
-  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
+  background: linear-gradient(135deg, #1976d2, #2196f3 80%);
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 18px;
+  border-radius: 22px;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem;
+  font-size: 2.3rem;
   transform: rotateY(180deg);
 }
 .card.matched .card-inner {
@@ -237,8 +315,9 @@ footer span span {
   box-shadow: 0 0 20px 8px #fa71cd;
   transform: scale(1.05);
 }
-@media (max-width: 480px) {
-  .card, .ctrl-btn, .splash-card { width: 42px; height: 42px; font-size: 0.9rem;}
+@media (max-width: 600px) {
+  .card, .ctrl-btn, .splash-card { width: 62px; height: 62px; font-size: 1.3rem;}
   .game-header h1 { font-size: 1rem;}
   .popup-content { padding: 0.6rem 0.2rem;}
+  .big-popup { max-width: 180px; }
   }
