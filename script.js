@@ -43,6 +43,12 @@ const audioWin = document.getElementById('audio-win');
 const audioLose = document.getElementById('audio-lose');
 const audioPause = document.getElementById('audio-pause');
 const audioRestart = document.getElementById('audio-restart');
+const resultLevel = document.getElementById('resultLevel');
+const resultScore = document.getElementById('resultScore');
+const resultTime = document.getElementById('resultTime');
+const resultLevelL = document.getElementById('resultLevelL');
+const resultScoreL = document.getElementById('resultScoreL');
+const resultTimeL = document.getElementById('resultTimeL');
 
 let state = {
   user: null,
@@ -183,7 +189,7 @@ function getGridSize(level) {
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  pauseBtn.textContent = "⏸️";
+  pauseBtn.textContent = "Pause";
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -253,6 +259,7 @@ function checkMatch() {
     card1.matched = card2.matched = true;
     board.children[i1].classList.add('matched');
     board.children[i2].classList.add('matched');
+    vibrate();
     state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
@@ -268,9 +275,13 @@ function checkMatch() {
 function winLevel() {
   clearInterval(state.timerId);
   popupSound('win');
+  vibrate();
   state.score += state.timeLeft*2;
   saveProgress();
   updateHUD();
+  resultLevel.textContent = "Level: " + state.level;
+  resultScore.textContent = "Score: " + state.score;
+  resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
   winPopup.classList.remove('hidden');
 }
 nextLevelBtn.onclick = () => {
@@ -291,6 +302,9 @@ homeBtn1.onclick = () => {
 function loseLevel() {
   clearInterval(state.timerId);
   popupSound('lose');
+  resultLevelL.textContent = "Level: " + state.level;
+  resultScoreL.textContent = "Score: " + state.score;
+  resultTimeL.textContent = "Time Left: 0s";
   losePopup.classList.remove('hidden');
 }
 playAgainBtn.onclick = () => {
@@ -334,13 +348,13 @@ function startTimer() {
   },1000);
 }
 function setupSwitches() {
-  soundSwitch.textContent = state.soundOn ? "🔊" : "🔇";
-  vibrationSwitch.textContent = state.vibrationOn ? "📳" : "📴";
-  soundSwitch.onclick = ()=>{ state.soundOn=!state.soundOn; soundSwitch.textContent=state.soundOn?"🔊":"🔇"; };
-  vibrationSwitch.onclick = ()=>{ state.vibrationOn=!state.vibrationOn; vibrationSwitch.textContent=state.vibrationOn?"📳":"📴"; };
+  soundSwitch.checked = state.soundOn;
+  vibrationSwitch.checked = state.vibrationOn;
+  soundSwitch.onchange = ()=>{ state.soundOn=soundSwitch.checked; };
+  vibrationSwitch.onchange = ()=>{ state.vibrationOn=vibrationSwitch.checked; };
   pauseBtn.onclick = ()=>{
     state.paused = !state.paused;
-    pauseBtn.textContent = state.paused ? "▶️" : "⏸️";
+    pauseBtn.textContent = state.paused ? "Resume" : "Pause";
     popupSound(state.paused ? 'pause' : 'restart');
   };
 }
@@ -360,6 +374,9 @@ function popupSound(type) {
 function stopAllSounds() {
   [audioTap,audioWin,audioLose,audioPause,audioRestart].forEach(a=>{ a.pause(); a.currentTime=0; });
   state.playingSound = null;
+}
+function vibrate() {
+  if(state.vibrationOn && window.navigator && window.navigator.vibrate) window.navigator.vibrate(220);
 }
 function saveProgress() {
   localStorage.setItem('memorymatch_progress', JSON.stringify({
@@ -401,4 +418,4 @@ function showAd(callback) {
 
 // Init
 showSplash();
-      
+                      
