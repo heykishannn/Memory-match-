@@ -1,7 +1,8 @@
+let gameScreen;
+let startScreen;
+
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
-const gameScreen = document.getElementById('game-screen');
-const startScreen = document.getElementById('start-screen');
 const gameContainer = document.getElementById('game');
 const levelDisplay = document.getElementById('levelDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
@@ -10,8 +11,8 @@ const vibrationToggle = document.getElementById('vibrationToggle');
 const soundToggle = document.getElementById('soundToggle');
 
 // Add these with other element selectors
-const splashScreen = document.getElementById('splash-screen');
-const loginSignupScreen = document.getElementById('login-signup-screen');
+let splashScreen;
+let loginSignupScreen;
 
 // Login/Signup Screen Elements
 const usernameInput = document.getElementById('usernameInput');
@@ -21,10 +22,10 @@ const signupBtn = document.getElementById('signupBtn');
 const authMessage = document.getElementById('authMessage');
 
 // Ad Simulation Screen Elements
-const adSimulationScreen = document.getElementById('ad-simulation-screen');
+let adSimulationScreen;
 const adTimerDisplay = document.getElementById('adTimerDisplay');
 
-const popup = document.getElementById('popup');
+let popup;
 const popupTitle = document.getElementById('popupTitle');
 const popupMessage = document.getElementById('popupMessage');
 const popupLevel = document.getElementById('popupLevel');
@@ -33,11 +34,11 @@ const popupTime = document.getElementById('popupTime');
 const homeBtn = document.getElementById('homeBtn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 
-const resumePopup = document.getElementById('resumePopup');
+let resumePopup;
 const newGameBtn = document.getElementById('newGameBtn');
 const continueBtn = document.getElementById('continueBtn');
 
-const losePopupWindow = document.getElementById('losePopupWindow'); // Renamed
+let losePopupWindow; // Renamed
 const losePlayAgainBtn = document.getElementById('losePlayAgainBtn'); // New
 const loseHomeBtn = document.getElementById('loseHomeBtn'); // New
 
@@ -528,6 +529,25 @@ if (watchAdBtn) {
 */
 
 window.addEventListener('load', () => {
+  splashScreen = document.getElementById('splash-screen');
+  loginSignupScreen = document.getElementById('login-signup-screen');
+  startScreen = document.getElementById('start-screen');
+  gameScreen = document.getElementById('game-screen');
+  adSimulationScreen = document.getElementById('ad-simulation-screen');
+  resumePopup = document.getElementById('resumePopup');
+  losePopupWindow = document.getElementById('losePopupWindow');
+  popup = document.getElementById('popup');
+
+  // Add diagnostic console.error logs if any critical element is not found
+  if (!splashScreen) console.error('CRITICAL: splashScreen element not found!');
+  if (!loginSignupScreen) console.error('CRITICAL: loginSignupScreen element not found!');
+  if (!startScreen) console.error('CRITICAL: startScreen element not found!');
+  if (!gameScreen) console.error('CRITICAL: gameScreen element not found!');
+  if (!resumePopup) console.error('CRITICAL: resumePopup element not found!');
+  if (!popup) console.error('CRITICAL: popup element not found!');
+  if (!losePopupWindow) console.error('CRITICAL: losePopupWindow element not found!');
+  if (!adSimulationScreen) console.error('CRITICAL: adSimulationScreen element not found!');
+
   // Ensure all other screens are hidden by default initially
   if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
   if (startScreen) startScreen.classList.add('hidden');
