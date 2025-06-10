@@ -123,7 +123,11 @@ function getGrid(level) {
   // Level 1: 2x2, Level 2: 3x2, Level 3: 3x3, ... up to 10x10
   let size = Math.min(MAX_GRID, Math.ceil(Math.sqrt(level + 1)));
   let rows = size, cols = size;
-  if (level < 3) { rows = 2; cols = level + 1; }
+  if (level === 1) { rows = 2; cols = 2; }
+  else if (level === 2) { rows = 2; cols = 3; }
+  else if (level === 3) { rows = 3; cols = 3; }
+  else if (level === 4) { rows = 2; cols = 4; }
+  else if (level === 5) { rows = 2; cols = 5; }
   return {rows, cols};
 }
 
@@ -280,10 +284,11 @@ function shuffle(arr) {
 
 function playSound(type) {
   if (!state.sound) return;
-  // You can add your own sound assets here
-  // Example: new Audio('assets/flip.mp3').play();
+  // Optional: Add your own sound files and play here using new Audio('sound.mp3').play();
+  // Example:
+  // if(type === 'flip') new Audio('flip.mp3').play();
 }
 
 function vibrate() {
   if (navigator.vibrate) navigator.vibrate(200);
-}
+    }
