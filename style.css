@@ -1,621 +1,98 @@
-/* Reset & base */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    overflow: hidden; /* Prevent scrollbars during splash */
 }
 
-html, body {
-  width: 360px;
-  height: 640px;
-  overflow: hidden;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #0e87cc, #2575fc);
-  position: relative;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 10px 0 110px 0;
-  color: #000;
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: inherit;
-  filter: blur(20px);
-  z-index: -1;
-}
-
-h1.small-title {
-  font-weight: 700;
-  font-size: 1.8rem;
-  letter-spacing: 2px;
-  color: #fff;
-  user-select: none;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.center-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  padding-bottom: 60px;
-}
-
-.hidden {
-  display: none;
-}
-
-/* Orange gradient buttons only */
-.btn-primary {
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  border: none;
-  color: white;
-  padding: 14px 30px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  user-select: none;
-  margin-top: 10px;
-  box-shadow: 0 4px 10px rgba(238, 9, 121, 0.6);
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-/* Pause button style */
-.btn-pause {
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 50px;
-  height: 34px;
-  box-shadow: 0 4px 10px rgba(238, 9, 121, 0.6);
-  user-select: none;
-  margin-top: 18px;
-  align-self: center;
-}
-
-/* Game Header */
-.game-header {
-  width: 100%;
-  max-width: 360px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.toggles-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
-  box-sizing: border-box;
-  margin-top: 0;
-}
-
-.toggle-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.toggle-left {
-  align-items: flex-start;
-}
-
-.toggle-right {
-  align-items: flex-end;
-}
-
-/* Orange gradient switch */
-.orange-switch {
-  width: 50px;
-  height: 26px;
-  position: relative;
-  display: inline-block;
-}
-
-.orange-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.orange-switch .slider {
-  position: absolute;
-  cursor: pointer;
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  border-radius: 26px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: 0.4s;
-}
-
-.orange-switch .slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-}
-
-.orange-switch input:checked + .slider {
-  background: linear-gradient(45deg, #ee0979, #ff6a00);
-}
-
-.orange-switch input:checked + .slider:before {
-  transform: translateX(24px);
-}
-
-/* Game Wrapper centers content vertically and horizontally */
-.game-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  width: 100%;
-  max-width: 360px;
-}
-
-/* Game info with colored texts */
-.game-info {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  font-size: 1.1rem;
-  font-weight: 600;
-  user-select: none;
-  margin-bottom: 10px;
-}
-
-.level-info {
-  color: black;
-  font-weight: 900;
-}
-
-.score-info {
-  color: #27ae60;
-  font-weight: 900;
-}
-
-.time-info {
-  color: #e74c3c;
-  font-weight: 900;
-}
-
-/* Game container */
-.game-container {
-  display: grid;
-  gap: 10px;
-  justify-content: center;
-  width: 100%;
-  max-width: 360px;
-}
-
-/* Cards - square shape with gradient backgrounds */
-.card {
-  width: 75px;
-  height: 75px;
-  perspective: 800px;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 12px;
-}
-
-.card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s;
-  transform-style: preserve-3d;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.card.flipped .card-inner {
-  transform: rotateY(180deg);
-}
-
-/* Card front cover gradient with no question mark */
-.card-front {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  border-radius: 12px;
-  border: 2px solid #3a1c8c;
-  backface-visibility: hidden;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-}
-
-/* Card back gradient */
-.card-back {
-  background: linear-gradient(135deg, #5dade2, #2874a6);
-  color: white;
-  border-radius: 12px;
-  border: 2px solid #21618c;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2.8rem;
-  backface-visibility: hidden;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  transform: rotateY(180deg);
-  user-select: none;
-}
-
-/* Responsive grid columns */
-.game-container[data-cols="2"] {
-  grid-template-columns: repeat(2, 1fr);
-}
-.game-container[data-cols="3"] {
-  grid-template-columns: repeat(3, 1fr);
-}
-.game-container[data-cols="4"] {
-  grid-template-columns: repeat(4, 1fr);
-}
-.game-container[data-cols="5"] {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-/* Popup Modal with blue-purple gradient background */
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 280px;
-  background: linear-gradient(135deg, #34495e, #2c3e50);
-  color: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  z-index: 1000;
-  padding: 25px 20px 20px 20px;
-  text-align: center;
-  animation: zoomIn 0.3s ease forwards;
-  user-select: none;
-}
-
-.popup.hidden {
-  display: none;
-}
-
-.popup-content h2 {
-  font-size: 2rem;
-  margin-bottom: 12px;
-  font-weight: 900;
-}
-
-.popup-content p {
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-}
-
-.popup-stats {
-  display: flex;
-  justify-content: space-around;
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  user-select: text;
-}
-
-.popup-stats div {
-  min-width: 70px;
-}
-
-.level-label {
-  color: black;
-  font-weight: 900;
-}
-
-.score-label {
-  color: #27ae60;
-  font-weight: 900;
-}
-
-.time-label {
-  color: #e74c3c;
-  font-weight: 900;
-}
-
-.popup-buttons {
-  display: flex;
-  justify-content: space-around;
-  gap: 12px;
-}
-
-.popup-buttons button {
-  background: linear-gradient(45deg, #ff6a00, #ee0979);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  padding: 14px 0;
-  font-size: 1.1rem;
-  flex: 1;
-  font-weight: 700;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 10px rgba(238, 9, 121, 0.6);
-}
-
-.popup-buttons button:hover {
-  opacity: 0.9;
-}
-
-/* Zoom animations */
-@keyframes zoomOut {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-}
-
-@keyframes zoomIn {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-/* Footer */
-footer {
-  width: 100%;
-  max-width: 360px;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fff; /* White color */
-  user-select: none;
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, #0e87cc, #2575fc); /* गेम बैकग्राउंड के साथ मिक्स */
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  z-index: 999;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Splash Screen Styles */
 #splash-screen {
-  display: flex; /* Use flex to show it */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
-  background: linear-gradient(135deg, #0e87cc, #2575fc); /* Same as body background */
-  position: fixed; /* Cover everything */
-  top: 0;
-  left: 0;
-  z-index: 2000; /* Make sure it's on top */
+    width: 100%;
+    height: 100vh;
+    background-color: #3498db; /* Example blue background */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: fixed; /* Cover the entire viewport */
+    top: 0;
+    left: 0;
+    z-index: 9999; /* Ensure it's on top */
 }
 
-.splash-content {
-  text-align: center;
-  color: white;
-}
-
-.splash-content .small-title {
-  font-size: 2.5rem; /* Larger title for splash */
-  margin-bottom: 30px;
-}
-
-.animated-cards {
-  display: flex;
-  justify-content: center;
-  gap: 15px; /* Space between cards */
-  margin-bottom: 30px;
-}
-
-.splash-card {
-  width: 60px;
-  height: 90px;
-  background-color: #ff6a00; /* Orange color like buttons */
-  border-radius: 8px;
-  animation: flip 1.5s infinite ease-in-out;
-}
-
-/* Stagger animation delays for a nicer effect */
-.splash-card:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.splash-card:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes flip {
-  0%, 100% {
-    transform: rotateY(0deg);
-  }
-  50% {
-    transform: rotateY(180deg);
-    background-color: #ee0979; /* Change color mid-flip */
-  }
-}
-
-.splash-loading {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-/* Login/Signup Screen Styles */
-#login-signup-screen {
-  display: flex; /* Will be changed to flex by JS when shown */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  background: linear-gradient(135deg, #0e87cc, #2575fc); /* Consistent background */
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1999; /* Below splash, above game */
-  padding: 20px;
-}
-
-/* Ensure .hidden correctly hides it */
-#login-signup-screen.hidden {
-   display: none;
-}
-
-.login-signup-content {
-  text-align: center;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.2); /* Slight overlay for content box */
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-}
-
-.login-signup-content .small-title {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-}
-
-.page-subtitle {
-  font-size: 1rem;
-  margin-bottom: 25px;
-  color: #f0f0f0;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* Space between form elements */
-}
-
-.input-field {
-  padding: 12px 15px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%; /* Full width within container */
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.input-field:focus {
-  outline: none;
-  border-color: #ff6a00; /* Highlight on focus */
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 0 2px rgba(255, 106, 0, 0.5);
-}
-
-/* Adjusting .btn-primary for this context if needed, or use as is */
-.form-container .btn-primary {
-  margin-top: 5px; /* Small top margin for buttons */
-  padding: 12px 20px; /* Slightly adjusted padding */
-  font-size: 1.1rem;
-}
-
-.auth-message {
-  margin-top: 15px;
-  font-size: 0.9rem;
-  color: #ffdddd; /* Light red for error messages, can be changed by JS */
-  min-height: 20px; /* Reserve space for messages */
-}
-
-/* Ad Simulation Screen Styles */
-#ad-simulation-screen {
-  display: flex; /* Changed by JS to flex when shown */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  background-color: rgba(0, 0, 0, 0.85); /* Dark overlay */
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2001; /* Highest z-index to cover everything */
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
-
-/* Ensure .hidden correctly hides it */
-#ad-simulation-screen.hidden {
-   display: none;
-}
-
-.ad-content h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-}
-
-.ad-content p {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-}
-
-.ad-timer {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: #ffc107; /* Amber color for timer */
-}
-
-/* Basic spinner animation */
 .spinner {
-  border: 6px solid #f3f3f3; /* Light grey */
-  border-top: 6px solid #ff6a00; /* Orange */
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: 0 auto; /* Center the spinner */
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 8px solid white;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin-top: 20px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#login-signup-page, #main-game-screen {
+    display: none; /* Hidden by default, controlled by JS */
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px; /* Max width for larger mobile screens */
+}
+
+#login-signup-page h2, #main-game-screen h1 {
+    margin-bottom: 20px;
+}
+
+#login-signup-page input {
+    width: calc(100% - 22px); /* Full width minus padding and border */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#login-signup-page button, #main-game-screen button {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #2ecc71; /* Green */
+    color: white;
+    cursor: pointer;
+    width: calc(100% - 22px);
+}
+
+#login-signup-page button:hover, #main-game-screen button:hover {
+    background-color: #27ae60;
+}
+
+#login-signup-page button#signup-btn {
+    background-color: #e67e22; /* Orange for signup */
+    margin-left: 0px; /* Ensure it's on a new line or adjust as needed */
+}
+
+#login-signup-page button#signup-btn:hover {
+    background-color: #d35400;
+}
+
+#main-game-screen #logout-btn {
+    background-color: #e74c3c; /* Red for logout */
+}
+
+#main-game-screen #logout-btn:hover {
+    background-color: #c0392b;
 }

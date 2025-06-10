@@ -1,113 +1,33 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=360, height=640, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Memory Match Game</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Match Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="splash-screen">
-    <div class="splash-content">
-      <h1 class="small-title">MEMORY MATCH</h1>
-      <div class="animated-cards">
-        <div class="splash-card"></div>
-        <div class="splash-card"></div>
-        <div class="splash-card"></div>
-  </div>
-  <div id="login-signup-screen" class="hidden">
-    <div class="login-signup-content">
-      <h1 class="small-title">Welcome!</h1>
-      <p class="page-subtitle">Login or Sign Up to Play</p>
-      <div class="form-container">
-      <input type="text" id="usernameInput" class="input-field" placeholder="Enter your username" />
-        <input type="email" id="emailInput" class="input-field" placeholder="Enter your email" />
-      <button id="loginBtn" class="btn-primary">Login</button>
-      <button id="signupBtn" class="btn-primary">Signup</button>
-      </div>
-      <p id="authMessage" class="auth-message"></p>
+    <div id="splash-screen">
+        <!-- Splash screen content will go here -->
+        <h1>Welcome to Card Match!</h1>
+        <div class="spinner"></div>
     </div>
-  </div>
-  <div id="start-screen" class="center-screen hidden">
-    <h1 class="small-title">MEMORY MATCH</h1>
-    <button id="startBtn" class="btn-primary">Start</button>
-  </div>  <!-- Game Screen -->  <div id="game-screen" class="hidden">
-    <header class="game-header">
-      <h1 class="small-title">MEMORY MATCH</h1>
-      <div class="toggles-row">
-        <div class="toggle-wrapper toggle-left">
-          <label class="switch orange-switch">
-            <input type="checkbox" id="soundToggle" checked />
-            <span class="slider"></span>
-          </label>
-          <div class="toggle-label">Sound</div>
-        </div><button id="pauseBtn" class="btn-pause" title="Pause/Resume Game">❚❚</button>
 
-    <div class="toggle-wrapper toggle-right">
-      <label class="switch orange-switch">
-        <input type="checkbox" id="vibrationToggle" checked />
-        <span class="slider"></span>
-      </label>
-      <div class="toggle-label">Vibration</div>
+    <div id="login-signup-page" style="display: none;">
+        <h2>Login or Sign Up</h2>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="text" id="username" placeholder="Enter your username" required>
+        <button id="login-btn">Login</button>
+        <button id="signup-btn">Sign Up</button>
     </div>
-  </div>
-</header>
 
-<div class="game-wrapper">
-  <div class="game-info">
-    <div class="level-info">Level: <span id="levelDisplay">1</span></div>
-    <div class="score-info">Score: <span id="scoreDisplay">0</span></div>
-    <div class="time-info">Time: <span id="timerDisplay">0</span>s</div>
-  </div>
-
-  <div class="game-container" id="game"></div>
-</div>
-
-  </div>  <!-- Resume Popup Modal -->  <div id="resumePopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>Welcome Back!</h2>
-      <p>Do you want to continue from where you left off?</p>
-      <div class="popup-buttons">
-        <button id="newGameBtn" class="btn-primary">Restart from Level 1</button>
-        <button id="continueBtn" class="btn-primary">Continue watch ad 3 sec</button>
-      </div>
+    <div id="main-game-screen" style="display: none;">
+        <!-- Main game content will go here -->
+        <h1>Game Screen</h1>
+        <p>Welcome, <span id="user-display"></span>!</p>
+        <button id="logout-btn">Logout</button>
     </div>
-  </div>  <!-- Win/Lose Popup Modal -->  <div id="popup" class="popup hidden">
-    <div class="popup-content">
-      <h2 id="popupTitle">You Won!</h2>
-      <p id="popupMessage">Level Complete!</p>
-      <div class="popup-stats" id="popupStats">
-        <div><span class="level-label">Level:</span> <span id="popupLevel"></span></div>
-        <div><span class="score-label">Score:</span> <span id="popupScore"></span></div>
-        <div><span class="time-label">Time:</span> <span id="popupTime"></span>s</div>
-      </div>
-      <div class="popup-buttons" id="popupButtons">
-        <button id="homeBtn" class="btn-primary">Home</button>
-        <button id="nextLevelBtn" class="btn-primary">Next Level</button>
-      </div>
-    </div>
-  </div>  <!-- Lose Popup Modal -->  <div id="losePopupWindow" class="popup hidden"> <!-- ID changed -->
-    <div class="popup-content">
-      <h2>Level Failed!</h2> <!-- Text changed -->
-      <div class="popup-buttons" style="justify-content: center; gap: 15px;">
-        <!-- Buttons changed -->
-        <button id="losePlayAgainBtn" class="btn-primary">Play Again</button>
-        <button id="loseHomeBtn" class="btn-primary">Home</button>
-      </div>
-    </div>
-  </div>  <!-- New Footer Ad Script -->  <div style="width: 320px; height: 50px; margin: 0 auto; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1001;">
-    <script type="text/javascript">
-      atOptions = {
-        'key' : '1401828e48164d6e5d2cfae0724ee0df',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script type="text/javascript" src="//www.highperformanceformat.com/1401828e48164d6e5d2cfae0724ee0df/invoke.js"></script>
-  </div>  <footer>
-    Powered by NAS
-  </footer>  <!-- Audio Files --><audio id="flipSound" src="tap.mp3" preload="auto"></audio> <audio id="matchSound" src="win.mp3" preload="auto"></audio> <audio id="loseSound" src="lose.mp3" preload="auto"></audio> <audio id="pauseSound" src="pause.mp3" preload="auto"></audio> <audio id="restartSound" src="restart.mp3" preload="auto"></audio>
 
-  <script src="script.js"></script></body>
+    <script src="script.js"></script>
+</body>
 </html>
