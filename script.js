@@ -78,7 +78,7 @@ function showSplash() {
   game.classList.add('hidden');
   auth.classList.add('hidden');
   splashCards.innerHTML = '';
-  document.querySelector('#splash h1').style.display = 'block';
+  // document.querySelector('#splash h1').style.display = 'block'; // This line is not typically needed and not requested.
   for (let i = 0; i < 3; i++) {
     const card = document.createElement('div');
     card.className = 'splash-card';
@@ -139,8 +139,7 @@ startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
     resumePopup.classList.remove('hidden');
-    // Sound will play only on button click as per requirement
-    popupSound('restart');
+    // Sound for continue popup removed as per request
   } else {
     state.level = 1;
     state.score = 0;
@@ -193,7 +192,7 @@ function getGridSize(level) {
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  pauseBtn.textContent = "||"; // Set to pause icon
+  pauseBtn.textContent = "||"; // Set to pause symbol
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -369,7 +368,8 @@ function setupSwitches() {
 
   pauseBtn.onclick = ()=>{
     state.paused = !state.paused;
-    pauseBtn.textContent = state.paused ? "Resume" : "||"; // Change text to "Resume" or "||"
+    // Changed text to symbols for pause/resume
+    pauseBtn.textContent = state.paused ? "▶" : "||";
     popupSound(state.paused ? 'pause' : 'restart');
   };
 }
