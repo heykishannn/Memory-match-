@@ -296,8 +296,8 @@ footer span span {
 .card {
   width: 100%; /* Make card fill its grid cell */
   aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 130px; /* Larger max size for desktop, increased from 120px */
-  max-height: 130px; /* Larger max size for desktop, increased from 120px */
+  max-width: 120px; /* Larger max size for desktop */
+  max-height: 120px; /* Larger max size for desktop */
   border: 2px solid black; /* Black border */
   border-radius: 20px;
   display: flex; /* For centering front/back content */
@@ -359,14 +359,7 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  .card {
-    width: 100%;
-    height: auto;
-    max-width: 100px; /* Increased from 80px */
-    max-height: 100px; /* Increased from 80px */
-    font-size: 2.8rem; /* Increased from 2.2rem */
-    border-radius: 18px;
-  }
+  .card { width: 100%; height: auto; max-width: 80px; max-height: 80px; font-size: 2.2rem; border-radius: 18px;} /* Larger cards on mobile */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
@@ -376,4 +369,4 @@ footer span span {
   .switch-label input:checked + .switch-slider { transform: translateX(15px); }
   .toggle-text { font-size: 0.75rem; margin-top: 3px; }
   .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
-    }
+}
