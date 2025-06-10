@@ -169,15 +169,15 @@ resumeHomeBtn.onclick = () => {
   saveProgress(); // Ensure current progress is saved
   showHome();
 };
-watchAdResumeBtn.onclick = () => {
-  resumePopup.classList.add('hidden');
-  showAd(() => {
-    const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-    state.level = progress.level;
-    state.score = progress.score;
-    showGame();
-  });
-};
+// watchAdResumeBtn.onclick = () => {
+//   resumePopup.classList.add('hidden');
+//   showAd(() => {
+//     const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
+//     state.level = progress.level;
+//     state.score = progress.score;
+//     showGame();
+//   });
+// };
 restartFrom1Btn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
@@ -435,16 +435,16 @@ loseHomeBtn.onclick = () => {
   saveProgress();
   showHome();
 };
-watchAdBtn.onclick = () => {
-  stopAllSounds();
-  losePopup.classList.add('hidden');
-  showAd(()=>{
-    // +10s reward
-    state.timeLeft += 10;
-    updateHUD();
-    startTimer();
-  });
-};
+// watchAdBtn.onclick = () => {
+//   stopAllSounds();
+//   losePopup.classList.add('hidden');
+//   showAd(()=>{
+//     // +10s reward
+//     state.timeLeft += 10;
+//     updateHUD();
+//     startTimer();
+//   });
+// };
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
   // Ensure time is formatted with leading zero if less than 10
@@ -541,23 +541,28 @@ function shuffle(arr) {
   return a;
 }
 function showAd(callback) {
-  adPopup.classList.remove('hidden');
-  popupSound('pause'); // Play pause sound during ad
-  let t = 5;
-  adTimer.textContent = t;
-  state.adTimeout && clearTimeout(state.adTimeout);
-  function tick() {
-    t--;
-    adTimer.textContent = t;
-    if(t<=0) {
-      adPopup.classList.add('hidden');
-      stopAllSounds(); // Stop pause sound after ad
-      callback && callback();
-    } else {
-      state.adTimeout = setTimeout(tick,1000);
-    }
+  // adPopup.classList.remove('hidden'); // No longer show internal popup
+  // popupSound('pause'); // No longer play internal sound
+  // let t = 5;
+  // adTimer.textContent = t;
+  // state.adTimeout && clearTimeout(state.adTimeout);
+  // function tick() {
+  //   t--;
+  //   adTimer.textContent = t;
+  //   if(t<=0) {
+  //     adPopup.classList.add('hidden');
+  //     stopAllSounds();
+  //     callback && callback(); // Execute callback
+  //   } else {
+  //     state.adTimeout = setTimeout(tick,1000);
+  //   }
+  // }
+  // state.adTimeout = setTimeout(tick,1000);
+
+  // Immediately execute the callback if provided, as ad is external.
+  if (callback) {
+    callback();
   }
-  state.adTimeout = setTimeout(tick,1000);
 }
 
 // Lose/Win/Popup sound only while popup is open
