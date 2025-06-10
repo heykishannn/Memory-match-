@@ -296,31 +296,26 @@ footer span span {
 .card {
   width: 100%; /* Make card fill its grid cell */
   aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 160px; /* Larger max size for desktop (APK icon like) */
-  max-height: 160px; /* Larger max size for desktop */
+  max-width: 120px; /* Larger max size for desktop */
+  max-height: 120px; /* Larger max size for desktop */
   border: 2px solid black; /* Black border */
   border-radius: 20px;
-  user-select: none;
-  perspective: 600px; /* Applies to the parent that contains the flipping element */
-  position: relative; /* For absolute positioning of inner elements */
+  display: flex; /* For centering front/back content */
+  justify-content: center; /* For centering front/back content */
+  align-items: center; /* For centering front/back content */
+  font-size: 2.8rem; /* Larger emoji size */
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
+  user-select: none;
+  perspective: 600px; /* For 3D transform */
+  position: relative;
+  /* Transition for the entire card flip */
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+  transform-style: preserve-3d; /* Enable 3D transform on the card itself */
 }
 
-/* New .card-inner container for the flip effect */
-.card-inner {
-  width: 100%; height: 100%;
-  border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 3.8rem; /* Larger Emoji size */
-  color: #fff;
-  transition: transform 0.5s cubic-bezier(.4,2,.6,1); /* Smooth flip animation */
-  transform-style: preserve-3d; /* Key for 3D transform */
-  position: relative; /* For absolute positioning of front/back */
-}
-
-/* When .card has 'flipped' class, its .card-inner flips */
-.card.flipped .card-inner {
+/* When flipped, rotate the entire card */
+.card.flipped {
   transform: rotateY(180deg);
 }
 
@@ -340,7 +335,7 @@ footer span span {
 .card .front {
   background: linear-gradient(to right, #a8ff78, #78ffd6); /* Light green gradient */
   color: #fff;
-  /* This side should be visible when card-inner is FLIPPED (180deg), so it needs to start at 180deg */
+  /* This is the side that shows when FLIPPED, so it starts rotated */
   transform: rotateY(180deg);
 }
 
@@ -348,8 +343,8 @@ footer span span {
 .card .back {
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient */
   color: #fff;
-  /* This side should be visible when card-inner is UNFLIPPED (0deg), so it starts at 0deg */
-  transform: rotateY(0deg); /* Explicitly set to 0deg */
+  /* This is the side that shows when UNFLIPPED, so it faces forward initially */
+  /* Default transform is rotateY(0deg) */
 }
 
 /* Removed glow animation on matched cards as requested */
@@ -364,7 +359,7 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  .card { width: 100%; height: auto; max-width: 110px; max-height: 110px; font-size: 3.2rem; border-radius: 18px;} /* Larger cards on mobile */
+  .card { width: 100%; height: auto; max-width: 80px; max-height: 80px; font-size: 2.2rem; border-radius: 18px;} /* Larger cards on mobile */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
