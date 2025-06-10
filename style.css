@@ -296,14 +296,14 @@ footer span span {
 .card {
   width: 100%; /* Make card fill its grid cell */
   aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 150px; /* Larger max size for desktop (iOS App Icon size is around 120-180px for larger displays) */
-  max-height: 150px; /* Larger max size for desktop */
+  max-width: 120px; /* Larger max size for desktop */
+  max-height: 120px; /* Larger max size for desktop */
   border: 2px solid black; /* Black border */
   border-radius: 20px;
   display: flex; /* For centering front/back content */
   justify-content: center; /* For centering front/back content */
   align-items: center; /* For centering front/back content */
-  font-size: 3.5rem; /* Larger emoji size */
+  font-size: 2.8rem; /* Larger emoji size */
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
   user-select: none;
@@ -359,7 +359,7 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  .card { width: 100%; height: auto; max-width: 100px; max-height: 100px; font-size: 2.8rem; border-radius: 18px;} /* Larger cards on mobile */
+  .card { width: 100%; height: auto; max-width: 80px; max-height: 80px; font-size: 2.2rem; border-radius: 18px;} /* Larger cards on mobile */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
