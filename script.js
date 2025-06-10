@@ -1,4 +1,3 @@
-// Emoji List
 const EMOJIS = [
   "🍎","🍌","🍇","🍓","🍉","🍍","🥝","🍒","🍑","🍋",
   "🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
@@ -10,6 +9,7 @@ const MAX_LEVEL = 100;
 
 // DOM
 const splash = document.getElementById('splash');
+const splashCards = document.querySelector('.splash-cards');
 const auth = document.getElementById('auth');
 const home = document.getElementById('home');
 const game = document.getElementById('game');
@@ -43,7 +43,6 @@ const audioLose = document.getElementById('audio-lose');
 const audioPause = document.getElementById('audio-pause');
 const audioRestart = document.getElementById('audio-restart');
 
-// State
 let state = {
   user: null,
   level: 1,
@@ -58,15 +57,41 @@ let state = {
   matchedCount: 0,
   busy: false,
   resumeData: null,
-  adTimeout: null
+  adTimeout: null,
+  playingSound: null
 };
 
-// Splash
+// Splash Animation with Matching Cards
 function showSplash() {
   splash.classList.remove('hidden');
   auth.classList.add('hidden');
   home.classList.add('hidden');
   game.classList.add('hidden');
+  splashCards.innerHTML = '';
+  const splashEmojis = shuffle(EMOJIS).slice(0, 4);
+  let pairs = shuffle([...splashEmojis, ...splashEmojis]);
+  for (let i = 0; i < 8; i++) {
+    const card = document.createElement('div');
+    card.className = 'splash-card';
+    card.textContent = '';
+    splashCards.appendChild(card);
+  }
+  setTimeout(() => {
+    let flipOrder = shuffle([0,1,2,3,4,5,6,7]);
+    flipOrder.forEach((idx, i) => {
+      setTimeout(() => {
+        let card = splashCards.children[idx];
+        card.textContent = pairs[idx];
+        card.classList.add('flipped');
+      }, i*130);
+    });
+    setTimeout(() => {
+      for(let i=0;i<8;i+=2) {
+        splashCards.children[i].classList.add('matching');
+        splashCards.children[i+1].classList.add('matching');
+      }
+    }, 1200);
+  }, 400);
   setTimeout(() => {
     splash.classList.add('hidden');
     checkLogin();
@@ -122,6 +147,7 @@ startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
     resumePopup.classList.remove('hidden');
+    popupSound('restart');
   } else {
     state.level = 1;
     state.score = 0;
@@ -186,6 +212,12 @@ function startLevel(level) {
     cardEl.className = 'card cover';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
+    cardEl.innerHTML = `
+      <div class="card-inner">
+        <div class="front"></div>
+        <div class="back">${card.emoji}</div>
+      </div>
+    `;
     cardEl.addEventListener('click',()=>onCardClick(i));
     cardEl.addEventListener('keydown',e=>{
       if(e.key==='Enter'||e.key===' ') { e.preventDefault(); onCardClick(i);}
@@ -214,7 +246,6 @@ function flipCard(index) {
   const cardEl = board.children[index];
   cardEl.classList.remove('cover');
   cardEl.classList.add('flipped');
-  cardEl.textContent = card.emoji;
 }
 function unflipCard(index) {
   const card = state.cards[index];
@@ -222,16 +253,15 @@ function unflipCard(index) {
   const cardEl = board.children[index];
   cardEl.classList.remove('flipped');
   cardEl.classList.add('cover');
-  cardEl.textContent = '';
 }
 function checkMatch() {
   const [i1,i2] = state.flippedIndices;
   const card1 = state.cards[i1], card2 = state.cards[i2];
   if(card1.emoji===card2.emoji) {
     card1.matched = card2.matched = true;
-    state.matchedCount++;
     board.children[i1].classList.add('matched');
     board.children[i2].classList.add('matched');
+    state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
     if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 400);
@@ -245,13 +275,14 @@ function checkMatch() {
 }
 function winLevel() {
   clearInterval(state.timerId);
-  playSound('win');
+  popupSound('win');
   state.score += state.timeLeft*2;
   saveProgress();
   updateHUD();
   winPopup.classList.remove('hidden');
 }
 nextLevelBtn.onclick = () => {
+  stopAllSounds();
   winPopup.classList.add('hidden');
   if(state.level<MAX_LEVEL) state.level++;
   else { state.level=1; state.score=0; }
@@ -259,6 +290,7 @@ nextLevelBtn.onclick = () => {
   startLevel(state.level);
 };
 homeBtn1.onclick = () => {
+  stopAllSounds();
   winPopup.classList.add('hidden');
   state.level = 1; state.score = 0;
   saveProgress();
@@ -266,20 +298,23 @@ homeBtn1.onclick = () => {
 };
 function loseLevel() {
   clearInterval(state.timerId);
-  playSound('lose');
+  popupSound('lose');
   losePopup.classList.remove('hidden');
 }
 playAgainBtn.onclick = () => {
+  stopAllSounds();
   losePopup.classList.add('hidden');
   startLevel(state.level);
 };
 loseHomeBtn.onclick = () => {
+  stopAllSounds();
   losePopup.classList.add('hidden');
   state.level = 1; state.score = 0;
   saveProgress();
   showHome();
 };
 watchAdBtn.onclick = () => {
+  stopAllSounds();
   losePopup.classList.add('hidden');
   showAd(()=>startLevel(state.level));
 };
@@ -309,16 +344,25 @@ function setupSwitches() {
   pauseBtn.onclick = ()=>{
     state.paused = !state.paused;
     pauseBtn.textContent = state.paused ? "▶️" : "⏸️";
-    playSound(state.paused ? 'pause' : 'restart');
+    popupSound(state.paused ? 'pause' : 'restart');
   };
 }
 function playSound(type) {
   if(!state.soundOn) return;
-  if(type==="tap") { audioTap.currentTime=0; audioTap.play(); }
-  if(type==="win") { audioWin.currentTime=0; audioWin.play(); }
-  if(type==="lose") { audioLose.currentTime=0; audioLose.play(); }
-  if(type==="pause") { audioPause.currentTime=0; audioPause.play(); }
-  if(type==="restart") { audioRestart.currentTime=0; audioRestart.play(); }
+  stopAllSounds();
+  if(type==="tap") { audioTap.currentTime=0; audioTap.play(); state.playingSound=audioTap; }
+}
+function popupSound(type) {
+  stopAllSounds();
+  if(!state.soundOn) return;
+  if(type==="win") { audioWin.currentTime=0; audioWin.loop=true; audioWin.play(); state.playingSound=audioWin; }
+  if(type==="lose") { audioLose.currentTime=0; audioLose.loop=true; audioLose.play(); state.playingSound=audioLose; }
+  if(type==="pause") { audioPause.currentTime=0; audioPause.loop=true; audioPause.play(); state.playingSound=audioPause; }
+  if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=true; audioRestart.play(); state.playingSound=audioRestart; }
+}
+function stopAllSounds() {
+  [audioTap,audioWin,audioLose,audioPause,audioRestart].forEach(a=>{ a.pause(); a.currentTime=0; });
+  state.playingSound = null;
 }
 function saveProgress() {
   localStorage.setItem('memorymatch_progress', JSON.stringify({
@@ -335,6 +379,7 @@ function shuffle(arr) {
 }
 function showAd(callback) {
   adPopup.classList.remove('hidden');
+  popupSound('pause');
   let t = 5;
   adTimer.textContent = t;
   state.adTimeout && clearTimeout(state.adTimeout);
@@ -343,6 +388,7 @@ function showAd(callback) {
     adTimer.textContent = t;
     if(t<=0) {
       adPopup.classList.add('hidden');
+      stopAllSounds();
       callback && callback();
     } else {
       state.adTimeout = setTimeout(tick,1000);
@@ -350,6 +396,11 @@ function showAd(callback) {
   }
   state.adTimeout = setTimeout(tick,1000);
 }
+
+// Lose/Win/Popup sound only while popup is open
+[winPopup, losePopup, adPopup, resumePopup].forEach(popup => {
+  if(popup) popup.addEventListener('transitionend', ()=>{ if(popup.classList.contains('hidden')) stopAllSounds(); });
+});
 
 // Init
 showSplash();
