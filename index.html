@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Emoji Match Game</title>
+  <title>Memory Match Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -16,7 +16,7 @@
   
   <!-- Login/Signup -->
   <div id="auth" class="screen hidden">
-    <form id="authForm">
+    <form id="authForm" autocomplete="off" onsubmit="return false;">
       <h2>Login / Signup</h2>
       <input type="email" id="email" placeholder="Email" required>
       <input type="password" id="password" placeholder="Password" required>
@@ -51,6 +51,6 @@
     </div>
   </div>
   
-  <script src="game.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
