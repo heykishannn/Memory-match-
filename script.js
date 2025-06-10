@@ -69,6 +69,7 @@ function showSplash() {
   game.classList.add('hidden');
   auth.classList.add('hidden');
   splashCards.innerHTML = '';
+  document.querySelector('#splash h1').style.display = 'block';
   for (let i = 0; i < 3; i++) {
     const card = document.createElement('div');
     card.className = 'splash-card';
@@ -172,9 +173,12 @@ function showGame() {
   startLevel(state.level);
 }
 function getGridSize(level) {
-  if(level === 1) return {rows:2, cols:2};
-  let size = Math.min(2 + Math.floor((level-1)/10), 10);
-  return {rows:size, cols:size};
+  // हर 3 level पर 2 cards add (1 pair)
+  let pairs = 2 + Math.floor((level-1)/3);
+  let totalCards = pairs * 2;
+  let cols = Math.ceil(Math.sqrt(totalCards));
+  let rows = Math.ceil(totalCards / cols);
+  return {rows, cols, totalCards};
 }
 function startLevel(level) {
   clearInterval(state.timerId);
@@ -183,8 +187,7 @@ function startLevel(level) {
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
-  const {rows,cols} = getGridSize(level);
-  const totalCards = rows*cols;
+  const {rows,cols,totalCards} = getGridSize(level);
   const totalPairs = Math.floor(totalCards/2);
   let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
@@ -212,8 +215,8 @@ function startLevel(level) {
     });
     board.appendChild(cardEl);
   });
-  // Timer: 4 cards = 10s, हर extra card पर 2.5s
-  state.timeLeft = Math.max(10, Math.round(totalCards/2*2.5));
+  // Timer: 4 cards = 10s, हर 2 cards पर 5s
+  state.timeLeft = Math.max(10, totalCards/2*2.5);
   updateHUD();
   startTimer();
 }
@@ -314,7 +317,7 @@ watchAdBtn.onclick = () => {
 };
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
-  timerDisplay.textContent = `Time: ${state.timeLeft<10?'0'+state.timeLeft:state.timeLeft}`;
+  timerDisplay.textContent = `Time: ${state.timeLeft<10?'0'+Math.round(state.timeLeft):Math.round(state.timeLeft)}`;
   scoreDisplay.textContent = `Score: ${state.score}`;
 }
 function startTimer() {
@@ -398,3 +401,4 @@ function showAd(callback) {
 
 // Init
 showSplash();
+      
