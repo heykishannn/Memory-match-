@@ -32,9 +32,12 @@ const homeBtn1 = document.getElementById('homeBtn1');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const loseHomeBtn = document.getElementById('loseHomeBtn');
 const watchAdBtn = document.getElementById('watchAdBtn');
-const soundSwitch = document.getElementById('soundSwitch');
-const vibrationSwitch = document.getElementById('vibrationSwitch');
+
+// Changed IDs for input elements for toggle switches
+const soundToggle = document.getElementById('soundToggle');
+const vibrationToggle = document.getElementById('vibrationToggle');
 const pauseBtn = document.getElementById('pauseBtn');
+
 const levelDisplay = document.getElementById('levelDisplay');
 const timerDisplay = document.getElementById('timerDisplay');
 const scoreDisplay = document.getElementById('scoreDisplay');
@@ -136,6 +139,7 @@ startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
     resumePopup.classList.remove('hidden');
+    // Sound will play only on button click as per requirement
     popupSound('restart');
   } else {
     state.level = 1;
@@ -189,7 +193,7 @@ function getGridSize(level) {
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  pauseBtn.textContent = "Pause";
+  pauseBtn.textContent = "||"; // Set to pause icon
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -197,8 +201,15 @@ function startLevel(level) {
   const totalPairs = Math.floor(totalCards/2);
   let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
-  if(cardsArray.length<totalCards) cardsArray.push(...shuffle(EMOJIS).slice(0,totalCards-cardsArray.length));
-  cardsArray = cardsArray.slice(0,totalCards);
+  // Ensure enough emojis for larger boards if totalCards > EMOJIS.length
+  if(cardsArray.length < totalCards) {
+      // If we don't have enough unique pairs, re-use some existing ones or add more from the EMOJIS pool
+      const needed = totalCards - cardsArray.length;
+      const additionalEmojis = shuffle(EMOJIS).slice(0, Math.ceil(needed / 2));
+      cardsArray.push(...additionalEmojis, ...additionalEmojis);
+      cardsArray = shuffle(cardsArray); // Re-shuffle after adding
+  }
+  cardsArray = cardsArray.slice(0,totalCards); // Trim to exact totalCards
   state.cards = cardsArray.map((emoji,idx)=>({
     emoji, flipped:false, matched:false, idx
   }));
@@ -331,7 +342,8 @@ watchAdBtn.onclick = () => {
 };
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
-  timerDisplay.textContent = `Time: ${state.timeLeft<10?'0'+Math.round(state.timeLeft):Math.round(state.timeLeft)}`;
+  // Ensure time is formatted with leading zero if less than 10
+  timerDisplay.textContent = `Time: ${state.timeLeft < 10 ? '0' + Math.round(state.timeLeft) : Math.round(state.timeLeft)}`;
   scoreDisplay.textContent = `Score: ${state.score}`;
 }
 function startTimer() {
@@ -348,13 +360,16 @@ function startTimer() {
   },1000);
 }
 function setupSwitches() {
-  soundSwitch.checked = state.soundOn;
-  vibrationSwitch.checked = state.vibrationOn;
-  soundSwitch.onchange = ()=>{ state.soundOn=soundSwitch.checked; };
-  vibrationSwitch.onchange = ()=>{ state.vibrationOn=vibrationSwitch.checked; };
+  // Use the new toggle input elements
+  soundToggle.checked = state.soundOn;
+  vibrationToggle.checked = state.vibrationOn;
+
+  soundToggle.onchange = ()=>{ state.soundOn=soundToggle.checked; };
+  vibrationToggle.onchange = ()=>{ state.vibrationOn=vibrationToggle.checked; };
+
   pauseBtn.onclick = ()=>{
     state.paused = !state.paused;
-    pauseBtn.textContent = state.paused ? "Resume" : "Pause";
+    pauseBtn.textContent = state.paused ? "Resume" : "||"; // Change text to "Resume" or "||"
     popupSound(state.paused ? 'pause' : 'restart');
   };
 }
@@ -418,4 +433,3 @@ function showAd(callback) {
 
 // Init
 showSplash();
-                      
