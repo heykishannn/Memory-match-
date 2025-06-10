@@ -31,7 +31,7 @@ const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
 const playAgainBtn = document.getElementById('playAgainBtn');
-const loseHomeBtn = document.getElementById('loseHomeBtn'); // Corrected DOM reference
+const loseHomeBtn = document.getElementById('loseHomeBtn');
 const watchAdBtn = document.getElementById('watchAdBtn');
 
 // Changed IDs for input elements for toggle switches
@@ -55,6 +55,9 @@ const audioSigma = document.getElementById('audio-sigma');
 const audioBirthday = document.getElementById('audio-birthday');
 const audioSitar = document.getElementById('audio-sitar');
 const audioBell = document.getElementById('audio-bell');
+// New sound for Continue window
+const audioKoni = document.getElementById('audio-koni');
+
 
 const resultLevel = document.getElementById('resultLevel');
 const resultScore = document.getElementById('resultScore');
@@ -148,7 +151,7 @@ startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
     resumePopup.classList.remove('hidden');
-    // Sound for continue popup is explicitly removed as per request
+    popupSound('koni'); // Play sound when continue window appears
   } else {
     state.level = 1;
     state.score = 0;
@@ -193,13 +196,53 @@ function showGame() {
   startLevel(state.level);
 }
 function getGridSize(level) {
-  // Logic: Start with 2 pairs (4 cards) and add 1 pair (2 cards) every 2 levels
-  let pairs = 2 + Math.floor((level - 1) / 2);
+  // Logic: First level has 2 cards. Each 2 levels, add 2 cards (1 pair).
+  // Level 1: 2 cards (1 pair)
+  // Level 2: 2 cards (1 pair)
+  // Level 3: 4 cards (2 pairs)
+  // Level 4: 4 cards (2 pairs)
+  // Level 5: 6 cards (3 pairs)
+  let pairs;
+  if (level === 1) {
+    pairs = 1; // Level 1 has 1 pair (2 cards)
+  } else {
+    // For levels > 1, add 1 pair every 2 levels starting from Level 3
+    pairs = 1 + Math.floor((level - 1) / 2);
+  }
+
   let totalCards = pairs * 2;
+  
+  // Max cards for a reasonable grid. Adjust as needed for specific screen sizes.
+  const maxPossibleCards = EMOJIS.length * 2; // Max possible pairs
+  if (totalCards > maxPossibleCards) {
+      totalCards = maxPossibleCards;
+  }
+  
+  // Calculate columns based on square-ish aspect ratio and total cards
   let cols = Math.ceil(Math.sqrt(totalCards));
+  // Ensure we don't end up with too many columns on small screens
+  // Example: Limit columns to 6 for mobile and 8 for larger screens
+  if (window.innerWidth <= 600) { // Mobile
+      cols = Math.min(cols, 4); // Max 4 columns on small screens
+  } else if (window.innerWidth <= 900) { // Tablet
+      cols = Math.min(cols, 6); // Max 6 columns on medium screens
+  } else { // Desktop
+      cols = Math.min(cols, 8); // Max 8 columns on large screens
+  }
+  
   let rows = Math.ceil(totalCards / cols);
+
+  // If after setting cols, rows*cols is less than totalCards, increase cols slightly
+  // This is a safety to make sure all cards fit, though it might make cols wider.
+  while (rows * cols < totalCards && cols < 10) { // Prevent infinite loop, limit max cols
+      cols++;
+      rows = Math.ceil(totalCards / cols);
+  }
+
   return {rows, cols, totalCards};
 }
+
+
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
@@ -207,13 +250,17 @@ function startLevel(level) {
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
+
   const {rows,cols,totalCards} = getGridSize(level);
+  
+  // Set CSS variable for grid columns to make it responsive
+  board.style.setProperty('--cols', cols);
+
   const totalPairs = Math.floor(totalCards/2);
   let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
   
   // Ensure enough emojis for larger boards if totalCards > EMOJIS.length
-  // This part already handles adding more emojis if needed, no change here.
   if(cardsArray.length < totalCards) {
       const needed = totalCards - cardsArray.length;
       const additionalEmojis = shuffle(EMOJIS).slice(0, Math.ceil(needed / 2));
@@ -225,17 +272,20 @@ function startLevel(level) {
   state.cards = cardsArray.map((emoji,idx)=>({
     emoji, flipped:false, matched:false, idx
   }));
-  board.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  
+  // The grid-template-columns is now set via CSS variable, but update the style attribute as well for older browsers or direct visibility
+  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   board.innerHTML = '';
   state.cards.forEach((card,i)=>{
     const cardEl = document.createElement('div');
     cardEl.className = 'card cover';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
+    // The `card-inner` is the element that flips
     cardEl.innerHTML = `
       <div class="card-inner">
-        <div class="front"></div>
-        <div class="back">${card.emoji}</div>
+        <div class="front">${card.emoji}</div>
+        <div class="back"></div>
       </div>
     `;
     cardEl.addEventListener('click',()=>onCardClick(i));
@@ -244,8 +294,9 @@ function startLevel(level) {
     });
     board.appendChild(cardEl);
   });
-  // Timer: 2.5 seconds per card (5 seconds per pair)
-  state.timeLeft = Math.max(10, totalCards * 2.5); // Total cards * 2.5 seconds
+  
+  // Timer: 2.5 seconds per card (5 seconds per pair) as requested
+  state.timeLeft = Math.max(10, totalCards * 2.5); // At least 10 seconds, then 2.5s per card
   updateHUD();
   startTimer();
 }
@@ -265,16 +316,15 @@ function flipCard(index) {
   const card = state.cards[index];
   card.flipped = true;
   const cardEl = board.children[index];
-  cardEl.classList.remove('cover');
+  cardEl.classList.remove('cover'); // Remove cover to allow flip
   cardEl.classList.add('flipped');
-  // No need for separate front/back elements, the card-inner handles the flip
 }
 function unflipCard(index) {
   const card = state.cards[index];
   card.flipped = false;
   const cardEl = board.children[index];
   cardEl.classList.remove('flipped');
-  cardEl.classList.add('cover');
+  cardEl.classList.add('cover'); // Add cover back to flip to back side
 }
 function checkMatch() {
   const [i1,i2] = state.flippedIndices;
@@ -402,6 +452,7 @@ function popupSound(type) {
   if(type==="lose") { audioLose.currentTime=0; audioLose.loop=false; audioLose.play(); state.playingSound=audioLose; }
   if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
   if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=false; audioRestart.play(); state.playingSound=audioRestart; }
+  if(type==="koni") { audioKoni.currentTime=0; audioKoni.loop=false; audioKoni.play(); state.playingSound=audioKoni; }
 }
 
 // New function to play specific sound for matched emoji
@@ -430,7 +481,7 @@ function playMatchSound(emoji) {
 
 function stopAllSounds() {
   [audioTap, audioWin, audioLose, audioPause, audioRestart,
-   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell
+   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell, audioKoni
   ].forEach(a=>{ a.pause(); a.currentTime=0; });
   state.playingSound = null;
 }
