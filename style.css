@@ -376,4 +376,4 @@ footer span span {
   .switch-label input:checked + .switch-slider { transform: translateX(15px); }
   .toggle-text { font-size: 0.75rem; margin-top: 3px; }
   .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
-  }
+}
