@@ -4,7 +4,7 @@ body {
   color: white;
   margin: 0;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* Prevents scrolling */
 }
 .hidden { display: none !important; }
 
@@ -15,7 +15,6 @@ footer {
   text-align: center;
   z-index: 200;
   font-family: 'Arial', sans-serif;
-  font-size: 1.18rem;
   letter-spacing: 1.5px;
   color: #fff;
   font-weight: bold;
@@ -166,11 +165,11 @@ footer span span {
 .result { margin-bottom: 0.6rem; }
 .result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
 
-#game { /* Centering game content vertically */
+#game { /* Centering game content vertically, but pushing board up */
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Centers items horizontally */
   background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
 }
 
@@ -280,24 +279,33 @@ footer span span {
   display: grid;
   /* Adjusting gaps */
   row-gap: 12px; /* Normal vertical distance */
-  column-gap: 5px; /* Closer horizontal distance */
+  column-gap: 5px; /* Closer horizontal distance (pass-pass) */
   justify-content: center;
-  align-content: center;
-  margin: auto; /* Vertically center the board in remaining space */
-  /* margin-top: 24px; REMOVED */
-  transition: grid-template-columns 0.3s;
+  /* Align cards to the top after header/stats, then center */
+  margin: 24px auto auto auto; /* Pushed down from top, auto for bottom to push up */
+  max-width: calc(100vw - 20px); /* Restrict board width to keep cards in screen */
+  flex-grow: 1; /* Allow board to take available space */
+  align-content: flex-start; /* Aligns content to the start (top) */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
+/* This makes cards fill their grid cell, and allows them to shrink */
+#board[style*="--cols"] { /* Use the CSS variable to define columns */
+  grid-template-columns: repeat(var(--cols), 1fr);
+}
+
 .card {
-  width: 100px; /* Larger card size */
-  height: 100px; /* Larger card size */
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient back (covered) */
+  width: 100%; /* Make card fill its grid cell */
+  aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
+  max-width: 100px; /* Max size for desktop, will shrink on mobile */
+  max-height: 100px; /* Max size for desktop */
+  border: 2px solid black; /* Black border */
   border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2.3rem;
   cursor: pointer;
-  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
   user-select: none;
   perspective: 600px;
   position: relative;
@@ -315,39 +323,41 @@ footer span span {
 }
 .card.cover .card-inner { background: linear-gradient(135deg, #6a11cb, #2575fc);} /* Purple gradient back (covered) */
 .card.flipped .card-inner { transform: rotateY(180deg);}
+
+/* Front side (emoji side) color to light green gradient */
 .card .front {
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Changed to Purple gradient for the front (emoji side) */
+  background: linear-gradient(to right, #a8ff78, #78ffd6); /* Light green gradient */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
   border-radius: 20px;
-  backface-visibility: hidden;
+  backface-visibility: hidden; /* Ensures only one side is seen during flip */
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
 }
+/* Back side color (when unflipped) to purple gradient */
 .card .back {
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient for the back */
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
   border-radius: 20px;
-  backface-visibility: hidden;
+  backface-visibility: hidden; /* Ensures only one side is seen during flip */
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
   transform: rotateY(180deg);
 }
-/* Removed glow animation on matched cards */
+/* Removed glow animation on matched cards as requested */
 .card.matched .card-inner {
   box-shadow: none; /* Removed glow effect */
   animation: none; /* Removed glow animation */
 }
 /* Kept the active state for visual feedback on tap */
 .card:active:not(.matched):not(.flipped) .card-inner {
-  box-shadow: 0 0 20px 8px #fa71cd; /* Retained this box shadow for tap feedback */
+  box-shadow: 0 0 20px 8px rgba(250, 113, 205, 0.4); /* Retained subtle box shadow for tap feedback */
   transform: scale(1.05);
 }
 @media (max-width: 600px) {
-  .card { width: 70px; height: 70px; font-size: 1.8rem; border-radius: 18px;} /* Larger cards on mobile */
-  #board { row-gap: 8px; column-gap: 3px; } /* Adjusted gaps on mobile */
-  .ctrl-btn { width: 62px; height: 62px; font-size: 1.3rem;}
+  .card { width: 100%; height: auto; max-width: 70px; max-height: 70px; font-size: 1.8rem; border-radius: 18px;} /* Smaller max-size for mobile */
+  #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
   .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
