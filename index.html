@@ -9,87 +9,62 @@
 <body>
   <!-- Splash -->
   <div id="splash">
-    <h1>MEMORY MATCH</h1>
     <div class="splash-cards"></div>
   </div>
-  <!-- Login/Signup -->
-  <div id="auth" class="hidden">
-    <form class="auth-form">
-      <h2>Login / Signup</h2>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="button" class="auth-btn" id="loginBtn">Login</button>
-      <button type="button" class="auth-btn" id="signupBtn">Sign Up</button>
-    </form>
-  </div>
   <!-- Home -->
-  <div id="home" class="hidden">
+  <div id="home">
     <div class="home-content">
-      <h1>MEMORY MATCH</h1>
+      <h1>Memory Match</h1>
       <button class="btn" id="startBtn">Start</button>
     </div>
   </div>
   <!-- Resume Popup -->
   <div id="resumePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom small-popup">
+    <div class="popup-content square popup-zoom">
       <h2>Continue?</h2>
       <button class="btn" id="resumeHomeBtn">Home</button>
       <button class="btn" id="watchAdResumeBtn">Watch Ad (5s) to Continue</button>
       <button class="btn" id="restartFrom1Btn">Restart from Level 1</button>
     </div>
   </div>
+  <!-- Auth -->
+  <div id="auth" class="popup hidden">
+    <div class="popup-content square popup-zoom">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn" id="loginBtn">Login</button>
+      <button class="btn" id="signupBtn">Sign Up</button>
+    </div>
+  </div>
   <!-- Game -->
   <div id="game" class="hidden">
     <div class="game-header">
-      <h1>MEMORY MATCH</h1>
+      <h1>Memory Match</h1>
       <div class="game-controls">
-        <div class="switch-col">
-          <label class="switch">
-            <input type="checkbox" id="soundSwitch" checked>
-            <span class="slider"></span>
-          </label>
-          <span class="switch-label">Sound</span>
-        </div>
-        <button class="pause-btn" id="pauseBtn"><span class="pause-icon"></span></button>
-        <div class="switch-col">
-          <label class="switch">
-            <input type="checkbox" id="vibrationSwitch" checked>
-            <span class="slider"></span>
-          </label>
-          <span class="switch-label">Vibration</span>
-        </div>
+        <button class="ctrl-btn" id="soundSwitch">🔊</button>
+        <button class="ctrl-btn" id="pauseBtn">⏸️</button>
+        <button class="ctrl-btn" id="vibrationSwitch">📳</button>
       </div>
     </div>
     <div class="stats">
-      <span id="levelDisplay" class="stat-level">Level: 1</span>
-      <span id="scoreDisplay" class="stat-score">Score: 0</span>
-      <span id="timerDisplay" class="stat-time">Time: 00</span>
+      <span id="levelDisplay">Level: 1</span>
+      <span id="scoreDisplay">Score: 0</span>
+      <span id="timerDisplay">Time: 00</span>
     </div>
     <div id="board"></div>
-    <img src="doge.png" class="doge-img" alt="doge">
   </div>
   <!-- Win Popup -->
   <div id="winPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom small-popup">
+    <div class="popup-content square popup-zoom">
       <h2>You Win!</h2>
-      <div class="result">
-        <span id="resultLevel"></span>
-        <span id="resultScore"></span>
-        <span id="resultTime"></span>
-      </div>
       <button class="btn" id="nextLevelBtn">Next Level</button>
       <button class="btn" id="homeBtn1">Home</button>
     </div>
   </div>
   <!-- Lose Popup -->
   <div id="losePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom small-popup">
+    <div class="popup-content square popup-zoom">
       <h2>You Lost!</h2>
-      <div class="result">
-        <span id="resultLevelL"></span>
-        <span id="resultScoreL"></span>
-        <span id="resultTimeL"></span>
-      </div>
       <button class="btn" id="playAgainBtn">Play Again</button>
       <button class="btn" id="loseHomeBtn">Home</button>
       <button class="btn" id="watchAdBtn">Watch Ad (5s) to Continue</button>
@@ -97,7 +72,7 @@
   </div>
   <!-- Ad Popup -->
   <div id="adPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom small-popup">
+    <div class="popup-content square popup-zoom">
       <h2>Ad</h2>
       <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
     </div>
@@ -109,7 +84,7 @@
   <audio id="audio-pause" src="pause.mp3"></audio>
   <audio id="audio-restart" src="restart.mp3"></audio>
   <footer>
-    <span class="powered">Powered by <span class="neon">NAS</span></span>
+    <span class="powered">Powered by <span>NAS</span></span>
   </footer>
   <script src="script.js"></script>
 </body>
