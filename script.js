@@ -83,8 +83,7 @@ let state = {
   adTimeout: null,
   playingSound: null,
   isMaxCardsReached: false, // New state to track if max cards capacity is hit
-  levelCardsCapped: 0, // New state to store level when cards were first capped
-  gameEnded: false // NEW: Flag to prevent multiple win/lose popups
+  levelCardsCapped: 0 // New state to store level when cards were first capped
 };
 
 // Splash: 3 blank gradient cards, flip animation
@@ -227,8 +226,8 @@ function getGridSize(level) {
     const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
     const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
 
-    // Assuming average card size of 100px (for responsive CSS, increased from 80px) + 12px row-gap
-    const estimatedCardHeightWithGap = 100 + 12; // UPDATED: Changed from 80+12 to 100+12
+    // Assuming average card size of 80px (for responsive CSS) + 12px row-gap
+    const estimatedCardHeightWithGap = 80 + 12;
     let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
     if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
 
@@ -279,7 +278,6 @@ function getGridSize(level) {
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  state.gameEnded = false; // NEW: Reset game ended flag
   pauseBtn.textContent = "||"; // Set to pause symbol
   state.flippedIndices = [];
   state.matchedCount = 0;
@@ -341,15 +339,15 @@ function startLevel(level) {
   startTimer();
 }
 function onCardClick(index) {
-  if(state.busy || state.paused || state.gameEnded) return; // NEW: Prevent clicks if game ended
+  if(state.busy||state.paused) return;
   const card = state.cards[index];
-  if(card.flipped || card.matched) return;
+  if(card.flipped||card.matched) return;
   playSound('tap');
   flipCard(index);
   state.flippedIndices.push(index);
   if(state.flippedIndices.length===2) {
     state.busy = true;
-    setTimeout(checkMatch, 200); // UPDATED: Reduced delay from 500ms to 200ms
+    setTimeout(checkMatch, 500);
   }
 }
 function flipCard(index) {
@@ -389,9 +387,7 @@ function checkMatch() {
   state.busy = false;
 }
 function winLevel() {
-  if(state.gameEnded) return; // NEW: If game already ended (e.g., lost), do nothing
   clearInterval(state.timerId);
-  state.gameEnded = true; // NEW: Set flag that game has ended
   popupSound('win');
   vibrate();
   state.score += state.timeLeft*2;
@@ -418,9 +414,7 @@ homeBtn1.onclick = () => {
   showHome();
 };
 function loseLevel() {
-  if(state.gameEnded) return; // NEW: If game already ended (e.g., won), do nothing
   clearInterval(state.timerId);
-  state.gameEnded = true; // NEW: Set flag that game has ended
   popupSound('lose');
   resultLevelL.textContent = "Level: " + state.level;
   resultScoreL.textContent = "Score: " + state.score;
@@ -458,7 +452,7 @@ function updateHUD() {
 function startTimer() {
   clearInterval(state.timerId);
   state.timerId = setInterval(()=>{
-    if(!state.paused && !state.gameEnded) { // NEW: Check gameEnded flag
+    if(!state.paused) {
       state.timeLeft--;
       updateHUD();
       if(state.timeLeft<=0) {
@@ -476,7 +470,6 @@ function setupSwitches() {
   vibrationToggle.onchange = ()=>{ state.vibrationOn=vibrationToggle.checked; };
 
   pauseBtn.onclick = ()=>{
-    if (state.gameEnded) return; // NEW: Don't allow pause if game ended
     state.paused = !state.paused;
     // Changed text to symbols for pause/resume
     pauseBtn.textContent = state.paused ? "▶" : "||";
@@ -501,7 +494,7 @@ function popupSound(type) {
 // New function to play specific sound for matched emoji
 function playMatchSound(emoji) {
   if(!state.soundOn) return;
-  stopAllSounds(); // Stop any currently playing sound (including tap sound)
+  stopAllSounds(); // Stop any currently playing sound
 
   let soundToPlay = null;
   switch(emoji) {
@@ -562,4 +555,12 @@ function showAd(callback) {
     }
   }
   state.adTimeout = setTimeout(tick,1000);
-      }
+}
+
+// Lose/Win/Popup sound only while popup is open
+[winPopup, losePopup, adPopup, resumePopup].forEach(popup => {
+  if(popup) popup.addEventListener('transitionend', ()=>{ if(popup.classList.contains('hidden')) stopAllSounds(); });
+});
+
+// Init
+showSplash();
