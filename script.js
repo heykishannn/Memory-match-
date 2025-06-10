@@ -1,224 +1,289 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const splashScreen = document.getElementById('splash-screen');
-    const loginSignupPage = document.getElementById('login-signup-page');
-    const mainGameScreen = document.getElementById('main-game-screen');
+// --- Emoji Set ---
+const EMOJIS = [
+  "🍎","🍌","🍇","🍓","🍉","🍍","🥝","🍒","🍑","🍋",
+  "🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
+  "🌷","🌸","🌺","🌼","🐼","🦄","🌺","🍂","🍄","🌿",
+  "🐥","🐤","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
+  "🍬","☕","🗿","🛕","🎂","🧸","🎹","💎","🔮","🔔"
+];
 
-    const emailInput = document.getElementById('email');
-    const usernameInput = document.getElementById('username');
-    const loginBtn = document.getElementById('login-btn');
-    const signupBtn = document.getElementById('signup-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userDisplay = document.getElementById('user-display');
+const MAX_LEVEL = 100;
+const MIN_GRID = 2, MAX_GRID = 10;
 
-    // Game Elements
-    const gameGrid = document.getElementById('game-grid');
-    const timerDisplay = document.getElementById('timer');
-    const scoreDisplay = document.getElementById('score');
-    const restartButton = document.getElementById('restart-btn');
+// --- DOM Elements ---
+const splash = document.getElementById('splash');
+const auth = document.getElementById('auth');
+const game = document.getElementById('game');
+const board = document.getElementById('board');
+const winPopup = document.getElementById('winPopup');
+const finalScore = document.getElementById('finalScore');
+const restartBtn = document.getElementById('restartBtn');
+const loginBtn = document.getElementById('loginBtn');
+const signupBtn = document.getElementById('signupBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const levelDisplay = document.getElementById('levelDisplay');
+const timerDisplay = document.getElementById('timerDisplay');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const soundBtn = document.getElementById('soundBtn');
+const vibrationBtn = document.getElementById('vibrationBtn');
+const pauseBtn = document.getElementById('pauseBtn');
 
-    // Emojis - 50 unique emojis, each will be duplicated
-    const emojis = [
-        '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊',
-        '😋', '😎', '😍', '😘', '😗', '😙', '😚', '🙂', '🤗', '🤔',
-        '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮', '🤐', '😯',
-        '😪', '😫', '😴', '😌', '😛', '😜', '😝', '🤤', '😒', '😓',
-        '😔', '😕', '🙃', '🤑', '😲', '☹️', '🙁', '😖', '😞', '😟'
-    ];
+// --- State ---
+let state = {
+  level: 1,
+  score: 0,
+  timeLeft: 0,
+  timer: null,
+  paused: false,
+  sound: true,
+  vibration: true,
+  user: null,
+  matches: 0,
+  cards: [],
+  flipped: [],
+  busy: false,
+  progress: {}
+};
 
-    // Game State Variables
-    let flippedCards = [];
-    let matchedPairs = 0;
-    let timerInterval = null;
-    let seconds = 0;
-    let canFlip = true;
-    const totalPairs = emojis.length; // Each emoji appears twice, so totalPairs is emojis.length
+// --- Splash Screen ---
+window.onload = () => {
+  splash.classList.remove('hidden');
+  setTimeout(() => {
+    splash.classList.add('hidden');
+    checkAuth();
+  }, 3000);
+};
 
-    // Sound Effects
-    function playSound(soundFile) {
-        // Ensure sounds directory is correct if you have one, e.g., 'sounds/tap.mp3'
-        // For now, assuming files are in the root or accessible path
-        try {
-            const audio = new Audio(soundFile);
-            audio.play();
-        } catch (e) {
-            console.error("Error playing sound:", soundFile, e);
-        }
+// --- Auth Logic ---
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('emojimatch_user'));
+  if (user && user.email) {
+    state.user = user;
+    loadProgress();
+    showGame();
+  } else {
+    auth.classList.remove('hidden');
+  }
+}
+
+loginBtn.onclick = () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) return alert('Enter email and password.');
+  const user = JSON.parse(localStorage.getItem('emojimatch_user'));
+  if (user && user.email === email && user.password === password) {
+    state.user = user;
+    loadProgress();
+    auth.classList.add('hidden');
+    showGame();
+  } else {
+    alert('Invalid credentials or user does not exist.');
+  }
+};
+
+signupBtn.onclick = () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) return alert('Enter email and password.');
+  localStorage.setItem('emojimatch_user', JSON.stringify({email, password}));
+  state.user = {email, password};
+  state.progress = {};
+  saveProgress();
+  auth.classList.add('hidden');
+  showGame();
+};
+
+// --- Progress ---
+function saveProgress() {
+  if (state.user) {
+    state.progress.level = state.level;
+    state.progress.score = state.score;
+    localStorage.setItem(`emojimatch_progress_${state.user.email}`, JSON.stringify(state.progress));
+  }
+}
+function loadProgress() {
+  if (state.user) {
+    const p = JSON.parse(localStorage.getItem(`emojimatch_progress_${state.user.email}`));
+    if (p) {
+      state.level = p.level || 1;
+      state.score = p.score || 0;
     }
+  }
+}
 
-    // Game Initialization Function
-    function startGame() {
-        if (!gameGrid || !timerDisplay || !scoreDisplay) {
-            console.error("Required game elements not found in the DOM.");
-            return;
-        }
+// --- Game Logic ---
+function showGame() {
+  game.classList.remove('hidden');
+  setupTopBar();
+  startLevel(state.level);
+}
 
-        // Reset game state
-        flippedCards = [];
-        matchedPairs = 0;
-        seconds = 0;
-        canFlip = true;
+function getGrid(level) {
+  // Level 1: 2x2, Level 2: 3x2, Level 3: 3x3, ... up to 10x10
+  let size = Math.min(MAX_GRID, Math.ceil(Math.sqrt(level + 1)));
+  let rows = size, cols = size;
+  if (level < 3) { rows = 2; cols = level + 1; }
+  return {rows, cols};
+}
 
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
-        timerDisplay.textContent = "Time: 0s";
-        scoreDisplay.textContent = "0";
+function startLevel(level) {
+  winPopup.classList.add('hidden');
+  state.level = level;
+  state.matches = 0;
+  state.flipped = [];
+  state.busy = false;
+  updateHUD();
+  const {rows, cols} = getGrid(level);
+  const numCards = rows * cols;
+  const numPairs = Math.floor(numCards / 2);
+  let emojis = shuffle(EMOJIS).slice(0, numPairs);
+  let cards = shuffle([...emojis, ...emojis]).slice(0, numCards);
+  state.cards = cards.map((emoji, i) => ({
+    id: i,
+    emoji,
+    matched: false,
+    flipped: false
+  }));
+  renderBoard(rows, cols);
+  state.timeLeft = Math.floor(numPairs * 5);
+  startTimer();
+}
 
-        // Create game board
-        gameGrid.innerHTML = ''; // Clear previous cards
-        let gameEmojis = [...emojis, ...emojis]; // Duplicate emojis for pairs
+function renderBoard(rows, cols) {
+  board.innerHTML = '';
+  board.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  state.cards.forEach((card, idx) => {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'card';
+    cardDiv.dataset.idx = idx;
+    cardDiv.innerHTML = `
+      <div class="front"></div>
+      <div class="back">${card.emoji}</div>
+    `;
+    cardDiv.onclick = () => flipCard(idx);
+    board.appendChild(cardDiv);
+  });
+}
 
-        // Shuffle emojis (Fisher-Yates Shuffle)
-        for (let i = gameEmojis.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [gameEmojis[i], gameEmojis[j]] = [gameEmojis[j], gameEmojis[i]];
-        }
+function flipCard(idx) {
+  if (state.busy || state.cards[idx].flipped || state.cards[idx].matched || state.paused) return;
+  state.cards[idx].flipped = true;
+  updateCard(idx);
+  playSound('flip');
+  state.flipped.push(idx);
 
-        gameEmojis.forEach(emoji => {
-            const card = document.createElement('div');
-            card.classList.add('card');
-            card.dataset.emoji = emoji; // Store emoji in data attribute for checking match
+  if (state.flipped.length === 2) {
+    state.busy = true;
+    setTimeout(() => checkMatch(), 700);
+  }
+}
 
-            const cardFront = document.createElement('div');
-            cardFront.classList.add('card-face', 'card-front');
-            // cardFront.textContent = '?'; // Optional: show something on the card front
+function updateCard(idx) {
+  const cardDiv = board.children[idx];
+  if (!cardDiv) return;
+  if (state.cards[idx].flipped || state.cards[idx].matched) {
+    cardDiv.classList.add('flipped');
+  } else {
+    cardDiv.classList.remove('flipped');
+  }
+  if (state.cards[idx].matched) cardDiv.classList.add('matched');
+}
 
-            const cardBack = document.createElement('div');
-            cardBack.classList.add('card-face', 'card-back');
-            cardBack.textContent = emoji;
-
-            card.appendChild(cardFront);
-            card.appendChild(cardBack);
-
-            card.addEventListener('click', handleCardClick);
-            gameGrid.appendChild(card);
-        });
-
-        // Start timer
-        timerInterval = setInterval(() => {
-            seconds++;
-            timerDisplay.textContent = `Time: ${seconds}s`;
-        }, 1000);
-
-        // Play restart/start sound if applicable
-        // playSound('restart.mp3'); // Consider if a 'start-game.mp3' is better
+function checkMatch() {
+  const [i, j] = state.flipped;
+  if (state.cards[i].emoji === state.cards[j].emoji) {
+    state.cards[i].matched = true;
+    state.cards[j].matched = true;
+    updateCard(i); updateCard(j);
+    state.matches++;
+    playSound('match');
+    state.score += 10 + state.timeLeft;
+    updateHUD();
+    if (state.matches === Math.floor(state.cards.length / 2)) {
+      setTimeout(() => winLevel(), 600);
     }
+  } else {
+    playSound('wrong');
+    if (state.vibration) vibrate();
+    state.cards[i].flipped = false;
+    state.cards[j].flipped = false;
+    updateCard(i); updateCard(j);
+  }
+  state.flipped = [];
+  state.busy = false;
+}
 
-    // Card Click Handling Function
-    function handleCardClick() {
-        if (!canFlip || this.classList.contains('flipped') || this.classList.contains('matched')) {
-            return;
-        }
+function winLevel() {
+  stopTimer();
+  state.score += state.timeLeft * 2;
+  saveProgress();
+  finalScore.textContent = `Score: ${state.score} | Time Left: ${state.timeLeft}s`;
+  winPopup.classList.remove('hidden');
+}
 
-        this.classList.add('flipped');
-        playSound('tap.mp3'); // Sound for flipping a card
-        flippedCards.push(this);
+restartBtn.onclick = () => {
+  winPopup.classList.add('hidden');
+  startLevel(state.level + 1);
+};
 
-        if (flippedCards.length === 2) {
-            canFlip = false; // Prevent more flips until these two are processed
-            const [card1, card2] = flippedCards;
-            const emoji1 = card1.dataset.emoji;
-            const emoji2 = card2.dataset.emoji;
+function updateHUD() {
+  levelDisplay.textContent = `Level: ${state.level}`;
+  timerDisplay.textContent = `Time: ${state.timeLeft}`;
+  scoreDisplay.textContent = `Score: ${state.score}`;
+}
 
-            if (emoji1 === emoji2) {
-                // Matched
-                matchedPairs++;
-                scoreDisplay.textContent = String(parseInt(scoreDisplay.textContent) + 10); // Add 10 points
-                playSound('restart.mp3'); // Placeholder for match sound, as per instructions
-
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                // Optional: remove event listeners from matched cards
-                // card1.removeEventListener('click', handleCardClick);
-                // card2.removeEventListener('click', handleCardClick);
-
-                flippedCards = [];
-                canFlip = true;
-
-                if (matchedPairs === totalPairs) {
-                    // All pairs matched - Game Won
-                    playSound('win.mp3');
-                    clearInterval(timerInterval);
-                    setTimeout(() => { // Delay alert to allow win sound to play and final card to show
-                        alert(`Congratulations! You won in ${seconds} seconds with a score of ${scoreDisplay.textContent}!`);
-                    }, 500);
-                }
-            } else {
-                // Not matched
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    playSound('lose.mp3'); // Sound for no match / flip back
-                    flippedCards = [];
-                    canFlip = true;
-                }, 1000); // 1-second delay before flipping back
-            }
-        }
+function startTimer() {
+  stopTimer();
+  state.timer = setInterval(() => {
+    if (!state.paused) {
+      state.timeLeft--;
+      updateHUD();
+      if (state.timeLeft <= 0) {
+        stopTimer();
+        alert('Time up! Try again.');
+        startLevel(state.level);
+      }
     }
+  }, 1000);
+}
+function stopTimer() { clearInterval(state.timer); }
 
-    // Check for existing session
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-        const userData = JSON.parse(loggedInUser);
-        showMainGameScreen(userData.username);
-        // Skip splash and login if user is already logged in
-        if(splashScreen) splashScreen.style.display = 'none';
-        if(loginSignupPage) loginSignupPage.style.display = 'none';
-        return;
-    } else {
-        // If no user data, show splash screen first
-        if(splashScreen) splashScreen.style.display = 'flex'; // Show splash
-        setTimeout(() => {
-            if(splashScreen) splashScreen.style.display = 'none';
-            showLoginSignupPage();
-        }, 3000); // Splash screen duration
-    }
+// --- Top Bar Controls ---
+function setupTopBar() {
+  soundBtn.textContent = state.sound ? '🔊' : '🔇';
+  vibrationBtn.textContent = state.vibration ? '📳' : '📴';
+  soundBtn.onclick = () => {
+    state.sound = !state.sound;
+    soundBtn.textContent = state.sound ? '🔊' : '🔇';
+  };
+  vibrationBtn.onclick = () => {
+    state.vibration = !state.vibration;
+    vibrationBtn.textContent = state.vibration ? '📳' : '📴';
+  };
+  pauseBtn.onclick = () => {
+    state.paused = !state.paused;
+    pauseBtn.textContent = state.paused ? '▶️' : '⏸️';
+  };
+}
 
-    function showLoginSignupPage() {
-        if(loginSignupPage) loginSignupPage.style.display = 'flex';
-        if(mainGameScreen) mainGameScreen.style.display = 'none';
-    }
+// --- Utility ---
+function shuffle(arr) {
+  let a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-    function showMainGameScreen(username) {
-        if(mainGameScreen) mainGameScreen.style.display = 'flex';
-        if(loginSignupPage) loginSignupPage.style.display = 'none';
-        if(splashScreen) splashScreen.style.display = 'none'; // Ensure splash is hidden
-        if(userDisplay) userDisplay.textContent = username;
-        startGame(); // Initialize game when screen is shown
-    }
+function playSound(type) {
+  if (!state.sound) return;
+  // You can add your own sound assets here
+  // Example: new Audio('assets/flip.mp3').play();
+}
 
-    function handleLogin() {
-        const email = emailInput.value;
-        const username = usernameInput.value;
-        if (email && username) {
-            const userData = { email, username };
-            localStorage.setItem('loggedInUser', JSON.stringify(userData));
-            showMainGameScreen(username);
-        } else {
-            alert('Please enter both email and username.');
-        }
-    }
-
-    function handleSignup() {
-        // For this example, signup and login perform the same action.
-        // In a real app, signup would typically involve creating a new user account.
-        handleLogin();
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('loggedInUser');
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-        showLoginSignupPage();
-    }
-
-    if(loginBtn) loginBtn.addEventListener('click', handleLogin);
-    if(signupBtn) signupBtn.addEventListener('click', handleSignup);
-    if(logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-    if(restartButton) restartButton.addEventListener('click', () => {
-        playSound('restart.mp3'); // Sound for restarting the game
-        startGame();
-    });
-});
+function vibrate() {
+  if (navigator.vibrate) navigator.vibrate(200);
+}
