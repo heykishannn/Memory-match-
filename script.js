@@ -558,24 +558,24 @@ window.addEventListener('load', () => {
   if (popup) popup.classList.add('hidden');
 
   const proceedWithAppLogic = () => {
-    const userEmail = localStorage.getItem('userEmail');
-    const username = localStorage.getItem('username');
+    console.log('Proceeding to app logic: Unconditionally showing Login/Signup screen.');
 
-    if (username && userEmail) {
-      console.log('User data found. Showing start screen. User:', username);
-      // Ensure login is hidden (splash is already gone or will be)
-      if (loginSignupScreen) loginSignupScreen.classList.add('hidden');
+    // Ensure startScreen and gameScreen are hidden
+    if (startScreen) startScreen.classList.add('hidden');
+    else console.error('CRITICAL: startScreen element not found during proceedWithAppLogic.');
 
-      if (startScreen) startScreen.classList.remove('hidden');
-      const progress = loadProgress();
-      if (progress) {
-        showResumePopup(progress);
-      }
+    if (gameScreen) gameScreen.classList.add('hidden');
+    else console.error('CRITICAL: gameScreen element not found during proceedWithAppLogic.');
+
+    // Ensure resumePopup is hidden
+    if (resumePopup) resumePopup.classList.add('hidden');
+    else console.error('CRITICAL: resumePopup element not found during proceedWithAppLogic.');
+
+    // Show loginSignupScreen
+    if (loginSignupScreen) {
+      loginSignupScreen.classList.remove('hidden');
     } else {
-      console.log('No user data found. Showing login/signup screen.');
-      // Ensure start screen is hidden (splash is already gone or will be)
-      if (startScreen) startScreen.classList.add('hidden');
-      if (loginSignupScreen) loginSignupScreen.classList.remove('hidden');
+      console.error('CRITICAL: loginSignupScreen element not found, cannot display login page.');
     }
   };
 
