@@ -3,7 +3,8 @@ const EMOJIS = [
   "🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
   "🌷","🌸","🌺","🌼","🐼","🦄","🍂","🍄","🌿",
   "🐥","🐤","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
-  "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔"
+  "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔",
+  "🦚","🪕" // Added Peacock and Banjo emojis for sound effects
 ];
 const MAX_LEVEL = 100;
 
@@ -30,7 +31,7 @@ const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
 const playAgainBtn = document.getElementById('playAgainBtn');
-const loseHomeBtn = document.getElementById('loseHomeBtn');
+const loseHomeBtn = document = document.getElementById('loseHomeBtn');
 const watchAdBtn = document.getElementById('watchAdBtn');
 
 // Changed IDs for input elements for toggle switches
@@ -46,6 +47,15 @@ const audioWin = document.getElementById('audio-win');
 const audioLose = document.getElementById('audio-lose');
 const audioPause = document.getElementById('audio-pause');
 const audioRestart = document.getElementById('audio-restart');
+// New Match Sounds DOM references
+const audioGwak = document.getElementById('audio-gwak');
+const audioTamatar = document.getElementById('audio-tamatar');
+const audioMor = document.getElementById('audio-mor');
+const audioSigma = document.getElementById('audio-sigma');
+const audioBirthday = document.getElementById('audio-birthday');
+const audioSitar = document.getElementById('audio-sitar');
+const audioBell = document.getElementById('audio-bell');
+
 const resultLevel = document.getElementById('resultLevel');
 const resultScore = document.getElementById('resultScore');
 const resultTime = document.getElementById('resultTime');
@@ -78,7 +88,6 @@ function showSplash() {
   game.classList.add('hidden');
   auth.classList.add('hidden');
   splashCards.innerHTML = '';
-  // document.querySelector('#splash h1').style.display = 'block'; // This line is not typically needed and not requested.
   for (let i = 0; i < 3; i++) {
     const card = document.createElement('div');
     card.className = 'splash-card';
@@ -150,6 +159,7 @@ startBtn.onclick = () => {
 resumeHomeBtn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
+  saveProgress(); // Save progress before returning to home
   showHome();
 };
 watchAdResumeBtn.onclick = () => {
@@ -273,6 +283,10 @@ function checkMatch() {
     state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
+
+    // Play specific sound for matched emoji
+    playMatchSound(card1.emoji);
+
     if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 400);
   } else {
     setTimeout(()=>{
@@ -305,8 +319,8 @@ nextLevelBtn.onclick = () => {
 homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
-  state.level = 1; state.score = 0;
-  saveProgress();
+  // Removed data reset here
+  saveProgress(); // Save progress before going to home
   showHome();
 };
 function loseLevel() {
@@ -325,8 +339,8 @@ playAgainBtn.onclick = () => {
 loseHomeBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
-  state.level = 1; state.score = 0;
-  saveProgress();
+  // Removed data reset here
+  saveProgress(); // Save progress before going to home
   showHome();
 };
 watchAdBtn.onclick = () => {
@@ -359,7 +373,6 @@ function startTimer() {
   },1000);
 }
 function setupSwitches() {
-  // Use the new toggle input elements
   soundToggle.checked = state.soundOn;
   vibrationToggle.checked = state.vibrationOn;
 
@@ -386,8 +399,35 @@ function popupSound(type) {
   if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
   if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=false; audioRestart.play(); state.playingSound=audioRestart; }
 }
+
+// New function to play specific sound for matched emoji
+function playMatchSound(emoji) {
+  if(!state.soundOn) return;
+  stopAllSounds(); // Stop any currently playing sound
+
+  let soundToPlay = null;
+  switch(emoji) {
+    case "🍌": soundToPlay = audioGwak; break;
+    case "🍅": soundToPlay = audioTamatar; break;
+    case "🦚": soundToPlay = audioMor; break;
+    case "🗿": soundToPlay = audioSigma; break;
+    case "🎂": soundToPlay = audioBirthday; break;
+    case "🪕": soundToPlay = audioSitar; break;
+    case "🔔": soundToPlay = audioBell; break;
+    default: break; // No specific sound for other emojis
+  }
+
+  if (soundToPlay) {
+    soundToPlay.currentTime = 0;
+    soundToPlay.play();
+    state.playingSound = soundToPlay;
+  }
+}
+
 function stopAllSounds() {
-  [audioTap,audioWin,audioLose,audioPause,audioRestart].forEach(a=>{ a.pause(); a.currentTime=0; });
+  [audioTap, audioWin, audioLose, audioPause, audioRestart,
+   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell
+  ].forEach(a=>{ a.pause(); a.currentTime=0; });
   state.playingSound = null;
 }
 function vibrate() {
