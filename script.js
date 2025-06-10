@@ -24,7 +24,8 @@ const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const startBtn = document.getElementById('startBtn');
-const resumeBtn = document.getElementById('resumeBtn');
+const resumeHomeBtn = document.getElementById('resumeHomeBtn');
+const watchAdResumeBtn = document.getElementById('watchAdResumeBtn');
 const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
@@ -61,37 +62,18 @@ let state = {
   playingSound: null
 };
 
-// Splash Animation with Matching Cards
+// Splash: 3 blank gradient cards, flip animation
 function showSplash() {
   splash.classList.remove('hidden');
-  auth.classList.add('hidden');
   home.classList.add('hidden');
   game.classList.add('hidden');
+  auth.classList.add('hidden');
   splashCards.innerHTML = '';
-  const splashEmojis = shuffle(EMOJIS).slice(0, 4);
-  let pairs = shuffle([...splashEmojis, ...splashEmojis]);
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 3; i++) {
     const card = document.createElement('div');
     card.className = 'splash-card';
-    card.textContent = '';
     splashCards.appendChild(card);
   }
-  setTimeout(() => {
-    let flipOrder = shuffle([0,1,2,3,4,5,6,7]);
-    flipOrder.forEach((idx, i) => {
-      setTimeout(() => {
-        let card = splashCards.children[idx];
-        card.textContent = pairs[idx];
-        card.classList.add('flipped');
-      }, i*130);
-    });
-    setTimeout(() => {
-      for(let i=0;i<8;i+=2) {
-        splashCards.children[i].classList.add('matching');
-        splashCards.children[i+1].classList.add('matching');
-      }
-    }, 1200);
-  }, 400);
   setTimeout(() => {
     splash.classList.add('hidden');
     checkLogin();
@@ -155,7 +137,12 @@ startBtn.onclick = () => {
     showGame();
   }
 };
-resumeBtn.onclick = () => {
+resumeHomeBtn.onclick = () => {
+  stopAllSounds();
+  resumePopup.classList.add('hidden');
+  showHome();
+};
+watchAdResumeBtn.onclick = () => {
   resumePopup.classList.add('hidden');
   showAd(() => {
     const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
@@ -165,6 +152,7 @@ resumeBtn.onclick = () => {
   });
 };
 restartFrom1Btn.onclick = () => {
+  stopAllSounds();
   resumePopup.classList.add('hidden');
   state.level = 1;
   state.score = 0;
@@ -224,7 +212,8 @@ function startLevel(level) {
     });
     board.appendChild(cardEl);
   });
-  state.timeLeft = Math.ceil((totalPairs)*2.5);
+  // Timer: 4 cards = 10s, हर extra card पर 2.5s
+  state.timeLeft = Math.max(10, Math.round(totalCards/2*2.5));
   updateHUD();
   startTimer();
 }
@@ -316,7 +305,12 @@ loseHomeBtn.onclick = () => {
 watchAdBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
-  showAd(()=>startLevel(state.level));
+  showAd(()=>{
+    // +10s reward
+    state.timeLeft += 10;
+    updateHUD();
+    startTimer();
+  });
 };
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
@@ -355,10 +349,10 @@ function playSound(type) {
 function popupSound(type) {
   stopAllSounds();
   if(!state.soundOn) return;
-  if(type==="win") { audioWin.currentTime=0; audioWin.loop=true; audioWin.play(); state.playingSound=audioWin; }
-  if(type==="lose") { audioLose.currentTime=0; audioLose.loop=true; audioLose.play(); state.playingSound=audioLose; }
-  if(type==="pause") { audioPause.currentTime=0; audioPause.loop=true; audioPause.play(); state.playingSound=audioPause; }
-  if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=true; audioRestart.play(); state.playingSound=audioRestart; }
+  if(type==="win") { audioWin.currentTime=0; audioWin.loop=false; audioWin.play(); state.playingSound=audioWin; }
+  if(type==="lose") { audioLose.currentTime=0; audioLose.loop=false; audioLose.play(); state.playingSound=audioLose; }
+  if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
+  if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=false; audioRestart.play(); state.playingSound=audioRestart; }
 }
 function stopAllSounds() {
   [audioTap,audioWin,audioLose,audioPause,audioRestart].forEach(a=>{ a.pause(); a.currentTime=0; });
@@ -404,4 +398,3 @@ function showAd(callback) {
 
 // Init
 showSplash();
-  
