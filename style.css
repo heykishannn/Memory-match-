@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #0f2027, #2c5364 80%);
+  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
   color: white;
   margin: 0;
   height: 100vh;
@@ -15,17 +15,19 @@ footer {
   text-align: center;
   z-index: 200;
   font-family: 'Poppins', 'Arial', sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   letter-spacing: 1.5px;
-  color: #ffc837;
-  text-shadow: 0 2px 10px #222, 0 0 12px #8e2de2;
+  color: #fff;
+  text-shadow: 0 2px 10px #26d0ce, 0 0 12px #8e2de2, 0 0 20px #fff;
+  font-weight: 600;
 }
 footer span span {
-  color: #ff8008;
+  color: #fff;
   font-weight: bold;
   font-family: 'Poppins', cursive, sans-serif;
   letter-spacing: 2px;
   font-size: 1.13em;
+  filter: drop-shadow(0 0 10px #fff);
 }
 
 .btn {
@@ -40,7 +42,7 @@ footer span span {
   font-size: 1.18rem;
   box-shadow: 0 4px 15px rgba(255, 128, 8, 0.2);
   width: 90%;
-  max-width: 270px;
+  max-width: 200px;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -49,18 +51,24 @@ footer span span {
 
 #splash {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, #0f2027, #2c5364 80%);
+  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 10;
   animation: fadeIn 0.5s;
 }
+#splash h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
+  letter-spacing: 2px;
+}
 .splash-cards {
-  display: flex; gap: 32px; justify-content: center;
+  display: flex; gap: 22px; justify-content: center;
 }
 .splash-card {
-  width: 92px; height: 92px;
-  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
-  border-radius: 24px;
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  border-radius: 18px;
   box-shadow: 0 2px 16px #0002;
   margin: 0 8px;
   animation: splashFlip 1.5s infinite alternate;
@@ -74,15 +82,15 @@ footer span span {
 #home {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #0f2027, #2c5364 80%);
+  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
   z-index: 5;
 }
 .home-content {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .home-content h1 {
-  font-size: 2.7rem;
-  margin-bottom: 1.7rem;
+  font-size: 2.2rem;
+  margin-bottom: 1.2rem;
   text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
   letter-spacing: 2px;
 }
@@ -90,18 +98,18 @@ footer span span {
 
 .popup {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, #8e2de2cc, #4a00e0cc);
+  background: transparent;
   display: flex; align-items: center; justify-content: center;
   z-index: 100;
 }
 .popup-content.square {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  padding: 2rem 1.4rem;
-  border-radius: 24px;
+  padding: 0.7rem 0.4rem;
+  border-radius: 14px;
   text-align: center;
-  width: 90vw;
-  max-width: 380px;
-  min-width: 220px;
+  width: 80vw;
+  max-width: 170px;
+  min-width: 100px;
   aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
@@ -109,39 +117,40 @@ footer span span {
   box-shadow: 0 8px 32px #0003;
   animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
 }
+.small-popup { max-width: 140px; min-width: 80px; }
 @keyframes popupZoom {
   0% { transform: scale(0.7); opacity:0; }
   100% { transform: scale(1); opacity:1; }
 }
-.popup-content h2, .popup-content h1 { font-size: 2rem; margin-bottom: 1rem;}
-.popup-content button { margin: 0.5rem auto; }
+.popup-content h2, .popup-content h1 { font-size: 1.1rem; margin-bottom: 0.5rem;}
+.popup-content button { margin: 0.3rem auto; }
 
 .game-header {
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 0.7rem;
+  margin-top: 0.5rem;
 }
 .game-header h1 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   text-align: center;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
   text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
 }
 .game-controls {
   display: flex;
   justify-content: center;
-  gap: 28px;
-  margin-bottom: 0.5rem;
+  gap: 16px;
+  margin-bottom: 0.3rem;
 }
 .ctrl-btn {
-  width: 92px;
-  height: 92px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: #fff;
-  font-size: 2.1rem;
+  font-size: 1.3rem;
   border: none;
   box-shadow: 0 2px 8px #0002;
   display: flex;
@@ -152,32 +161,32 @@ footer span span {
 }
 .ctrl-btn:active { background: linear-gradient(135deg, #fa71cd, #4a00e0);}
 .stats {
-  margin: 0.7rem 0 0.2rem 0;
+  margin: 0.4rem 0 0.1rem 0;
   width: 100vw;
   display: flex;
   justify-content: space-around;
-  font-size: 1.16rem;
+  font-size: 1rem;
   font-weight: bold;
   text-shadow: 0 0 6px #4a00e0;
 }
 #board {
   display: grid;
-  gap: 22px;
+  gap: 8px;
   justify-content: center;
   align-content: center;
   margin: 0 auto;
-  margin-top: 16px;
+  margin-top: 10px;
   transition: grid-template-columns 0.3s;
 }
 .card {
-  width: 92px;
-  height: 92px;
-  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
-  border-radius: 24px;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  border-radius: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.1rem;
+  font-size: 1.4rem;
   cursor: pointer;
   box-shadow: 0 2px 8px #0002;
   user-select: none;
@@ -187,9 +196,9 @@ footer span span {
 }
 .card-inner {
   width: 100%; height: 100%;
-  border-radius: 24px;
+  border-radius: 18px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 2.1rem;
+  font-size: 1.4rem;
   color: #fff;
   transition: transform 0.5s cubic-bezier(.4,2,.6,1);
   transform-style: preserve-3d;
@@ -197,20 +206,23 @@ footer span span {
 }
 .card.cover .card-inner { background: linear-gradient(135deg, #8e2de2, #4a00e0);}
 .card.flipped .card-inner { transform: rotateY(180deg);}
-.card .front, .card .back {
-  position: absolute; width: 100%; height: 100%;
-  border-radius: 24px;
-  backface-visibility: hidden;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 2.1rem;
-}
 .card .front {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: #fff;
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
 }
 .card .back {
-  background: linear-gradient(135deg, #fa71cd, #8e2de2, #4a00e0);
+  background: linear-gradient(135deg, #1a2980, #26d0ce 80%);
   color: #fff;
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
   transform: rotateY(180deg);
 }
 .card.matched .card-inner {
@@ -226,7 +238,7 @@ footer span span {
   transform: scale(1.05);
 }
 @media (max-width: 480px) {
-  .card, .ctrl-btn, .splash-card { width: 62px; height: 62px; font-size: 1.3rem;}
-  .game-header h1 { font-size: 1.2rem;}
-  .popup-content { padding: 1.1rem 0.4rem;}
-}
+  .card, .ctrl-btn, .splash-card { width: 42px; height: 42px; font-size: 0.9rem;}
+  .game-header h1 { font-size: 1rem;}
+  .popup-content { padding: 0.6rem 0.2rem;}
+  }
