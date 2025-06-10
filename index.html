@@ -2,55 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Memory Match Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Match</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash" class="screen">
-    <div class="centered">
-      <h1>Emoji Match Game</h1>
-    </div>
+  <!-- Splash -->
+  <div id="splash">
+    <h1>Memory Match</h1>
+    <div class="anim-cards"></div>
   </div>
-  
-  <!-- Login/Signup -->
-  <div id="auth" class="screen hidden">
-    <form id="authForm" autocomplete="off" onsubmit="return false;">
-      <h2>Login / Signup</h2>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <div class="auth-buttons">
-        <button type="button" id="loginBtn">Login</button>
-        <button type="button" id="signupBtn">Sign Up</button>
+  <!-- Auth -->
+  <div id="auth" class="hidden">
+    <div class="auth-box">
+      <h2>Memory Match</h2>
+      <input type="email" id="email" placeholder="Email" autocomplete="username" required><br>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" required><br>
+      <div class="auth-btns">
+        <button id="loginBtn">Login</button>
+        <button id="signupBtn">Sign Up</button>
       </div>
-    </form>
+    </div>
   </div>
-  
-  <!-- Game UI -->
-  <div id="game" class="screen hidden">
-    <!-- Top Controls -->
-    <div id="topBar">
-      <button id="soundBtn" title="Sound">🔊</button>
+  <!-- Game -->
+  <div id="game" class="hidden">
+    <div id="game-header">Memory Match</div>
+    <div id="controls-row">
+      <button id="soundBtn" title="Toggle Sound">🔊</button>
       <button id="pauseBtn" title="Pause">⏸️</button>
-      <button id="vibrationBtn" title="Vibration">📳</button>
+      <button id="vibrationBtn" title="Toggle Vibration">📳</button>
     </div>
-    <!-- HUD -->
-    <div id="hud">
-      <span id="levelDisplay">Level: 1</span>
-      <span id="timerDisplay">Time: 00</span>
-      <span id="scoreDisplay">Score: 0</span>
+    <div id="stats-row">
+      <div id="levelDisplay">Level: 1/100</div>
+      <div id="timerDisplay">Time: 00</div>
+      <div id="scoreDisplay">Score: 0</div>
     </div>
-    <!-- Game Board -->
     <div id="board"></div>
-    <!-- Win Popup -->
-    <div id="winPopup" class="popup hidden">
-      <h2>You Win!</h2>
-      <p id="finalScore"></p>
-      <button id="restartBtn">Restart</button>
-    </div>
   </div>
-  
+  <!-- Win Popup -->
+  <div id="winPopup" class="hidden">
+    <h2>You Win!</h2>
+    <p id="winDesc"></p>
+    <button id="restartBtn">Next Level</button>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
