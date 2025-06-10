@@ -9,6 +9,7 @@
 <body>
   <!-- Splash -->
   <div id="splash">
+    <h1>Memory Match</h1>
     <div class="splash-cards"></div>
   </div>
   <!-- Home -->
@@ -28,22 +29,33 @@
     </div>
   </div>
   <!-- Auth -->
-  <div id="auth" class="popup hidden">
-    <div class="popup-content square popup-zoom">
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <button class="btn" id="loginBtn">Login</button>
-      <button class="btn" id="signupBtn">Sign Up</button>
-    </div>
+  <div id="auth" class="hidden"> <!-- Removed 'popup' class here -->
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button class="btn" id="loginBtn">Login</button>
+    <button class="btn" id="signupBtn">Sign Up</button>
   </div>
   <!-- Game -->
   <div id="game" class="hidden">
     <div class="game-header">
       <h1>Memory Match</h1>
       <div class="game-controls">
-        <button class="ctrl-btn" id="soundSwitch">🔊</button>
-        <button class="ctrl-btn" id="pauseBtn">⏸️</button>
-        <button class="ctrl-btn" id="vibrationSwitch">📳</button>
+        <!-- Sound Toggle -->
+        <label for="soundToggle" class="switch-label">
+            <input type="checkbox" id="soundToggle">
+            <span class="switch-slider"></span>
+        </label>
+        <!-- Pause Button -->
+        <button class="pause-btn" id="pauseBtn">||</button>
+        <!-- Vibration Toggle -->
+        <label for="vibrationToggle" class="switch-label">
+            <input type="checkbox" id="vibrationToggle">
+            <span class="switch-slider"></span>
+        </label>
+      </div>
+      <div class="switch-texts"> <!-- Text for Sound/Vibration toggles -->
+        <span>Sound</span>
+        <span>Vibration</span>
       </div>
     </div>
     <div class="stats">
@@ -57,6 +69,11 @@
   <div id="winPopup" class="popup hidden">
     <div class="popup-content square popup-zoom">
       <h2>You Win!</h2>
+      <div class="result">
+        <span id="resultLevel">Level: 1</span>
+        <span id="resultScore">Score: 0</span>
+        <span id="resultTime">Time Left: 0s</span>
+      </div>
       <button class="btn" id="nextLevelBtn">Next Level</button>
       <button class="btn" id="homeBtn1">Home</button>
     </div>
@@ -65,6 +82,11 @@
   <div id="losePopup" class="popup hidden">
     <div class="popup-content square popup-zoom">
       <h2>You Lost!</h2>
+      <div class="result">
+        <span id="resultLevelL">Level: 1</span>
+        <span id="resultScoreL">Score: 0</span>
+        <span id="resultTimeL">Time Left: 0s</span>
+      </div>
       <button class="btn" id="playAgainBtn">Play Again</button>
       <button class="btn" id="loseHomeBtn">Home</button>
       <button class="btn" id="watchAdBtn">Watch Ad (5s) to Continue</button>
