@@ -1,171 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Memory Match</title>
-    <style>
-        /* Base Styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #8e2de2, #4a00e0);
-            height: 100vh;
-            color: white;
-            overflow: hidden;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* Common Components */
-        .btn {
-            background: linear-gradient(to right, #ff8008, #ffc837);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 128, 8, 0.3);
-        }
-
-        /* Splash Screen */
-        #splash {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.5s;
-        }
-
-        #splash h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Auth Screen */
-        #auth {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .auth-box {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255,255,255,0.9);
-        }
-
-        /* Game Controls */
-        #controls {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.1);
-        }
-
-        .switch {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Card Grid */
-        #board {
-            display: grid;
-            gap: 10px;
-            padding: 1rem;
-            margin-top: 80px;
-            justify-content: center;
-        }
-
-        .card {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #fcb69f, #a1c4fd);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .card.flipped {
-            background: linear-gradient(135deg, #ffffff, #f8f9fa);
-        }
-
-        /* Popups */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-content {
-            background: linear-gradient(135deg, #8e2de2, #4a00e0);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Memory Match</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Screens -->
-    <div id="splash">
-        <h1>Memory Match</h1>
+  <!-- Splash -->
+  <div id="splash">
+    <h1>Memory Match</h1>
+    <div class="anim-cards"></div>
+  </div>
+  <!-- Auth -->
+  <div id="auth" class="hidden">
+    <div class="auth-box">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn" id="loginBtn">Login</button>
+      <button class="btn" id="signupBtn">Sign Up</button>
     </div>
-
-    <div id="auth" class="hidden">
-        <div class="auth-box">
-            <input type="email" id="email" placeholder="Email">
-            <input type="password" id="password" placeholder="Password">
-            <button class="btn" id="loginBtn">Login</button>
-            <button class="btn" id="signupBtn">Sign Up</button>
-        </div>
+  </div>
+  <!-- Home -->
+  <div id="home" class="hidden">
+    <div class="centered">
+      <h1>Memory Match</h1>
+      <button class="btn" id="startBtn">Start</button>
     </div>
-
-    <div id="game" class="hidden">
-        <div id="controls">
-            <div class="switch" id="soundSwitch">🔊</div>
-            <div class="switch" id="pauseBtn">⏸️</div>
-            <
-              
+  </div>
+  <!-- Resume Popup -->
+  <div id="resumePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Resume Game?</h2>
+      <p>Resume from last level or start over?</p>
+      <button class="btn" id="restartFrom1Btn">Restart from Level 1</button>
+      <button class="btn" id="resumeBtn">Watch Ad (5s) to Continue</button>
+    </div>
+  </div>
+  <!-- Game -->
+  <div id="game" class="hidden">
+    <div id="controls">
+      <div class="switch" id="soundSwitch">🔊</div>
+      <div class="switch" id="pauseBtn">⏸️</div>
+      <div class="switch" id="vibrationSwitch">📳</div>
+    </div>
+    <div class="stats">
+      <span id="levelDisplay">Level: 1</span>
+      <span id="scoreDisplay">Score: 0</span>
+      <span id="timerDisplay">Time: 00</span>
+    </div>
+    <div id="board"></div>
+  </div>
+  <!-- Win Popup -->
+  <div id="winPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>You Win!</h2>
+      <button class="btn" id="nextLevelBtn">Next Level</button>
+      <button class="btn" id="homeBtn1">Home</button>
+    </div>
+  </div>
+  <!-- Lose Popup -->
+  <div id="losePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>You Lost!</h2>
+      <button class="btn" id="playAgainBtn">Play Again</button>
+      <button class="btn" id="loseHomeBtn">Home</button>
+      <button class="btn" id="watchAdBtn">Watch Ad (5s) to Continue</button>
+    </div>
+  </div>
+  <!-- Ad Popup -->
+  <div id="adPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Ad</h2>
+      <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
+    </div>
+  </div>
+  <!-- Sounds -->
+  <audio id="audio-tap" src="tap.mp3"></audio>
+  <audio id="audio-win" src="win.mp3"></audio>
+  <audio id="audio-lose" src="lose.mp3"></audio>
+  <audio id="audio-pause" src="pause.mp3"></audio>
+  <audio id="audio-restart" src="restart.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
