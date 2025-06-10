@@ -9,7 +9,6 @@ html,body {
 }
 .hidden { display: none !important; }
 
-/* Splash */
 #splash {
   position: fixed; inset:0;
   background: linear-gradient(to bottom, #8e2de2, #4a00e0);
@@ -48,7 +47,6 @@ html,body {
 }
 @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
 
-/* Auth */
 #auth {
   position: fixed; inset:0;
   background: linear-gradient(to bottom, #8e2de2, #4a00e0);
@@ -96,7 +94,6 @@ html,body {
 }
 #auth button:hover { background: #fa71cd; color: #4a00e0; }
 
-/* Game Layout */
 #game {
   position: fixed; inset:0;
   background: linear-gradient(to bottom, #8e2de2, #4a00e0);
@@ -227,7 +224,6 @@ html,body {
   transform: scale(1.05);
 }
 
-/* Popups */
 .popup {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(to bottom, #8e2de2cc, #4a00e0cc);
@@ -265,11 +261,10 @@ html,body {
   background: #fa71cd; color: #4a00e0;
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   #auth .auth-box { padding: 1.2rem 0.7rem;}
   #game-header { font-size: 1.5rem;}
   .popup-content { padding: 1.2rem 0.4rem;}
   #controls-row { gap: 0.5rem;}
   .popup-btns button { font-size: 1rem; padding: 0.6em 1em;}
-  }
+}
