@@ -4,7 +4,7 @@ const EMOJIS = [
   "🌷","🌸","🌺","🌼","🐼","🦄","🍂","🍄","🌿",
   "🐥","🐤","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
   "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔",
-  "🦚","🪕" // Added Peacock and Banjo emojis for sound effects
+  "🦚","🪕" // Added Peacock and Banjo emojis for sound effects as per list
 ];
 const MAX_LEVEL = 100;
 
@@ -31,7 +31,7 @@ const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
 const playAgainBtn = document.getElementById('playAgainBtn');
-const loseHomeBtn = document = document.getElementById('loseHomeBtn');
+const loseHomeBtn = document.getElementById('loseHomeBtn'); // Corrected DOM reference
 const watchAdBtn = document.getElementById('watchAdBtn');
 
 // Changed IDs for input elements for toggle switches
@@ -148,7 +148,7 @@ startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
     resumePopup.classList.remove('hidden');
-    // Sound for continue popup removed as per request
+    // Sound for continue popup is explicitly removed as per request
   } else {
     state.level = 1;
     state.score = 0;
@@ -156,10 +156,11 @@ startBtn.onclick = () => {
     showGame();
   }
 };
+// Home button clicks from any popup/screen should save data and show resume window
 resumeHomeBtn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
-  saveProgress(); // Save progress before returning to home
+  saveProgress(); // Ensure current progress is saved
   showHome();
 };
 watchAdResumeBtn.onclick = () => {
@@ -192,8 +193,8 @@ function showGame() {
   startLevel(state.level);
 }
 function getGridSize(level) {
-  // हर 3 level पर 2 cards add (1 pair)
-  let pairs = 2 + Math.floor((level-1)/3);
+  // Logic: Start with 2 pairs (4 cards) and add 1 pair (2 cards) every 2 levels
+  let pairs = 2 + Math.floor((level - 1) / 2);
   let totalCards = pairs * 2;
   let cols = Math.ceil(Math.sqrt(totalCards));
   let rows = Math.ceil(totalCards / cols);
@@ -210,15 +211,17 @@ function startLevel(level) {
   const totalPairs = Math.floor(totalCards/2);
   let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
+  
   // Ensure enough emojis for larger boards if totalCards > EMOJIS.length
+  // This part already handles adding more emojis if needed, no change here.
   if(cardsArray.length < totalCards) {
-      // If we don't have enough unique pairs, re-use some existing ones or add more from the EMOJIS pool
       const needed = totalCards - cardsArray.length;
       const additionalEmojis = shuffle(EMOJIS).slice(0, Math.ceil(needed / 2));
       cardsArray.push(...additionalEmojis, ...additionalEmojis);
-      cardsArray = shuffle(cardsArray); // Re-shuffle after adding
+      cardsArray = shuffle(cardsArray);
   }
   cardsArray = cardsArray.slice(0,totalCards); // Trim to exact totalCards
+
   state.cards = cardsArray.map((emoji,idx)=>({
     emoji, flipped:false, matched:false, idx
   }));
@@ -241,8 +244,8 @@ function startLevel(level) {
     });
     board.appendChild(cardEl);
   });
-  // Timer: 4 cards = 10s, हर 2 cards पर 5s
-  state.timeLeft = Math.max(10, totalCards/2*2.5);
+  // Timer: 2.5 seconds per card (5 seconds per pair)
+  state.timeLeft = Math.max(10, totalCards * 2.5); // Total cards * 2.5 seconds
   updateHUD();
   startTimer();
 }
@@ -264,6 +267,7 @@ function flipCard(index) {
   const cardEl = board.children[index];
   cardEl.classList.remove('cover');
   cardEl.classList.add('flipped');
+  // No need for separate front/back elements, the card-inner handles the flip
 }
 function unflipCard(index) {
   const card = state.cards[index];
@@ -283,7 +287,7 @@ function checkMatch() {
     state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
-
+    
     // Play specific sound for matched emoji
     playMatchSound(card1.emoji);
 
@@ -319,8 +323,8 @@ nextLevelBtn.onclick = () => {
 homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
-  // Removed data reset here
-  saveProgress(); // Save progress before going to home
+  // Data should not reset when clicking home button
+  saveProgress();
   showHome();
 };
 function loseLevel() {
@@ -339,8 +343,8 @@ playAgainBtn.onclick = () => {
 loseHomeBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
-  // Removed data reset here
-  saveProgress(); // Save progress before going to home
+  // Data should not reset when clicking home button
+  saveProgress();
   showHome();
 };
 watchAdBtn.onclick = () => {
@@ -448,7 +452,7 @@ function shuffle(arr) {
 }
 function showAd(callback) {
   adPopup.classList.remove('hidden');
-  popupSound('pause');
+  popupSound('pause'); // Play pause sound during ad
   let t = 5;
   adTimer.textContent = t;
   state.adTimeout && clearTimeout(state.adTimeout);
@@ -457,7 +461,7 @@ function showAd(callback) {
     adTimer.textContent = t;
     if(t<=0) {
       adPopup.classList.add('hidden');
-      stopAllSounds();
+      stopAllSounds(); // Stop pause sound after ad
       callback && callback();
     } else {
       state.adTimeout = setTimeout(tick,1000);
