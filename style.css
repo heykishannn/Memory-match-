@@ -1,379 +1,372 @@
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue background */
-  color: white;
-  margin: 0;
-  height: 100vh;
-  overflow: hidden; /* Prevents scrolling */
+font-family: 'Segoe UI', Arial, sans-serif;
+background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue background /
+color: white;
+margin: 0;
+height: 100vh;
+overflow: hidden; / Prevents scrolling */
 }
 .hidden { display: none !important; }
 
 footer {
-  position: fixed;
-  bottom: 10px;
-  width: 100vw;
-  text-align: center;
-  z-index: 200;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 1.5px;
-  color: #fff;
-  font-weight: bold;
+position: fixed;
+bottom: 10px;
+width: 100vw;
+text-align: center;
+z-index: 200;
+font-family: 'Arial', sans-serif;
+letter-spacing: 1.5px;
+color: #fff;
+font-weight: bold;
 }
-/* Removed Neon effect and made font smaller for "Powered by NAS" */
+/* Removed Neon effect and made font smaller for "Powered by NAS" /
 footer .powered {
-  color: #fff;
-  font-size: 0.8rem; /* Smaller font size */
-  text-shadow: none; /* Removed glow effect */
+color: #fff;
+font-size: 0.8rem; / Smaller font size /
+text-shadow: none; / Removed glow effect /
 }
 footer span span {
-  color: #fff;
-  font-weight: bold;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 2px;
-  font-size: 0.8em; /* Smaller font size */
-  text-shadow: none;
-  filter: none;
+color: #fff;
+font-weight: bold;
+font-family: 'Arial', sans-serif;
+letter-spacing: 2px;
+font-size: 0.8em; / Smaller font size */
+text-shadow: none;
+filter: none;
 }
 
 .btn {
-  background: linear-gradient(to right, #ff8008, #ffc837);
-  border: none;
-  padding: 15px 0;
-  border-radius: 25px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 12px 0;
-  font-size: 1.18rem;
-  box-shadow: 0 4px 15px rgba(255, 128, 8, 0.2);
-  width: 90%;
-  max-width: 220px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  letter-spacing: 1.2px;
+background: linear-gradient(to right, #ff8008, #ffc837);
+border: none;
+padding: 15px 0;
+border-radius: 25px;
+color: white;
+font-weight: bold;
+cursor: pointer;
+margin: 12px 0;
+font-size: 1.18rem;
+box-shadow: 0 4px 15px rgba(255, 128, 8, 0.2);
+width: 90%;
+max-width: 220px;
+display: block;
+margin-left: auto;
+margin-right: auto;
+letter-spacing: 1.2px;
 }
 
 #splash {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 10;
-  animation: fadeIn 0.5s;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue /
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+z-index: 10;
+animation: fadeIn 0.5s;
 }
 #splash h1 {
-  font-size: 2.2rem;
-  margin-bottom: 2.6rem;
-  text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
-  letter-spacing: 2px;
+font-size: 2.2rem;
+margin-bottom: 2.6rem;
+text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
+letter-spacing: 2px;
 }
 .splash-cards {
-  display: flex; gap: 20px;
-  justify-content: center;
+display: flex; gap: 20px;
+justify-content: center;
 }
 .splash-card {
-  width: 90px; height: 140px;
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient consistent with card back */
-  border-radius: 20px;
-  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 16px rgba(0,0,0,0.2);
-  animation: splashFlip 1.5s infinite alternate;
-  transition: transform 0.5s;
+width: 90px; height: 140px;
+background: linear-gradient(135deg, #6a11cb, #2575fc); / Purple gradient consistent with card back */
+border-radius: 20px;
+box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 16px rgba(0,0,0,0.2);
+animation: splashFlip 1.5s infinite alternate;
+transition: transform 0.5s;
 }
 @keyframes splashFlip {
-  0% { transform: rotateY(0deg);}
-  100% { transform: rotateY(180deg);}
+0% { transform: rotateY(0deg);}
+100% { transform: rotateY(180deg);}
 }
 
 #home {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
-  z-index: 5;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
+z-index: 5;
 }
 .home-content {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .home-content h1 {
-  font-size: 2.6rem;
-  margin-bottom: 1.7rem;
-  text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
-  letter-spacing: 2px;
+font-size: 2.6rem;
+margin-bottom: 1.7rem;
+text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
+letter-spacing: 2px;
 }
 .home-content button { margin-top: 0.2rem; }
 
 #auth {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-  padding: 20px;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 20;
+padding: 20px;
 }
 #auth input {
-  width: 90%;
-  max-width: 320px;
-  padding: 15px;
-  margin: 0.7rem 0;
-  border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  font-size: 1.15rem;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+width: 90%;
+max-width: 320px;
+padding: 15px;
+margin: 0.7rem 0;
+border-radius: 11px;
+border: 1px solid rgba(255,255,255,0.4);
+background: rgba(255,255,255,0.2);
+color: #fff;
+font-size: 1.15rem;
+outline: none;
+box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 #auth input::placeholder {
-  color: rgba(255,255,255,0.8);
+color: rgba(255,255,255,0.8);
 }
 #auth .btn {
-  max-width: 280px;
+max-width: 280px;
 }
 
 .popup {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+background: transparent;
+display: flex; align-items: center; justify-content: center;
+z-index: 100;
 }
 .popup-content.square {
-  background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  padding: 1.2rem 0.8rem;
-  border-radius: 22px;
-  text-align: center;
-  width: 90vw;
-  max-width: 280px;
-  min-width: 150px;
-  aspect-ratio: 1/1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-shadow: 0 8px 32px #0003;
-  animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
+background: linear-gradient(135deg, #8e2de2, #4a00e0);
+padding: 1.2rem 0.8rem;
+border-radius: 22px;
+text-align: center;
+width: 90vw;
+max-width: 280px;
+min-width: 150px;
+aspect-ratio: 1/1;
+display: flex;
+flex-direction: column;
+justify-content: center;
+box-shadow: 0 8px 32px #0003;
+animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
 }
 .big-popup { max-width: 280px; min-width: 150px; }
 @keyframes popupZoom {
-  0% { transform: scale(0.7); opacity:0; }
-  100% { transform: scale(1); opacity:1; }
+0% { transform: scale(0.7); opacity:0; }
+100% { transform: scale(1); opacity:1; }
 }
 .popup-content h2, .popup-content h1 {
-  font-size: 1.2rem;
-  margin-bottom: 0.6rem;
+font-size: 1.2rem;
+margin-bottom: 0.6rem;
 }
 .popup-content button { margin: 0.5rem auto; }
 .result { margin-bottom: 0.6rem; }
 .result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
 
-#game { /* Centering game content vertically, but pushing board up */
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centers items horizontally */
-  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
+#game { /* Centering game content vertically, but pushing board up /
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+display: flex;
+flex-direction: column;
+align-items: center; / Centers items horizontally /
+background: linear-gradient(to right, #4facfe, #00f2fe); / Gradient blue */
 }
 
 .game-header {
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 0.7rem;
+width: 100vw;
+display: flex;
+flex-direction: column;
+align-items: center;
+margin-top: 0.7rem;
 }
 .game-header h1 {
-  font-size: 2.2rem; /* Larger font size */
-  font-weight: bold; /* Bold text */
-  text-align: center;
-  margin-bottom: 0.2rem;
-  text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
+font-size: 2.2rem; /* Larger font size /
+font-weight: bold; / Bold text /
+text-align: center;
+margin-bottom: 0.2rem;
+text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
 }
 .game-controls {
-  display: flex;
-  justify-content: space-between; /* Pushes items to right/left */
-  align-items: center;
-  width: 90%; /* Max width for controls */
-  max-width: 450px; /* Adjust based on desired spread */
-  margin: 0 auto; /* Center the control block */
-  padding: 0 10px; /* Add slight padding from screen edges */
-  margin-bottom: 0.3rem;
+display: flex;
+justify-content: space-between; / Pushes items to right/left /
+align-items: center;
+width: 90%; / Max width for controls /
+max-width: 450px; / Adjust based on desired spread /
+margin: 0 auto; / Center the control block /
+padding: 0 10px; / Add slight padding from screen edges /
+margin-bottom: 0.3rem;
 }
-/* New style for toggle groups */
+/ New style for toggle groups /
 .control-item {
-    display: flex;
-    flex-direction: column; /* Stack label and text */
-    align-items: center;
-    width: 60px; /* Fixed width to ensure consistent spacing */
-    flex-shrink: 0;
+display: flex;
+flex-direction: column; / Stack label and text /
+align-items: center;
+width: 60px; / Fixed width to ensure consistent spacing /
+flex-shrink: 0;
 }
 .toggle-text {
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 5px #000;
-    margin-top: 5px; /* Space between toggle and text */
+font-size: 0.9rem;
+font-weight: bold;
+color: white;
+text-shadow: 0 0 5px #000;
+margin-top: 5px; / Space between toggle and text */
 }
 
-/* Custom Toggle Switches (Sound & Vibration) */
+/* Custom Toggle Switches (Sound & Vibration) /
 .switch-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 55px; /* Consistent width */
-    height: 35px; /* Consistent height */
-    background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
-    border-radius: 17.5px;
-    position: relative;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    transition: background 0.3s;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 55px; / Consistent width /
+height: 35px; / Consistent height /
+background: linear-gradient(to right, #ff8008, #ffc837); / Orange gradient /
+border-radius: 17.5px;
+position: relative;
+cursor: pointer;
+box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+transition: background 0.3s;
 }
 .switch-label input[type="checkbox"] {
-    display: none;
+display: none;
 }
 .switch-slider {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: 27px; /* Knob size */
-    height: 27px; /* Knob size */
-    background: white;
-    border-radius: 50%;
-    transition: transform 0.3s, background 0.3s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+position: absolute;
+top: 4px;
+left: 4px;
+width: 27px; / Knob size /
+height: 27px; / Knob size /
+background: white;
+border-radius: 50%;
+transition: transform 0.3s, background 0.3s;
+box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .switch-label input:checked + .switch-slider {
-    transform: translateX(18px); /* Move knob to the right when checked */
-    background: white;
+transform: translateX(18px); / Move knob to the right when checked */
+background: white;
 }
 
-/* Pause Button */
+/* Pause Button /
 .pause-btn {
-  background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
-  border: none;
-  border-radius: 10px;
-  width: 55px; /* Consistent width */
-  height: 35px; /* Consistent height */
-  color: white;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
+background: linear-gradient(to right, #ff8008, #ffc837); / Orange gradient /
+border: none;
+border-radius: 10px;
+width: 55px; / Consistent width /
+height: 35px; / Consistent height */
+color: white;
+font-size: 1.2rem;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+transition: transform 0.2s;
 }
 .pause-btn:active {
-  transform: scale(0.95);
+transform: scale(0.95);
 }
 
 .stats {
-  margin: 0.6rem 0 0.1rem 0;
-  width: 100vw;
-  display: flex;
-  justify-content: space-around;
-  font-size: 1.13rem;
-  font-weight: bold;
-  text-shadow: 0 0 6px #4a00e0;
+margin: 0.6rem 0 0.1rem 0;
+width: 100vw;
+display: flex;
+justify-content: space-around;
+font-size: 1.13rem;
+font-weight: bold;
+text-shadow: 0 0 6px #4a00e0;
 }
 #board {
-  display: grid;
-  /* Adjusting gaps */
-  row-gap: 12px; /* Normal vertical distance */
-  column-gap: 5px; /* Closer horizontal distance (pass-pass) */
-  justify-content: center;
-  /* Align cards to the top after header/stats, then center */
-  margin: 24px auto auto auto; /* Pushed down from top, auto for bottom to push up */
-  max-width: calc(100vw - 20px); /* Restrict board width to keep cards in screen */
-  flex-grow: 1; /* Allow board to take available space */
-  align-content: flex-start; /* Aligns content to the start (top) */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+display: grid;
+/* Adjusting gaps /
+row-gap: 12px; / Normal vertical distance /
+column-gap: 5px; / Closer horizontal distance (pass-pass) /
+justify-content: center;
+/ Align cards to the top after header/stats, then center /
+margin: 24px auto auto auto; / Pushed down from top, auto for bottom to push up /
+max-width: calc(100vw - 20px); / Restrict board width to keep cards in screen /
+flex-grow: 1; / Allow board to take available space /
+align-content: flex-start; / Aligns content to the start (top) /
+box-sizing: border-box; / Include padding and border in the element's total width and height /
 }
-/* This makes cards fill their grid cell, and allows them to shrink */
-#board[style*="--cols"] { /* Use the CSS variable to define columns */
-  grid-template-columns: repeat(var(--cols), 1fr);
+/ This makes cards fill their grid cell, and allows them to shrink /
+#board[style="--cols"] { /* Use the CSS variable to define columns */
+grid-template-columns: repeat(var(--cols), 1fr);
 }
 
 .card {
-  width: 100%; /* Make card fill its grid cell */
-  aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 130px; /* Larger max size for desktop, increased from 120px */
-  max-height: 130px; /* Larger max size for desktop, increased from 120px */
-  border: 2px solid black; /* Black border */
-  border-radius: 20px;
-  display: flex; /* For centering front/back content */
-  justify-content: center; /* For centering front/back content */
-  align-items: center; /* For centering front/back content */
-  font-size: 2.8rem; /* Larger emoji size */
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
-  user-select: none;
-  perspective: 600px; /* For 3D transform */
-  position: relative;
-  /* Transition for the entire card flip */
-  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
-  transform-style: preserve-3d; /* Enable 3D transform on the card itself */
+width: 100%; /* Make card fill its grid cell /
+aspect-ratio: 1 / 1; / Keep it square regardless of width changes /
+max-width: 120px; / Larger max size for desktop /
+max-height: 120px; / Larger max size for desktop /
+border: 2px solid black; / Black border /
+border-radius: 20px;
+display: flex; / For centering front/back content /
+justify-content: center; / For centering front/back content /
+align-items: center; / For centering front/back content /
+font-size: 2.8rem; / Larger emoji size /
+cursor: pointer;
+box-shadow: 0 2px 8px rgba(0,0,0,0.2); / Adjusted shadow /
+user-select: none;
+perspective: 600px; / For 3D transform /
+position: relative;
+/ Transition for the entire card flip /
+transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+transform-style: preserve-3d; / Enable 3D transform on the card itself */
 }
 
 /* When flipped, rotate the entire card */
 .card.flipped {
-  transform: rotateY(180deg);
+transform: rotateY(180deg);
 }
 
-/* Front and Back sides should be absolute and fill the card, and handle backface-visibility */
+/* Front and Back sides should be absolute and fill the card, and handle backface-visibility /
 .card .front, .card .back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px; /* Consistent with card radius */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden; /* Hide the back of the element when rotated */
+position: absolute;
+width: 100%;
+height: 100%;
+border-radius: 20px; / Consistent with card radius /
+display: flex;
+align-items: center;
+justify-content: center;
+backface-visibility: hidden; / Hide the back of the element when rotated */
 }
 
-/* Front side (emoji side) color to light green gradient */
+/* Front side (emoji side) color to light green gradient /
 .card .front {
-  background: linear-gradient(to right, #a8ff78, #78ffd6); /* Light green gradient */
-  color: #fff;
-  /* This is the side that shows when FLIPPED, so it starts rotated */
-  transform: rotateY(180deg);
+background: linear-gradient(to right, #a8ff78, #78ffd6); / Light green gradient /
+color: #fff;
+/ This is the side that shows when FLIPPED, so it starts rotated */
+transform: rotateY(180deg);
 }
 
-/* Back side color (when unflipped) to purple gradient */
+/* Back side color (when unflipped) to purple gradient /
 .card .back {
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient */
-  color: #fff;
-  /* This is the side that shows when UNFLIPPED, so it faces forward initially */
-  /* Default transform is rotateY(0deg) */
+background: linear-gradient(135deg, #6a11cb, #2575fc); / Purple gradient /
+color: #fff;
+/ This is the side that shows when UNFLIPPED, so it faces forward initially /
+/ Default transform is rotateY(0deg) */
 }
 
-/* Removed glow animation on matched cards as requested */
-.card.matched { /* Apply to .card directly */
-  box-shadow: none; /* Removed glow effect */
-  animation: none; /* Removed glow animation */
+/* Removed glow animation on matched cards as requested /
+.card.matched { / Apply to .card directly /
+box-shadow: none; / Removed glow effect /
+animation: none; / Removed glow animation /
 }
-/* Kept the active state for visual feedback on tap */
-.card:active:not(.matched):not(.flipped) { /* Apply to .card directly */
-  box-shadow: 0 0 20px 8px rgba(250, 113, 205, 0.4); /* Retained subtle box shadow for tap feedback */
-  transform: scale(1.05); /* Scales the whole card */
+/ Kept the active state for visual feedback on tap /
+.card:active:not(.matched):not(.flipped) { / Apply to .card directly /
+box-shadow: 0 0 20px 8px rgba(250, 113, 205, 0.4); / Retained subtle box shadow for tap feedback /
+transform: scale(1.05); / Scales the whole card */
 }
 
 @media (max-width: 600px) {
-  .card {
-    width: 100%;
-    height: auto;
-    max-width: 100px; /* Increased from 80px */
-    max-height: 100px; /* Increased from 80px */
-    font-size: 2.8rem; /* Increased from 2.2rem */
-    border-radius: 18px;
-  }
-  #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
-  .splash-card { width: 70px; height: 110px; border-radius: 18px;}
-  .game-header h1 { font-size: 1.7rem;}
-  .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
-  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;}
-  .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
-  .switch-label input:checked + .switch-slider { transform: translateX(15px); }
-  .toggle-text { font-size: 0.75rem; margin-top: 3px; }
-  .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
+.card { width: 100%; height: auto; max-width: 80px; max-height: 80px; font-size: 2.2rem; border-radius: 18px;} /* Larger cards on mobile /
+#board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } / Adjusted gaps and max-width on mobile /
+.splash-card { width: 70px; height: 110px; border-radius: 18px;}
+.game-header h1 { font-size: 1.7rem;}
+.popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
+.pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;}
+.switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
+.switch-label input:checked + .switch-slider { transform: translateX(15px); }
+.toggle-text { font-size: 0.75rem; margin-top: 3px; }
+.game-controls { max-width: 300px; } / Adjusted max-width for mobile */
 }
