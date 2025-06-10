@@ -1,10 +1,10 @@
 const EMOJIS = [
-  "🍎","🍌","🍇","🍓","🍉","🍍","🥝","🍒","🍑","🍋",
-  "🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
-  "🌷","🌸","🌺","🌼","🐼","🦄","🍂","🍄","🌿",
-  "🐥","🐤","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
-  "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔",
-  "🦚","🪕" // Added Peacock and Banjo emojis for sound effects as per list
+"🍎","🍌","🍇","🍓","🍉","🍍","🥝","🍒","🍑","🍋",
+"🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
+"🌷","🌸","🌺","🌼","🐼","🦄","🍂","🍄","🌿",
+"🐥","🐤","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
+"🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔",
+"🦚","🪕" // Added Peacock and Banjo emojis for sound effects as per list
 ];
 const MAX_LEVEL = 100;
 
@@ -58,7 +58,6 @@ const audioBell = document.getElementById('audio-bell');
 // New sound for Continue window
 const audioKoni = document.getElementById('audio-koni');
 
-
 const resultLevel = document.getElementById('resultLevel');
 const resultScore = document.getElementById('resultScore');
 const resultTime = document.getElementById('resultTime');
@@ -67,499 +66,498 @@ const resultScoreL = document.getElementById('resultScoreL');
 const resultTimeL = document.getElementById('resultTimeL');
 
 let state = {
-  user: null,
-  level: 1,
-  score: 0,
-  timeLeft: 0,
-  timerId: null,
-  paused: false,
-  soundOn: true,
-  vibrationOn: true,
-  cards: [],
-  flippedIndices: [],
-  matchedCount: 0,
-  busy: false,
-  resumeData: null,
-  adTimeout: null,
-  playingSound: null,
-  isMaxCardsReached: false, // New state to track if max cards capacity is hit
-  levelCardsCapped: 0, // New state to store level when cards were first capped
-  gameEnded: false // NEW: Flag to prevent multiple win/lose popups
+user: null,
+level: 1,
+score: 0,
+timeLeft: 0,
+timerId: null,
+paused: false,
+soundOn: true,
+vibrationOn: true,
+cards: [],
+flippedIndices: [],
+matchedCount: 0,
+busy: false,
+resumeData: null,
+adTimeout: null,
+playingSound: null,
+isMaxCardsReached: false, // New state to track if max cards capacity is hit
+levelCardsCapped: 0 // New state to store level when cards were first capped
 };
 
 // Splash: 3 blank gradient cards, flip animation
 function showSplash() {
-  splash.classList.remove('hidden');
-  home.classList.add('hidden');
-  game.classList.add('hidden');
-  auth.classList.add('hidden');
-  splashCards.innerHTML = '';
-  for (let i = 0; i < 3; i++) {
-    const card = document.createElement('div');
-    card.className = 'splash-card';
-    splashCards.appendChild(card);
-  }
-  setTimeout(() => {
-    splash.classList.add('hidden');
-    checkLogin();
-  }, 3000);
+splash.classList.remove('hidden');
+home.classList.add('hidden');
+game.classList.add('hidden');
+auth.classList.add('hidden');
+splashCards.innerHTML = '';
+for (let i = 0; i < 3; i++) {
+const card = document.createElement('div');
+card.className = 'splash-card';
+splashCards.appendChild(card);
+}
+setTimeout(() => {
+splash.classList.add('hidden');
+checkLogin();
+}, 3000);
 }
 
 // Auth
 function checkLogin() {
-  const savedUser = JSON.parse(localStorage.getItem('memorymatch_user'));
-  if(savedUser && savedUser.email) {
-    state.user = savedUser;
-    showHome();
-  } else {
-    showAuth();
-  }
+const savedUser = JSON.parse(localStorage.getItem('memorymatch_user'));
+if(savedUser && savedUser.email) {
+state.user = savedUser;
+showHome();
+} else {
+showAuth();
+}
 }
 function showAuth() {
-  auth.classList.remove('hidden');
-  home.classList.add('hidden');
-  game.classList.add('hidden');
-  emailInput.value = '';
-  passwordInput.value = '';
+auth.classList.remove('hidden');
+home.classList.add('hidden');
+game.classList.add('hidden');
+emailInput.value = '';
+passwordInput.value = '';
 }
 loginBtn.onclick = () => {
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value;
-  if(!email || !password) { alert('Please enter email and password.'); return; }
-  const saved = JSON.parse(localStorage.getItem('memorymatch_user'));
-  if(saved && saved.email === email && saved.password === password) {
-    state.user = {email, password};
-    showHome();
-  } else {
-    alert('Invalid credentials or user does not exist.');
-  }
+const email = emailInput.value.trim().toLowerCase();
+const password = passwordInput.value;
+if(!email || !password) { alert('Please enter email and password.'); return; }
+const saved = JSON.parse(localStorage.getItem('memorymatch_user'));
+if(saved && saved.email === email && saved.password === password) {
+state.user = {email, password};
+showHome();
+} else {
+alert('Invalid credentials or user does not exist.');
+}
 };
 signupBtn.onclick = () => {
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value;
-  if(!email || !password) { alert('Please enter email and password.'); return; }
-  localStorage.setItem('memorymatch_user', JSON.stringify({email, password}));
-  state.user = {email, password};
-  localStorage.setItem('memorymatch_progress', JSON.stringify({level:1, score:0}));
-  showHome();
+const email = emailInput.value.trim().toLowerCase();
+const password = passwordInput.value;
+if(!email || !password) { alert('Please enter email and password.'); return; }
+localStorage.setItem('memorymatch_user', JSON.stringify({email, password}));
+state.user = {email, password};
+localStorage.setItem('memorymatch_progress', JSON.stringify({level:1, score:0}));
+showHome();
 };
 
 // Home
 function showHome() {
-  auth.classList.add('hidden');
-  home.classList.remove('hidden');
-  game.classList.add('hidden');
+auth.classList.add('hidden');
+home.classList.remove('hidden');
+game.classList.add('hidden');
 }
 startBtn.onclick = () => {
-  const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-  if(progress && progress.level && progress.level > 1) {
-    resumePopup.classList.remove('hidden');
-    popupSound('koni'); // Play sound when continue window appears
-  } else {
-    state.level = 1;
-    state.score = 0;
-    saveProgress();
-    showGame();
-  }
+const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
+if(progress && progress.level && progress.level > 1) {
+resumePopup.classList.remove('hidden');
+popupSound('koni'); // Play sound when continue window appears
+} else {
+state.level = 1;
+state.score = 0;
+saveProgress();
+showGame();
+}
 };
 // Home button clicks from any popup/screen should save data and show resume window
 resumeHomeBtn.onclick = () => {
-  stopAllSounds();
-  resumePopup.classList.add('hidden');
-  saveProgress(); // Ensure current progress is saved
-  showHome();
+stopAllSounds();
+resumePopup.classList.add('hidden');
+saveProgress(); // Ensure current progress is saved
+showHome();
 };
 watchAdResumeBtn.onclick = () => {
-  resumePopup.classList.add('hidden');
-  showAd(() => {
-    const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-    state.level = progress.level;
-    state.score = progress.score;
-    showGame();
-  });
+resumePopup.classList.add('hidden');
+showAd(() => {
+const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
+state.level = progress.level;
+state.score = progress.score;
+showGame();
+});
 };
 restartFrom1Btn.onclick = () => {
-  stopAllSounds();
-  resumePopup.classList.add('hidden');
-  state.level = 1;
-  state.score = 0;
-  saveProgress();
-  showGame();
+stopAllSounds();
+resumePopup.classList.add('hidden');
+state.level = 1;
+state.score = 0;
+saveProgress();
+showGame();
 };
 
 // Game
 function showGame() {
-  home.classList.add('hidden');
-  game.classList.remove('hidden');
-  winPopup.classList.add('hidden');
-  losePopup.classList.add('hidden');
-  resumePopup.classList.add('hidden');
-  updateHUD();
-  setupSwitches();
-  startLevel(state.level);
+home.classList.add('hidden');
+game.classList.remove('hidden');
+winPopup.classList.add('hidden');
+losePopup.classList.add('hidden');
+resumePopup.classList.add('hidden');
+updateHUD();
+setupSwitches();
+startLevel(state.level);
 }
 
 function getGridSize(level) {
-    let pairs;
-    if (level === 1) {
-        pairs = 1; // Level 1 has 1 pair (2 cards)
-    } else {
-        pairs = 1 + Math.floor((level - 1) / 2); // Add 1 pair every 2 levels from level 2 onwards
-    }
-    let totalCards = pairs * 2;
+let pairs;
+if (level === 1) {
+pairs = 1; // Level 1 has 1 pair (2 cards)
+} else {
+pairs = 1 + Math.floor((level - 1) / 2); // Add 1 pair every 2 levels from level 2 onwards
+}
+let totalCards = pairs * 2;
 
-    // Estimate maximum possible columns based on screen width
-    let maxColsPossible;
-    if (window.innerWidth <= 400) { // Very small mobile
-        maxColsPossible = 3;
-    } else if (window.innerWidth <= 600) { // Standard mobile
-        maxColsPossible = 4;
-    } else if (window.innerWidth <= 900) { // Tablet
-        maxColsPossible = 6;
-    } else { // Desktop
-        maxColsPossible = 8;
-    }
-
-    // Estimate maximum possible rows based on available height for the board
-    // Roughly calculate available height by subtracting header, stats, and footer heights
-    const headerHeight = document.querySelector('.game-header').offsetHeight;
-    const statsHeight = document.querySelector('.stats').offsetHeight;
-    const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
-    const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
-
-    // Assuming average card size of 100px (for responsive CSS, increased from 80px) + 12px row-gap
-    const estimatedCardHeightWithGap = 100 + 12; // UPDATED: Changed from 80+12 to 100+12
-    let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
-    if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
-
-    const maxCardsCanFit = maxColsPossible * maxRowsPossible;
-
-    // Check if card count should be capped
-    let currentTotalCards = totalCards;
-    let cardCountWasCapped = false;
-
-    if (totalCards > maxCardsCanFit) {
-        currentTotalCards = maxCardsCanFit;
-        cardCountWasCapped = true;
-        // If it's the first time cards are capped, record the level
-        if (!state.isMaxCardsReached) {
-            state.levelCardsCapped = level;
-        }
-        state.isMaxCardsReached = true;
-    } else {
-        // If current totalCards is less than maxCardsCanFit, it means we are not capped yet
-        // or we are on a level below where it was capped previously.
-        state.isMaxCardsReached = false; // Reset if we drop below capacity (e.g. restart from level 1)
-        state.levelCardsCapped = 0;
-    }
-
-    // Now, calculate the actual grid dimensions for the `totalCards` we will display
-    let cols = Math.ceil(Math.sqrt(currentTotalCards));
-    // Ensure cols don't exceed maxColsPossible
-    if (cols > maxColsPossible) {
-        cols = maxColsPossible;
-    }
-    let rows = Math.ceil(currentTotalCards / cols);
-
-    // If totalCards is 0 (shouldn't happen with min 1 pair), default to 2x1 for sizing.
-    if (currentTotalCards === 0) {
-        cols = 2;
-        rows = 1;
-    }
-    
-    return {
-        rows: rows,
-        cols: cols,
-        totalCards: currentTotalCards,
-        isMaxCardsReached: state.isMaxCardsReached // Return the updated state
-    };
+// Estimate maximum possible columns based on screen width
+let maxColsPossible;
+if (window.innerWidth <= 400) { // Very small mobile
+    maxColsPossible = 3;
+} else if (window.innerWidth <= 600) { // Standard mobile
+    maxColsPossible = 4;
+} else if (window.innerWidth <= 900) { // Tablet
+    maxColsPossible = 6;
+} else { // Desktop
+    maxColsPossible = 8;
 }
 
+// Estimate maximum possible rows based on available height for the board
+// Roughly calculate available height by subtracting header, stats, and footer heights
+const headerHeight = document.querySelector('.game-header').offsetHeight;
+const statsHeight = document.querySelector('.stats').offsetHeight;
+const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
+const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
+
+// Assuming average card size of 80px (for responsive CSS) + 12px row-gap
+const estimatedCardHeightWithGap = 80 + 12;
+let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
+if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
+
+const maxCardsCanFit = maxColsPossible * maxRowsPossible;
+
+// Check if card count should be capped
+let currentTotalCards = totalCards;
+let cardCountWasCapped = false;
+
+if (totalCards > maxCardsCanFit) {
+    currentTotalCards = maxCardsCanFit;
+    cardCountWasCapped = true;
+    // If it's the first time cards are capped, record the level
+    if (!state.isMaxCardsReached) {
+        state.levelCardsCapped = level;
+    }
+    state.isMaxCardsReached = true;
+} else {
+    // If current totalCards is less than maxCardsCanFit, it means we are not capped yet
+    // or we are on a level below where it was capped previously.
+    state.isMaxCardsReached = false; // Reset if we drop below capacity (e.g. restart from level 1)
+    state.levelCardsCapped = 0;
+}
+
+// Now, calculate the actual grid dimensions for the `totalCards` we will display
+let cols = Math.ceil(Math.sqrt(currentTotalCards));
+// Ensure cols don't exceed maxColsPossible
+if (cols > maxColsPossible) {
+    cols = maxColsPossible;
+}
+let rows = Math.ceil(currentTotalCards / cols);
+
+// If totalCards is 0 (shouldn't happen with min 1 pair), default to 2x1 for sizing.
+if (currentTotalCards === 0) {
+    cols = 2;
+    rows = 1;
+}
+
+return {
+    rows: rows,
+    cols: cols,
+    totalCards: currentTotalCards,
+    isMaxCardsReached: state.isMaxCardsReached // Return the updated state
+};
+Use code with caution.
+}
 
 function startLevel(level) {
-  clearInterval(state.timerId);
-  state.paused = false;
-  state.gameEnded = false; // NEW: Reset game ended flag
-  pauseBtn.textContent = "||"; // Set to pause symbol
-  state.flippedIndices = [];
-  state.matchedCount = 0;
-  state.busy = false;
+clearInterval(state.timerId);
+state.paused = false;
+pauseBtn.textContent = "||"; // Set to pause symbol
+state.flippedIndices = [];
+state.matchedCount = 0;
+state.busy = false;
 
-  const {rows,cols,totalCards, isMaxCardsReached} = getGridSize(level);
-  
-  // Set CSS variable for grid columns to make it responsive
-  board.style.setProperty('--cols', cols);
+const {rows,cols,totalCards, isMaxCardsReached} = getGridSize(level);
 
-  const totalPairs = Math.floor(totalCards/2);
-  let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
-  let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
-  
-  // Ensure enough emojis for larger boards if totalCards > EMOJIS.length
-  if(cardsArray.length < totalCards) {
-      const needed = totalCards - cardsArray.length;
-      const additionalEmojis = shuffle(EMOJIS).slice(0, Math.ceil(needed / 2));
-      cardsArray.push(...additionalEmojis, ...additionalEmojis);
-      cardsArray = shuffle(cardsArray);
-  }
-  cardsArray = cardsArray.slice(0,totalCards); // Trim to exact totalCards
+// Set CSS variable for grid columns to make it responsive
+board.style.setProperty('--cols', cols);
 
-  state.cards = cardsArray.map((emoji,idx)=>({
-    emoji, flipped:false, matched:false, idx
-  }));
-  
-  board.innerHTML = '';
-  state.cards.forEach((card,i)=>{
-    const cardEl = document.createElement('div');
-    cardEl.className = 'card'; // Removed 'cover' class
-    cardEl.tabIndex = 0;
-    cardEl.dataset.index = i;
-    // Direct front/back children for full card flip
-    cardEl.innerHTML = `
-      <div class="front">${card.emoji}</div>
-      <div class="back"></div>
-    `;
-    cardEl.addEventListener('click',()=>onCardClick(i));
-    cardEl.addEventListener('keydown',e=>{
-      if(e.key==='Enter'||e.key===' ') { e.preventDefault(); onCardClick(i);}
-    });
-    board.appendChild(cardEl);
-  });
-  
-  // Timer calculation
-  let baseTime = totalCards * 2.5; // Base: 2.5 seconds per card
-  
-  // If max cards are reached and level is higher than where it was capped, reduce time
-  if (isMaxCardsReached && state.levelCardsCapped > 0 && level > state.levelCardsCapped) {
-      const levelsPastCap = level - state.levelCardsCapped;
-      const timeReductionPerLevel = 1; // Decrease by 1 second per level after cap
-      baseTime -= (levelsPastCap * timeReductionPerLevel);
-      baseTime = Math.max(10, baseTime); // Ensure time doesn't go below 10 seconds
-  }
-  
-  state.timeLeft = baseTime;
-  updateHUD();
-  startTimer();
+const totalPairs = Math.floor(totalCards/2);
+let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
+let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
+
+// Ensure enough emojis for larger boards if totalCards > EMOJIS.length
+if(cardsArray.length < totalCards) {
+const needed = totalCards - cardsArray.length;
+const additionalEmojis = shuffle(EMOJIS).slice(0, Math.ceil(needed / 2));
+cardsArray.push(...additionalEmojis, ...additionalEmojis);
+cardsArray = shuffle(cardsArray);
+}
+cardsArray = cardsArray.slice(0,totalCards); // Trim to exact totalCards
+
+state.cards = cardsArray.map((emoji,idx)=>({
+emoji, flipped:false, matched:false, idx
+}));
+
+board.innerHTML = '';
+state.cards.forEach((card,i)=>{
+const cardEl = document.createElement('div');
+cardEl.className = 'card'; // Removed 'cover' class
+cardEl.tabIndex = 0;
+cardEl.dataset.index = i;
+// Direct front/back children for full card flip
+cardEl.innerHTML = <div class="front">${card.emoji}</div> <div class="back"></div>;
+cardEl.addEventListener('click',()=>onCardClick(i));
+cardEl.addEventListener('keydown',e=>{
+if(e.key==='Enter'||e.key===' ') { e.preventDefault(); onCardClick(i);}
+});
+board.appendChild(cardEl);
+});
+
+// Timer calculation
+let baseTime = totalCards * 2.5; // Base: 2.5 seconds per card
+
+// If max cards are reached and level is higher than where it was capped, reduce time
+if (isMaxCardsReached && state.levelCardsCapped > 0 && level > state.levelCardsCapped) {
+const levelsPastCap = level - state.levelCardsCapped;
+const timeReductionPerLevel = 1; // Decrease by 1 second per level after cap
+baseTime -= (levelsPastCap * timeReductionPerLevel);
+baseTime = Math.max(10, baseTime); // Ensure time doesn't go below 10 seconds
+}
+
+state.timeLeft = baseTime;
+updateHUD();
+startTimer();
 }
 function onCardClick(index) {
-  if(state.busy || state.paused || state.gameEnded) return; // NEW: Prevent clicks if game ended
-  const card = state.cards[index];
-  if(card.flipped || card.matched) return;
-  playSound('tap');
-  flipCard(index);
-  state.flippedIndices.push(index);
-  if(state.flippedIndices.length===2) {
-    state.busy = true;
-    setTimeout(checkMatch, 200); // UPDATED: Reduced delay from 500ms to 200ms
-  }
+if(state.busy||state.paused) return;
+const card = state.cards[index];
+if(card.flipped||card.matched) return;
+playSound('tap');
+flipCard(index);
+state.flippedIndices.push(index);
+if(state.flippedIndices.length===2) {
+state.busy = true;
+setTimeout(checkMatch, 500);
+}
 }
 function flipCard(index) {
-  const card = state.cards[index];
-  card.flipped = true;
-  const cardEl = board.children[index];
-  cardEl.classList.add('flipped'); // Add flipped class directly to the card
+const card = state.cards[index];
+card.flipped = true;
+const cardEl = board.children[index];
+cardEl.classList.add('flipped'); // Add flipped class directly to the card
 }
 function unflipCard(index) {
-  const card = state.cards[index];
-  card.flipped = false;
-  const cardEl = board.children[index];
-  cardEl.classList.remove('flipped'); // Remove flipped class directly from the card
+const card = state.cards[index];
+card.flipped = false;
+const cardEl = board.children[index];
+cardEl.classList.remove('flipped'); // Remove flipped class directly from the card
 }
 function checkMatch() {
-  const [i1,i2] = state.flippedIndices;
-  const card1 = state.cards[i1], card2 = state.cards[i2];
-  if(card1.emoji===card2.emoji) {
-    card1.matched = card2.matched = true;
-    board.children[i1].classList.add('matched');
-    board.children[i2].classList.add('matched');
-    vibrate();
-    state.matchedCount++;
-    state.score += 10+state.timeLeft;
-    updateHUD();
-    
-    // Play specific sound for matched emoji
-    playMatchSound(card1.emoji);
+const [i1,i2] = state.flippedIndices;
+const card1 = state.cards[i1], card2 = state.cards[i2];
+if(card1.emoji===card2.emoji) {
+card1.matched = card2.matched = true;
+board.children[i1].classList.add('matched');
+board.children[i2].classList.add('matched');
+vibrate();
+state.matchedCount++;
+state.score += 10+state.timeLeft;
+updateHUD();
 
-    if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 400);
-  } else {
-    setTimeout(()=>{
-      unflipCard(i1); unflipCard(i2);
-    }, 400);
-  }
-  state.flippedIndices = [];
-  state.busy = false;
+// Play specific sound for matched emoji
+playMatchSound(card1.emoji);
+
+if(state.matchedCount===Math.floor(state.cards.length/2)) setTimeout(winLevel, 400);
+Use code with caution.
+} else {
+setTimeout(()=>{
+unflipCard(i1); unflipCard(i2);
+}, 400);
+}
+state.flippedIndices = [];
+state.busy = false;
 }
 function winLevel() {
-  if(state.gameEnded) return; // NEW: If game already ended (e.g., lost), do nothing
-  clearInterval(state.timerId);
-  state.gameEnded = true; // NEW: Set flag that game has ended
-  popupSound('win');
-  vibrate();
-  state.score += state.timeLeft*2;
-  saveProgress();
-  updateHUD();
-  resultLevel.textContent = "Level: " + state.level;
-  resultScore.textContent = "Score: " + state.score;
-  resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
-  winPopup.classList.remove('hidden');
+clearInterval(state.timerId);
+popupSound('win');
+vibrate();
+state.score += state.timeLeft*2;
+saveProgress();
+updateHUD();
+resultLevel.textContent = "Level: " + state.level;
+resultScore.textContent = "Score: " + state.score;
+resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
+winPopup.classList.remove('hidden');
 }
 nextLevelBtn.onclick = () => {
-  stopAllSounds();
-  winPopup.classList.add('hidden');
-  if(state.level<MAX_LEVEL) state.level++;
-  else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
-  saveProgress();
-  startLevel(state.level);
+stopAllSounds();
+winPopup.classList.add('hidden');
+if(state.level<MAX_LEVEL) state.level++;
+else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
+saveProgress();
+startLevel(state.level);
 };
 homeBtn1.onclick = () => {
-  stopAllSounds();
-  winPopup.classList.add('hidden');
-  // Data should not reset when clicking home button
-  saveProgress();
-  showHome();
+stopAllSounds();
+winPopup.classList.add('hidden');
+// Data should not reset when clicking home button
+saveProgress();
+showHome();
 };
 function loseLevel() {
-  if(state.gameEnded) return; // NEW: If game already ended (e.g., won), do nothing
-  clearInterval(state.timerId);
-  state.gameEnded = true; // NEW: Set flag that game has ended
-  popupSound('lose');
-  resultLevelL.textContent = "Level: " + state.level;
-  resultScoreL.textContent = "Score: " + state.score;
-  resultTimeL.textContent = "Time Left: 0s";
-  losePopup.classList.remove('hidden');
+clearInterval(state.timerId);
+popupSound('lose');
+resultLevelL.textContent = "Level: " + state.level;
+resultScoreL.textContent = "Score: " + state.score;
+resultTimeL.textContent = "Time Left: 0s";
+losePopup.classList.remove('hidden');
 }
 playAgainBtn.onclick = () => {
-  stopAllSounds();
-  losePopup.classList.add('hidden');
-  startLevel(state.level);
+stopAllSounds();
+losePopup.classList.add('hidden');
+startLevel(state.level);
 };
 loseHomeBtn.onclick = () => {
-  stopAllSounds();
-  losePopup.classList.add('hidden');
-  // Data should not reset when clicking home button
-  saveProgress();
-  showHome();
+stopAllSounds();
+losePopup.classList.add('hidden');
+// Data should not reset when clicking home button
+saveProgress();
+showHome();
 };
 watchAdBtn.onclick = () => {
-  stopAllSounds();
-  losePopup.classList.add('hidden');
-  showAd(()=>{
-    // +10s reward
-    state.timeLeft += 10;
-    updateHUD();
-    startTimer();
-  });
+stopAllSounds();
+losePopup.classList.add('hidden');
+showAd(()=>{
+// +10s reward
+state.timeLeft += 10;
+updateHUD();
+startTimer();
+});
 };
 function updateHUD() {
-  levelDisplay.textContent = `Level: ${state.level}`;
-  // Ensure time is formatted with leading zero if less than 10
-  timerDisplay.textContent = `Time: ${state.timeLeft < 10 ? '0' + Math.round(state.timeLeft) : Math.round(state.timeLeft)}`;
-  scoreDisplay.textContent = `Score: ${state.score}`;
+levelDisplay.textContent = Level: ${state.level};
+// Ensure time is formatted with leading zero if less than 10
+timerDisplay.textContent = Time: ${state.timeLeft < 10 ? '0' + Math.round(state.timeLeft) : Math.round(state.timeLeft)};
+scoreDisplay.textContent = Score: ${state.score};
 }
 function startTimer() {
-  clearInterval(state.timerId);
-  state.timerId = setInterval(()=>{
-    if(!state.paused && !state.gameEnded) { // NEW: Check gameEnded flag
-      state.timeLeft--;
-      updateHUD();
-      if(state.timeLeft<=0) {
-        clearInterval(state.timerId);
-        loseLevel();
-      }
-    }
-  },1000);
+clearInterval(state.timerId);
+state.timerId = setInterval(()=>{
+if(!state.paused) {
+state.timeLeft--;
+updateHUD();
+if(state.timeLeft<=0) {
+clearInterval(state.timerId);
+loseLevel();
+}
+}
+},1000);
 }
 function setupSwitches() {
-  soundToggle.checked = state.soundOn;
-  vibrationToggle.checked = state.vibrationOn;
+soundToggle.checked = state.soundOn;
+vibrationToggle.checked = state.vibrationOn;
 
-  soundToggle.onchange = ()=>{ state.soundOn=soundToggle.checked; };
-  vibrationToggle.onchange = ()=>{ state.vibrationOn=vibrationToggle.checked; };
+soundToggle.onchange = ()=>{ state.soundOn=soundToggle.checked; };
+vibrationToggle.onchange = ()=>{ state.vibrationOn=vibrationToggle.checked; };
 
-  pauseBtn.onclick = ()=>{
-    if (state.gameEnded) return; // NEW: Don't allow pause if game ended
-    state.paused = !state.paused;
-    // Changed text to symbols for pause/resume
-    pauseBtn.textContent = state.paused ? "▶" : "||";
-    popupSound(state.paused ? 'pause' : 'restart');
-  };
+pauseBtn.onclick = ()=>{
+state.paused = !state.paused;
+// Changed text to symbols for pause/resume
+pauseBtn.textContent = state.paused ? "▶" : "||";
+popupSound(state.paused ? 'pause' : 'restart');
+};
 }
 function playSound(type) {
-  if(!state.soundOn) return;
-  stopAllSounds();
-  if(type==="tap") { audioTap.currentTime=0; audioTap.play(); state.playingSound=audioTap; }
+if(!state.soundOn) return;
+stopAllSounds();
+if(type==="tap") { audioTap.currentTime=0; audioTap.play(); state.playingSound=audioTap; }
 }
 function popupSound(type) {
-  stopAllSounds();
-  if(!state.soundOn) return;
-  if(type==="win") { audioWin.currentTime=0; audioWin.loop=false; audioWin.play(); state.playingSound=audioWin; }
-  if(type==="lose") { audioLose.currentTime=0; audioLose.loop=false; audioLose.play(); state.playingSound=audioLose; }
-  if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
-  if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=false; audioRestart.play(); state.playingSound=audioRestart; }
-  if(type==="koni") { audioKoni.currentTime=0; audioKoni.loop=false; audioKoni.play(); state.playingSound=audioKoni; }
+stopAllSounds();
+if(!state.soundOn) return;
+if(type==="win") { audioWin.currentTime=0; audioWin.loop=false; audioWin.play(); state.playingSound=audioWin; }
+if(type==="lose") { audioLose.currentTime=0; audioLose.loop=false; audioLose.play(); state.playingSound=audioLose; }
+if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
+if(type==="restart") { audioRestart.currentTime=0; audioRestart.loop=false; audioRestart.play(); state.playingSound=audioRestart; }
+if(type==="koni") { audioKoni.currentTime=0; audioKoni.loop=false; audioKoni.play(); state.playingSound=audioKoni; }
 }
 
 // New function to play specific sound for matched emoji
 function playMatchSound(emoji) {
-  if(!state.soundOn) return;
-  stopAllSounds(); // Stop any currently playing sound (including tap sound)
+if(!state.soundOn) return;
+stopAllSounds(); // Stop any currently playing sound
 
-  let soundToPlay = null;
-  switch(emoji) {
-    case "🍌": soundToPlay = audioGwak; break;
-    case "🍅": soundToPlay = audioTamatar; break;
-    case "🦚": soundToPlay = audioMor; break;
-    case "🗿": soundToPlay = audioSigma; break;
-    case "🎂": soundToPlay = audioBirthday; break;
-    case "🪕": soundToPlay = audioSitar; break;
-    case "🔔": soundToPlay = audioBell; break;
-    default: break; // No specific sound for other emojis
-  }
+let soundToPlay = null;
+switch(emoji) {
+case "🍌": soundToPlay = audioGwak; break;
+case "🍅": soundToPlay = audioTamatar; break;
+case "🦚": soundToPlay = audioMor; break;
+case "🗿": soundToPlay = audioSigma; break;
+case "🎂": soundToPlay = audioBirthday; break;
+case "🪕": soundToPlay = audioSitar; break;
+case "🔔": soundToPlay = audioBell; break;
+default: break; // No specific sound for other emojis
+}
 
-  if (soundToPlay) {
-    soundToPlay.currentTime = 0;
-    soundToPlay.play();
-    state.playingSound = soundToPlay;
-  }
+if (soundToPlay) {
+soundToPlay.currentTime = 0;
+soundToPlay.play();
+state.playingSound = soundToPlay;
+}
 }
 
 function stopAllSounds() {
-  [audioTap, audioWin, audioLose, audioPause, audioRestart,
-   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell, audioKoni
-  ].forEach(a=>{ a.pause(); a.currentTime=0; });
-  state.playingSound = null;
+[audioTap, audioWin, audioLose, audioPause, audioRestart,
+audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell, audioKoni
+].forEach(a=>{ a.pause(); a.currentTime=0; });
+state.playingSound = null;
 }
 function vibrate() {
-  if(state.vibrationOn && window.navigator && window.navigator.vibrate) window.navigator.vibrate(220);
+if(state.vibrationOn && window.navigator && window.navigator.vibrate) window.navigator.vibrate(220);
 }
 function saveProgress() {
-  localStorage.setItem('memorymatch_progress', JSON.stringify({
-    level: state.level, score: state.score
-  }));
+localStorage.setItem('memorymatch_progress', JSON.stringify({
+level: state.level, score: state.score
+}));
 }
 function shuffle(arr) {
-  let a = arr.slice();
-  for(let i=a.length-1;i>0;i--) {
-    let j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
+let a = arr.slice();
+for(let i=a.length-1;i>0;i--) {
+let j = Math.floor(Math.random()*(i+1));
+[a[i],a[j]] = [a[j],a[i]];
+}
+return a;
 }
 function showAd(callback) {
-  adPopup.classList.remove('hidden');
-  popupSound('pause'); // Play pause sound during ad
-  let t = 5;
-  adTimer.textContent = t;
-  state.adTimeout && clearTimeout(state.adTimeout);
-  function tick() {
-    t--;
-    adTimer.textContent = t;
-    if(t<=0) {
-      adPopup.classList.add('hidden');
-      stopAllSounds(); // Stop pause sound after ad
-      callback && callback();
-    } else {
-      state.adTimeout = setTimeout(tick,1000);
-    }
-  }
-  state.adTimeout = setTimeout(tick,1000);
-    }
+adPopup.classList.remove('hidden');
+popupSound('pause'); // Play pause sound during ad
+let t = 5;
+adTimer.textContent = t;
+state.adTimeout && clearTimeout(state.adTimeout);
+function tick() {
+t--;
+adTimer.textContent = t;
+if(t<=0) {
+adPopup.classList.add('hidden');
+stopAllSounds(); // Stop pause sound after ad
+callback && callback();
+} else {
+state.adTimeout = setTimeout(tick,1000);
+}
+}
+state.adTimeout = setTimeout(tick,1000);
+}
+
+// Lose/Win/Popup sound only while popup is open
+[winPopup, losePopup, adPopup, resumePopup].forEach(popup => {
+if(popup) popup.addEventListener('transitionend', ()=>{ if(popup.classList.contains('hidden')) stopAllSounds(); });
+});
+
+// Init
+showSplash();
