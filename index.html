@@ -10,11 +10,11 @@
   <!-- Splash -->
   <div id="splash">
     <h1>Memory Match</h1>
-    <div class="anim-cards"></div>
+    <div class="splash-cards"></div>
   </div>
   <!-- Auth -->
   <div id="auth" class="hidden">
-    <div class="auth-box">
+    <div class="popup-content square">
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
       <button class="btn" id="loginBtn">Login</button>
@@ -23,14 +23,14 @@
   </div>
   <!-- Home -->
   <div id="home" class="hidden">
-    <div class="centered">
+    <div class="popup-content square home-box">
       <h1>Memory Match</h1>
       <button class="btn" id="startBtn">Start</button>
     </div>
   </div>
   <!-- Resume Popup -->
   <div id="resumePopup" class="popup hidden">
-    <div class="popup-content">
+    <div class="popup-content square popup-zoom">
       <h2>Resume Game?</h2>
       <p>Resume from last level or start over?</p>
       <button class="btn" id="restartFrom1Btn">Restart from Level 1</button>
@@ -39,10 +39,13 @@
   </div>
   <!-- Game -->
   <div id="game" class="hidden">
-    <div id="controls">
-      <div class="switch" id="soundSwitch">🔊</div>
-      <div class="switch" id="pauseBtn">⏸️</div>
-      <div class="switch" id="vibrationSwitch">📳</div>
+    <div class="game-header">
+      <h1>Memory Match</h1>
+      <div class="game-controls">
+        <button class="ctrl-btn" id="soundSwitch">🔊</button>
+        <button class="ctrl-btn" id="pauseBtn">⏸️</button>
+        <button class="ctrl-btn" id="vibrationSwitch">📳</button>
+      </div>
     </div>
     <div class="stats">
       <span id="levelDisplay">Level: 1</span>
@@ -53,7 +56,7 @@
   </div>
   <!-- Win Popup -->
   <div id="winPopup" class="popup hidden">
-    <div class="popup-content">
+    <div class="popup-content square popup-zoom">
       <h2>You Win!</h2>
       <button class="btn" id="nextLevelBtn">Next Level</button>
       <button class="btn" id="homeBtn1">Home</button>
@@ -61,7 +64,7 @@
   </div>
   <!-- Lose Popup -->
   <div id="losePopup" class="popup hidden">
-    <div class="popup-content">
+    <div class="popup-content square popup-zoom">
       <h2>You Lost!</h2>
       <button class="btn" id="playAgainBtn">Play Again</button>
       <button class="btn" id="loseHomeBtn">Home</button>
@@ -70,7 +73,7 @@
   </div>
   <!-- Ad Popup -->
   <div id="adPopup" class="popup hidden">
-    <div class="popup-content">
+    <div class="popup-content square popup-zoom">
       <h2>Ad</h2>
       <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
     </div>
