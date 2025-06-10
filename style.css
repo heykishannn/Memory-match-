@@ -1,6 +1,6 @@
 body {
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  background: linear-gradient(135deg, #0f2027, #2c5364 80%);
   color: white;
   margin: 0;
   height: 100vh;
@@ -19,62 +19,115 @@ body {
   margin: 10px 0;
   font-size: 1.1rem;
   box-shadow: 0 4px 15px rgba(255, 128, 8, 0.3);
+  width: 90%;
+  max-width: 240px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-#splash, #auth, #home, #game {
+
+#splash {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, #8e2de2, #4a00e0);
+  background: linear-gradient(135deg, #0f2027, #2c5364 80%);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 1;
+  z-index: 10;
+  animation: fadeIn 0.5s;
 }
-#splash h1, #home h1 {
+#splash h1 {
   font-size: 2.7rem;
   margin-bottom: 2rem;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
-.auth-box {
-  background: rgba(255,255,255,0.1);
-  padding: 2rem;
-  border-radius: 20px;
-  width: 90%;
+.splash-cards {
+  display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+}
+.splash-card {
+  width: 54px; height: 54px;
+  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  margin: 5px;
+  animation: splashFlip 1.5s infinite alternate;
+  box-shadow: 0 2px 8px #0003;
+  transition: transform 0.5s;
+}
+.splash-card.flipped { transform: rotateY(180deg);}
+.splash-card.matching { animation: splashMatch 0.7s infinite alternate; }
+@keyframes splashFlip {
+  0% { transform: rotateY(0deg);}
+  100% { transform: rotateY(180deg);}
+}
+@keyframes splashMatch {
+  0% { background: linear-gradient(135deg, #fa71cd, #8e2de2);}
+  100% { background: linear-gradient(135deg, #4a00e0, #fa71cd);}
+}
+
+.popup {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, #8e2de2cc, #4a00e0cc);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.popup-content.square, .home-box {
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  padding: 2rem 1.4rem;
+  border-radius: 24px;
+  text-align: center;
+  width: 90vw;
   max-width: 340px;
-  box-shadow: 0 4px 16px #0004;
+  min-width: 220px;
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 8px 32px #0003;
+  animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
 }
-input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255,255,255,0.9);
-  font-size: 1rem;
+@keyframes popupZoom {
+  0% { transform: scale(0.7); opacity:0; }
+  100% { transform: scale(1); opacity:1; }
 }
-#controls {
+.popup-content h2, .popup-content h1 { font-size: 2rem; margin-bottom: 1rem;}
+.popup-content button { margin: 0.5rem auto; }
+
+.game-header {
   width: 100vw;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 1.2rem 1.2rem 0.5rem 1.2rem;
-  background: transparent;
-  font-size: 1.7rem;
+  margin-top: 0.7rem;
 }
-.switch {
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 0.2em 0.7em;
+.game-header h1 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
+}
+.game-controls {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 0.4rem;
+}
+.ctrl-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
+  color: #fff;
+  font-size: 1.7rem;
+  border: none;
+  box-shadow: 0 2px 8px #0002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  user-select: none;
   transition: background 0.2s;
 }
-.switch:active { background: rgba(255,255,255,0.2); }
+.ctrl-btn:active { background: linear-gradient(135deg, #fa71cd, #4a00e0);}
 .stats {
-  margin: 10px 0 0 0;
+  margin: 0.6rem 0 0.2rem 0;
   width: 100vw;
   display: flex;
   justify-content: space-around;
@@ -88,57 +141,67 @@ input {
   justify-content: center;
   align-content: center;
   margin: 0 auto;
-  margin-top: 20px;
+  margin-top: 12px;
   transition: grid-template-columns 0.3s;
 }
 .card {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, #fcb69f, #a1c4fd, #c471f5, #fa71cd);
-  border-radius: 16px;
+  width: 54px;
+  height: 54px;
+  background: linear-gradient(135deg, #8e2de2, #fa71cd, #4a00e0);
+  border-radius: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2.1rem;
+  font-size: 2rem;
   cursor: pointer;
   box-shadow: 0 2px 8px #0002;
-  transition: background 0.3s, transform 0.3s;
   user-select: none;
+  perspective: 500px;
+  position: relative;
+  transition: background 0.3s, transform 0.2s;
 }
-.card.cover {
+.card-inner {
+  width: 100%; height: 100%;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  color: #fff;
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+  transform-style: preserve-3d;
+  position: relative;
+}
+.card.cover .card-inner { background: linear-gradient(135deg, #8e2de2, #4a00e0);}
+.card.flipped .card-inner { transform: rotateY(180deg);}
+.card .front, .card .back {
+  position: absolute; width: 100%; height: 100%;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.card .front {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  color: #fff;
 }
-.card.flipped, .card.matched {
-  background: linear-gradient(135deg, #fcb69f, #a1c4fd, #c471f5, #fa71cd);
+.card .back {
+  background: linear-gradient(135deg, #fa71cd, #8e2de2, #4a00e0);
+  color: #fff;
+  transform: rotateY(180deg);
 }
-.card.matched {
-  box-shadow: 0 0 16px 6px #fa71cd;
+.card.matched .card-inner {
+  box-shadow: 0 0 18px 5px #fa71cd;
   animation: matchedGlow 0.7s;
 }
 @keyframes matchedGlow {
   0% { box-shadow: 0 0 0 0 #fa71cd;}
-  100% { box-shadow: 0 0 16px 6px #fa71cd;}
+  100% { box-shadow: 0 0 18px 5px #fa71cd;}
 }
-.popup {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, #8e2de2cc, #4a00e0cc);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100;
+.card:active:not(.matched):not(.flipped) .card-inner {
+  box-shadow: 0 0 20px 8px #fa71cd;
+  transform: scale(1.05);
 }
-.popup-content {
-  background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  padding: 2rem;
-  border-radius: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 340px;
-  color: #fff;
-  box-shadow: 0 4px 32px #0004;
-}
-.popup-content h2 { font-size: 2rem; margin-bottom: 1rem;}
-.popup-content button { width: 90%; margin: 0.5rem auto; }
 @media (max-width: 480px) {
-  #board .card { width: 52px; height: 52px; font-size: 1.5rem; }
-  #controls { font-size: 1.3rem; padding: 0.7rem 0.7rem 0.2rem 0.7rem;}
-  .auth-box, .popup-content { padding: 1.2rem; }
+  .card, .ctrl-btn, .splash-card { width: 40px; height: 40px; font-size: 1.3rem;}
+  .game-header h1 { font-size: 1.2rem;}
+  .popup-content { padding: 1.1rem 0.4rem;}
 }
