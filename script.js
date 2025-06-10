@@ -226,8 +226,8 @@ function getGridSize(level) {
     const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
     const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
 
-    // Assuming average card size of 80px (for responsive CSS) + 12px row-gap
-    const estimatedCardHeightWithGap = 80 + 12;
+    // Assuming average card size of 60px (for responsive CSS) + 60px row-gap
+    const estimatedCardHeightWithGap = 60 + 60;
     let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
     if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
 
