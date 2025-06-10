@@ -1,43 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Match Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Emoji Match Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="splash-screen">
-        <!-- Splash screen content will go here -->
-        <h1>Welcome to Card Match!</h1>
-        <div class="spinner"></div>
+  <!-- Splash Screen -->
+  <div id="splash" class="screen">
+    <div class="centered">
+      <h1>Emoji Match Game</h1>
     </div>
-
-    <div id="login-signup-page" style="display: none;">
-        <h2>Login or Sign Up</h2>
-        <input type="email" id="email" placeholder="Enter your email" required>
-        <input type="text" id="username" placeholder="Enter your username" required>
-        <button id="login-btn">Login</button>
-        <button id="signup-btn">Sign Up</button>
+  </div>
+  
+  <!-- Login/Signup -->
+  <div id="auth" class="screen hidden">
+    <form id="authForm">
+      <h2>Login / Signup</h2>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <div class="auth-buttons">
+        <button type="button" id="loginBtn">Login</button>
+        <button type="button" id="signupBtn">Sign Up</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Game UI -->
+  <div id="game" class="screen hidden">
+    <!-- Top Controls -->
+    <div id="topBar">
+      <button id="soundBtn" title="Sound">🔊</button>
+      <button id="pauseBtn" title="Pause">⏸️</button>
+      <button id="vibrationBtn" title="Vibration">📳</button>
     </div>
-
-    <div id="main-game-screen" style="display: none;">
-        <!-- Main game content will go here -->
-        <h1>Game Screen</h1>
-        <p>Welcome, <span id="user-display"></span>!</p>
-        <div id="game-controls">
-            <span id="timer">Time: 0s</span>
-            <button id="restart-btn">Restart</button>
-        </div>
-        <div id="score-board">
-            Score: <span id="score">0</span>
-        </div>
-        <div id="game-grid">
-            <!-- Game cards will be populated here by JavaScript -->
-        </div>
-        <button id="logout-btn">Logout</button>
+    <!-- HUD -->
+    <div id="hud">
+      <span id="levelDisplay">Level: 1</span>
+      <span id="timerDisplay">Time: 00</span>
+      <span id="scoreDisplay">Score: 0</span>
     </div>
-
-    <script src="script.js"></script>
+    <!-- Game Board -->
+    <div id="board"></div>
+    <!-- Win Popup -->
+    <div id="winPopup" class="popup hidden">
+      <h2>You Win!</h2>
+      <p id="finalScore"></p>
+      <button id="restartBtn">Restart</button>
+    </div>
+  </div>
+  
+  <script src="game.js"></script>
 </body>
 </html>
