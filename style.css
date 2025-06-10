@@ -1,196 +1,143 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
-    overflow: hidden; /* Prevent scrollbars during splash */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-#splash-screen {
-    width: 100%;
-    height: 100vh;
-    background-color: #3498db; /* Example blue background */
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: fixed; /* Cover the entire viewport */
-    top: 0;
-    left: 0;
-    z-index: 9999; /* Ensure it's on top */
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #2193b0, #6dd5ed);
+  transition: opacity 0.5s;
+  z-index: 1;
+}
+.hidden { display: none !important; }
+
+.centered { text-align: center; }
+
+#auth form {
+  background: rgba(255,255,255,0.15);
+  padding: 2em;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
-.spinner {
-    border: 8px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top: 8px solid white;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-    margin-top: 20px;
+#auth input {
+  padding: 0.8em;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.auth-buttons {
+  display: flex;
+  gap: 1em;
+  justify-content: center;
 }
 
-#login-signup-page, #main-game-screen {
-    display: none; /* Hidden by default, controlled by JS */
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 400px; /* Max width for larger mobile screens */
+#topBar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5em 1em;
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  z-index: 2;
 }
 
-#login-signup-page h2, #main-game-screen h1 {
-    margin-bottom: 20px;
+#topBar button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+#topBar button:active { transform: scale(0.9); }
+
+#hud {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 3em;
+  font-size: 1.2em;
+  color: #fff;
+  text-shadow: 0 2px 8px #2193b0;
 }
 
-#login-signup-page input {
-    width: calc(100% - 22px); /* Full width minus padding and border */
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#login-signup-page button, #main-game-screen button {
-    padding: 10px 15px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #2ecc71; /* Green */
-    color: white;
-    cursor: pointer;
-    width: calc(100% - 22px);
-}
-
-#login-signup-page button:hover, #main-game-screen button:hover {
-    background-color: #27ae60;
-}
-
-#login-signup-page button#signup-btn {
-    background-color: #e67e22; /* Orange for signup */
-    margin-left: 0px; /* Ensure it's on a new line or adjust as needed */
-}
-
-#login-signup-page button#signup-btn:hover {
-    background-color: #d35400;
-}
-
-#main-game-screen #logout-btn {
-    background-color: #e74c3c; /* Red for logout */
-}
-
-#main-game-screen #logout-btn:hover {
-    background-color: #c0392b;
-}
-
-/* Game Screen Specific Styles */
-#game-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
-    margin-bottom: 15px;
-}
-
-#timer, #score {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #333;
-}
-
-#restart-btn {
-    background-color: #3498db; /* Blue */
-    color: white;
-    padding: 8px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 1em;
-    width: auto; /* Override full width from general button style */
-}
-
-#restart-btn:hover {
-    background-color: #2980b9;
-}
-
-#score-board {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.2em;
-    color: #555;
-}
-
-#game-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 6x6 grid */
-    gap: 10px;
-    width: 100%;
-    max-width: 500px; /* Adjust as needed */
-    margin: 0 auto; /* Center the grid */
+#board {
+  display: grid;
+  gap: 1em;
+  margin: 2em auto 0 auto;
+  width: min(90vw, 600px);
+  justify-content: center;
 }
 
 .card {
-    width: 100%; /* Make card responsive within grid cell */
-    aspect-ratio: 1 / 1; /* Maintain square shape */
-    background-color: #ddd; /* Default card back color */
-    border: 2px solid #aaa;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2em; /* Emoji size */
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.5s;
+  width: 60px; height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2em;
+  background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  perspective: 600px;
+  user-select: none;
 }
 
-.card .card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 3px; /* Match card's border-radius */
+.card.flipped, .card.matched {
+  box-shadow: 0 0 16px 4px #6dd5ed;
+  background: linear-gradient(to right, #fcb69f 0%, #ffecd2 100%);
 }
 
-.card .card-front {
-    background-color: #ccc; /* Color of the card's "back" face */
-    color: #ccc; /* Hide text by matching color */
+.card .front, .card .back {
+  position: absolute;
+  width: 100%; height: 100%;
+  backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px;
+  transition: transform 0.4s;
 }
 
-.card .card-back {
-    background-color: #fff; /* Color of the card's "front" face (where emoji is) */
-    transform: rotateY(180deg);
+.card .front {
+  background: transparent;
+  font-size: 2em;
+  transform: rotateY(0deg);
 }
 
-.card.flipped {
-    transform: rotateY(180deg);
+.card .back {
+  background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+  transform: rotateY(180deg);
 }
 
-/* Specific style for logout button if it needs to be different from restart */
-#main-game-screen #logout-btn {
-    background-color: #e74c3c; /* Red for logout */
-    margin-top: 20px; /* Add some space above logout */
+.card.flipped .front { transform: rotateY(180deg); }
+.card.flipped .back { transform: rotateY(0deg); }
+
+.card:hover:not(.flipped):not(.matched) {
+  box-shadow: 0 0 24px 8px #6dd5ed;
+  transform: scale(1.06);
 }
 
-#main-game-screen #logout-btn:hover {
-    background-color: #c0392b;
+.popup {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.95);
+  padding: 2em 3em;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  text-align: center;
+  z-index: 10;
 }
+
+#winPopup h2 { color: #2193b0; }
+#restartBtn { margin-top: 1em; padding: 0.7em 2em; border-radius: 8px; border: none; background: #2193b0; color: #fff; font-size: 1.1em; cursor: pointer; }
+#restartBtn:hover { background: #6dd5ed; color: #2193b0; }
