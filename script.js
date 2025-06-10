@@ -83,7 +83,8 @@ let state = {
   adTimeout: null,
   playingSound: null,
   isMaxCardsReached: false, // New state to track if max cards capacity is hit
-  levelCardsCapped: 0 // New state to store level when cards were first capped
+  levelCardsCapped: 0, // New state to store level when cards were first capped
+  isGameActive: true // Added for visibility change sound control
 };
 
 // Splash: 3 blank gradient cards, flip animation
@@ -396,6 +397,7 @@ function winLevel() {
   resultLevel.textContent = "Level: " + state.level;
   resultScore.textContent = "Score: " + state.score;
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
+  losePopup.classList.add('hidden'); // Ensure losePopup is hidden
   winPopup.classList.remove('hidden');
 }
 nextLevelBtn.onclick = () => {
@@ -457,6 +459,7 @@ function startTimer() {
       updateHUD();
       if(state.timeLeft<=0) {
         clearInterval(state.timerId);
+        winPopup.classList.add('hidden'); // Ensure winPopup is hidden
         loseLevel();
       }
     }
@@ -477,13 +480,13 @@ function setupSwitches() {
   };
 }
 function playSound(type) {
-  if(!state.soundOn) return;
+  if(!state.soundOn || !state.isGameActive) return;
   stopAllSounds();
   if(type==="tap") { audioTap.currentTime=0; audioTap.play(); state.playingSound=audioTap; }
 }
 function popupSound(type) {
+  if(!state.soundOn || !state.isGameActive) return;
   stopAllSounds();
-  if(!state.soundOn) return;
   if(type==="win") { audioWin.currentTime=0; audioWin.loop=false; audioWin.play(); state.playingSound=audioWin; }
   if(type==="lose") { audioLose.currentTime=0; audioLose.loop=false; audioLose.play(); state.playingSound=audioLose; }
   if(type==="pause") { audioPause.currentTime=0; audioPause.loop=false; audioPause.play(); state.playingSound=audioPause; }
@@ -493,7 +496,7 @@ function popupSound(type) {
 
 // New function to play specific sound for matched emoji
 function playMatchSound(emoji) {
-  if(!state.soundOn) return;
+  if(!state.soundOn || !state.isGameActive) return;
   stopAllSounds(); // Stop any currently playing sound
 
   let soundToPlay = null;
@@ -564,3 +567,25 @@ function showAd(callback) {
 
 // Init
 showSplash();
+
+// Event listener for page visibility
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    state.isGameActive = false;
+    stopAllSounds();
+    // Optionally, also pause the game timer if desired
+    // if (state.timerId && !state.paused) {
+    //   state.paused = true; // Visually pause the game
+    //   pauseBtn.textContent = "▶";
+    // }
+  } else {
+    state.isGameActive = true;
+    // Optionally, resume game timer if it was paused due to visibility
+    // if (state.timerId && state.paused && pauseBtn.textContent === "▶") {
+    //   // Check if it was paused by visibility, not manually by user
+    //   // This part needs careful handling if you have manual pause too
+    //   state.paused = false;
+    //   pauseBtn.textContent = "||";
+    // }
+  }
+});
