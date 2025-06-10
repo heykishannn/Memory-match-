@@ -24,13 +24,42 @@
       </div>
     </div>
   </div>
+  <!-- Resume Popup -->
+  <div id="resumePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Resume Game?</h2>
+      <p>Continue from where you left off or start from Level 1?</p>
+      <div class="popup-btns">
+        <button id="resumeBtn">Continue (Watch Ad 5s)</button>
+        <button id="restartFrom1Btn">Start from Level 1</button>
+      </div>
+    </div>
+  </div>
   <!-- Game -->
   <div id="game" class="hidden">
     <div id="game-header">Memory Match</div>
     <div id="controls-row">
-      <button id="soundBtn" title="Toggle Sound">🔊</button>
-      <button id="pauseBtn" title="Pause">⏸️</button>
-      <button id="vibrationBtn" title="Toggle Vibration">📳</button>
+      <div class="switch-group">
+        <label class="switch">
+          <input type="checkbox" id="soundSwitch" checked>
+          <span class="slider"></span>
+        </label>
+        <span id="soundIcon">🔊</span>
+      </div>
+      <div class="switch-group">
+        <label class="switch">
+          <input type="checkbox" id="pauseSwitch">
+          <span class="slider"></span>
+        </label>
+        <span id="pauseIcon">⏸️</span>
+      </div>
+      <div class="switch-group">
+        <label class="switch">
+          <input type="checkbox" id="vibrationSwitch" checked>
+          <span class="slider"></span>
+        </label>
+        <span id="vibrationIcon">📳</span>
+      </div>
     </div>
     <div id="stats-row">
       <div id="levelDisplay">Level: 1/100</div>
@@ -40,11 +69,39 @@
     <div id="board"></div>
   </div>
   <!-- Win Popup -->
-  <div id="winPopup" class="hidden">
-    <h2>You Win!</h2>
-    <p id="winDesc"></p>
-    <button id="restartBtn">Next Level</button>
+  <div id="winPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>You Win!</h2>
+      <p id="winDesc"></p>
+      <div class="popup-btns">
+        <button id="nextLevelBtn">Next Level</button>
+        <button id="homeBtn1">Home</button>
+      </div>
+    </div>
   </div>
+  <!-- Lose Popup -->
+  <div id="losePopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>You Lost!</h2>
+      <p id="loseDesc"></p>
+      <div class="popup-btns">
+        <button id="loseHomeBtn">Home</button>
+        <button id="playAgainBtn">Play Again</button>
+        <button id="watchAdBtn">Watch Ad (5s) to Continue</button>
+      </div>
+    </div>
+  </div>
+  <!-- Fake Ad Popup -->
+  <div id="adPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>Ad</h2>
+      <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
+    </div>
+  </div>
+  <!-- Sounds -->
+  <audio id="audio-match" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa7f2b.mp3"></audio>
+  <audio id="audio-win" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa7f2b.mp3"></audio>
+  <audio id="audio-lose" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfa7f2b.mp3"></audio>
   <script src="script.js"></script>
 </body>
 </html>
