@@ -1,6 +1,6 @@
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #2196f3; /* Solid blue background */
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue background */
   color: white;
   margin: 0;
   height: 100vh;
@@ -20,30 +20,21 @@ footer {
   color: #fff;
   font-weight: bold;
 }
-/* Neon effect for "Powered by" */
+/* Removed Neon effect for "Powered by" */
 footer .powered {
   color: #fff;
-  text-shadow:
-      0 0 5px #fff,
-      0 0 10px #fff,
-      0 0 20px #FF5733, /* Red/Pink glow */
-      0 0 30px #FF5733,
-      0 0 40px #FF5733;
+  font-size: 0.9rem; /* Smaller font size */
+  text-shadow: none; /* Removed glow effect */
 }
-/* Neon effect for "NAS" */
+/* Removed Neon effect for "NAS" */
 footer span span {
   color: #fff; /* Keep white for main text */
   font-weight: bold;
   font-family: 'Arial', sans-serif;
-  letter-spacing: 3px; /* Slightly wider spacing for effect */
-  font-size: 1.13em;
-  text-shadow:
-      0 0 7px #fff,
-      0 0 14px #fff,
-      0 0 28px #FFC300, /* Golden/Yellow glow for NAS */
-      0 0 42px #FFC300,
-      0 0 56px #FFC300;
-  filter: none; /* Remove existing drop-shadow */
+  letter-spacing: 2px; /* Slightly wider spacing for effect */
+  font-size: 0.9em; /* Smaller font size */
+  text-shadow: none; /* Removed glow effect */
+  filter: none;
 }
 
 .btn {
@@ -67,26 +58,26 @@ footer span span {
 
 #splash {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: #2196f3; /* Solid blue */
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 10;
   animation: fadeIn 0.5s;
 }
 #splash h1 {
-  font-size: 2.2rem; /* Smaller font size */
+  font-size: 2.2rem;
   margin-bottom: 2.6rem;
   text-shadow: 0 0 18px #fff,0 0 24px #8e2de2;
   letter-spacing: 2px;
 }
 .splash-cards {
-  display: flex; gap: 20px; /* Smaller gap */
+  display: flex; gap: 20px;
   justify-content: center;
 }
 .splash-card {
-  width: 90px; height: 140px; /* Taller cards */
-  background: linear-gradient(135deg, #5D3FD3, #6A5ACD); /* Similar to game card back */
-  border-radius: 20px; /* Adjusted border radius */
-  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 16px rgba(0,0,0,0.2); /* Card-like shadow */
+  width: 90px; height: 140px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient consistent with card back */
+  border-radius: 20px;
+  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 16px rgba(0,0,0,0.2);
   animation: splashFlip 1.5s infinite alternate;
   transition: transform 0.5s;
 }
@@ -98,7 +89,7 @@ footer span span {
 #home {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #2196f3; /* Solid blue */
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
   z-index: 5;
 }
 .home-content {
@@ -114,48 +105,48 @@ footer span span {
 
 #auth {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: #2196f3; /* Solid blue, no transparent overlay */
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 20;
-  padding: 20px; /* Add some padding */
+  padding: 20px;
 }
 #auth input {
-  width: 90%; /* Wider inputs */
-  max-width: 320px; /* Max width for inputs */
+  width: 90%;
+  max-width: 320px;
   padding: 15px;
   margin: 0.7rem 0;
   border-radius: 11px;
-  border: 1px solid rgba(255,255,255,0.4); /* Subtle white border */
-  background: rgba(255,255,255,0.2); /* Slightly transparent background */
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.2);
   color: #fff;
   font-size: 1.15rem;
   outline: none;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 #auth input::placeholder {
-  color: rgba(255,255,255,0.8); /* Lighter placeholder text */
+  color: rgba(255,255,255,0.8);
 }
 #auth .btn {
-  max-width: 280px; /* Wider buttons for auth */
+  max-width: 280px;
 }
 
 .popup {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: transparent; /* Keep transparent for popups */
+  background: transparent;
   display: flex; align-items: center; justify-content: center;
   z-index: 100;
 }
 .popup-content.square {
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
-  padding: 1.2rem 0.8rem; /* Smaller padding */
+  padding: 1.2rem 0.8rem;
   border-radius: 22px;
   text-align: center;
   width: 90vw;
-  max-width: 280px; /* Smaller max-width */
-  min-width: 150px; /* Smaller min-width */
+  max-width: 280px;
+  min-width: 150px;
   aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
@@ -163,18 +154,18 @@ footer span span {
   box-shadow: 0 8px 32px #0003;
   animation: popupZoom 0.35s cubic-bezier(.4,2,.6,1);
 }
-.big-popup { max-width: 280px; min-width: 150px; } /* Updated for consistency */
+.big-popup { max-width: 280px; min-width: 150px; }
 @keyframes popupZoom {
   0% { transform: scale(0.7); opacity:0; }
   100% { transform: scale(1); opacity:1; }
 }
 .popup-content h2, .popup-content h1 {
-  font-size: 1.2rem; /* Smaller font size */
-  margin-bottom: 0.6rem; /* Smaller margin */
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
 }
 .popup-content button { margin: 0.5rem auto; }
 .result { margin-bottom: 0.6rem; }
-.result span { display: block; font-size: 1rem; margin: 0.1rem 0; } /* Smaller font size */
+.result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
 
 .game-header {
   width: 100vw;
@@ -184,7 +175,8 @@ footer span span {
   margin-top: 0.7rem;
 }
 .game-header h1 {
-  font-size: 1.7rem;
+  font-size: 2.2rem; /* Larger font size */
+  font-weight: bold; /* Bold text */
   text-align: center;
   margin-bottom: 0.2rem;
   text-shadow: 0 0 12px #fff,0 0 24px #8e2de2;
@@ -192,22 +184,36 @@ footer span span {
 .game-controls {
   display: flex;
   justify-content: center;
-  gap: 10px; /* Reduced gap */
+  gap: 15px; /* Increased gap for new structure */
   margin-bottom: 0.3rem;
   align-items: center;
 }
+/* New style for toggle groups */
+.control-item {
+    display: flex;
+    flex-direction: column; /* Stack label and text */
+    align-items: center;
+}
+.toggle-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 5px #000;
+    margin-top: 5px; /* Space between toggle and text */
+}
+
 /* Custom Toggle Switches (Sound & Vibration) */
 .switch-label {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 70px; /* Width as per image */
-    height: 40px; /* Height as per image */
-    background: #f4f4f4; /* Default background (off state) */
-    border-radius: 20px;
+    width: 55px; /* Smaller width */
+    height: 35px; /* Smaller height */
+    background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
+    border-radius: 17.5px; /* Adjusted border radius */
     position: relative;
     cursor: pointer;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Consistent shadow */
     transition: background 0.3s;
 }
 .switch-label input[type="checkbox"] {
@@ -217,47 +223,29 @@ footer span span {
     position: absolute;
     top: 4px;
     left: 4px;
-    width: 32px; /* Knob size */
-    height: 32px; /* Knob size */
+    width: 27px; /* Knob size */
+    height: 27px; /* Knob size */
     background: white;
     border-radius: 50%;
     transition: transform 0.3s, background 0.3s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .switch-label input:checked + .switch-slider {
-    transform: translateX(30px); /* Move knob to the right when checked */
+    transform: translateX(18px); /* Move knob to the right when checked */
     background: white; /* Knob color when on */
 }
-.switch-label input:checked {
-    background: linear-gradient(to right, #FF5733, #FF3366); /* Red/Pink gradient when on */
-}
-/* Text below the switches */
-.switch-texts {
-    display: flex;
-    justify-content: space-around;
-    width: 100%; /* Spanning full width to align text */
-    margin-top: 5px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 5px #000;
-}
-.switch-texts span:nth-child(1) { /* Sound text alignment */
-    margin-left: -50px; /* Adjust as needed for alignment */
-}
-.switch-texts span:nth-child(2) { /* Vibration text alignment */
-    margin-right: -50px; /* Adjust as needed for alignment */
-}
+/* Removed .switch-label input:checked background change as button is always orange gradient */
+/* Removed .switch-texts and its children rules */
 
 /* Pause Button */
 .pause-btn {
-  background: linear-gradient(to right, #FF5733, #FF3366); /* Red/Pink gradient from image */
+  background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
   border: none;
-  border-radius: 12px; /* Slightly rounded corners */
-  width: 70px; /* Same width as switches */
-  height: 40px; /* Same height as switches */
+  border-radius: 10px; /* Slightly rounded corners */
+  width: 55px; /* Same width as switches */
+  height: 35px; /* Same height as switches */
   color: white;
-  font-size: 1.5rem; /* For the pause icon */
+  font-size: 1.2rem; /* For the pause icon */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,7 +268,7 @@ footer span span {
 }
 #board {
   display: grid;
-  gap: 12px; /* Reduced gap */
+  gap: 8px; /* Reduced gap */
   justify-content: center;
   align-content: center;
   margin: 0 auto;
@@ -288,16 +276,16 @@ footer span span {
   transition: grid-template-columns 0.3s;
 }
 .card {
-  width: 80px; /* Smaller card size */
-  height: 80px; /* Smaller card size */
-  background: linear-gradient(135deg, #5D3FD3, #6A5ACD); /* Solid purple-blue back (covered) */
-  border-radius: 18px; /* Adjusted border radius */
+  width: 90px; /* Larger card size */
+  height: 90px; /* Larger card size */
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient back (covered) */
+  border-radius: 20px; /* Adjusted border radius */
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 2.3rem;
   cursor: pointer;
-  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 8px rgba(0,0,0,0.2); /* Light blue border/shadow */
+  box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 8px rgba(0,0,0,0.2);
   user-select: none;
   perspective: 600px;
   position: relative;
@@ -305,7 +293,7 @@ footer span span {
 }
 .card-inner {
   width: 100%; height: 100%;
-  border-radius: 18px; /* Adjusted border radius */
+  border-radius: 20px; /* Adjusted border radius */
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
   color: #fff;
@@ -313,22 +301,22 @@ footer span span {
   transform-style: preserve-3d;
   position: relative;
 }
-.card.cover .card-inner { background: linear-gradient(135deg, #5D3FD3, #6A5ACD);} /* Back (covered) */
+.card.cover .card-inner { background: linear-gradient(135deg, #6a11cb, #2575fc);} /* Purple gradient back (covered) */
 .card.flipped .card-inner { transform: rotateY(180deg);}
 .card .front {
-  background: #2196f3; /* Lighter blue for the front (revealed) */
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Dark blue gradient for the front (revealed) */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 18px; /* Adjusted border radius */
+  border-radius: 20px; /* Adjusted border radius */
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
 }
 .card .back {
-  background: #5D3FD3; /* Solid purple-blue for the back */
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient for the back */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 18px; /* Adjusted border radius */
+  border-radius: 20px; /* Adjusted border radius */
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
@@ -347,13 +335,13 @@ footer span span {
   transform: scale(1.05);
 }
 @media (max-width: 600px) {
-  .card { width: 52px; height: 52px; font-size: 1.3rem; border-radius: 12px;} /* Smaller cards on mobile */
-  .ctrl-btn { width: 62px; height: 62px; font-size: 1.3rem;} /* Keep control button size */
-  .splash-card { width: 60px; height: 100px; font-size: 1.1rem; border-radius: 15px;} /* Smaller splash cards on mobile */
-  .game-header h1 { font-size: 1rem;}
-  .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;} /* Smaller popup on mobile */
-  .pause-btn, .switch-label { width: 60px; height: 35px; } /* Adjust pause button size on mobile */
-  .switch-slider { top: 3px; left: 3px; width: 28px; height: 28px; }
-  .switch-label input:checked + .switch-slider { transform: translateX(25px); }
-  .switch-texts { font-size: 0.8rem; margin-top: 3px; }
+  .card { width: 60px; height: 60px; font-size: 1.6rem; border-radius: 15px;} /* Smaller cards on mobile */
+  .ctrl-btn { width: 62px; height: 62px; font-size: 1.3rem;}
+  .splash-card { width: 70px; height: 110px; border-radius: 18px;} /* Slightly larger splash cards on mobile */
+  .game-header h1 { font-size: 1.7rem;} /* Adjusted for mobile */
+  .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
+  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;} /* Adjust pause button size on mobile */
+  .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
+  .switch-label input:checked + .switch-slider { transform: translateX(15px); }
+  .toggle-text { font-size: 0.75rem; margin-top: 3px; }
 }
