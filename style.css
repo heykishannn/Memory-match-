@@ -3,6 +3,7 @@ body, html {
   padding: 0;
   height: 100%;
   font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(to bottom, #2193b0, #6dd5ed);
 }
 
 .screen {
