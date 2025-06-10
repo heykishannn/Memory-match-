@@ -81,7 +81,9 @@ let state = {
   busy: false,
   resumeData: null,
   adTimeout: null,
-  playingSound: null
+  playingSound: null,
+  isMaxCardsReached: false, // New state to track if max cards capacity is hit
+  levelCardsCapped: 0 // New state to store level when cards were first capped
 };
 
 // Splash: 3 blank gradient cards, flip animation
@@ -195,51 +197,81 @@ function showGame() {
   setupSwitches();
   startLevel(state.level);
 }
+
 function getGridSize(level) {
-  // Logic: First level has 2 cards. Each 2 levels, add 2 cards (1 pair).
-  // Level 1: 2 cards (1 pair)
-  // Level 2: 2 cards (1 pair)
-  // Level 3: 4 cards (2 pairs)
-  // Level 4: 4 cards (2 pairs)
-  // Level 5: 6 cards (3 pairs)
-  let pairs;
-  if (level === 1) {
-    pairs = 1; // Level 1 has 1 pair (2 cards)
-  } else {
-    // For levels > 1, add 1 pair every 2 levels starting from Level 3
-    pairs = 1 + Math.floor((level - 1) / 2);
-  }
+    let pairs;
+    if (level === 1) {
+        pairs = 1; // Level 1 has 1 pair (2 cards)
+    } else {
+        pairs = 1 + Math.floor((level - 1) / 2); // Add 1 pair every 2 levels from level 2 onwards
+    }
+    let totalCards = pairs * 2;
 
-  let totalCards = pairs * 2;
-  
-  // Max cards for a reasonable grid. Adjust as needed for specific screen sizes.
-  const maxPossibleCards = EMOJIS.length * 2; // Max possible pairs
-  if (totalCards > maxPossibleCards) {
-      totalCards = maxPossibleCards;
-  }
-  
-  // Calculate columns based on square-ish aspect ratio and total cards
-  let cols = Math.ceil(Math.sqrt(totalCards));
-  // Ensure we don't end up with too many columns on small screens
-  // Example: Limit columns to 6 for mobile and 8 for larger screens
-  if (window.innerWidth <= 600) { // Mobile
-      cols = Math.min(cols, 4); // Max 4 columns on small screens
-  } else if (window.innerWidth <= 900) { // Tablet
-      cols = Math.min(cols, 6); // Max 6 columns on medium screens
-  } else { // Desktop
-      cols = Math.min(cols, 8); // Max 8 columns on large screens
-  }
-  
-  let rows = Math.ceil(totalCards / cols);
+    // Estimate maximum possible columns based on screen width
+    let maxColsPossible;
+    if (window.innerWidth <= 400) { // Very small mobile
+        maxColsPossible = 3;
+    } else if (window.innerWidth <= 600) { // Standard mobile
+        maxColsPossible = 4;
+    } else if (window.innerWidth <= 900) { // Tablet
+        maxColsPossible = 6;
+    } else { // Desktop
+        maxColsPossible = 8;
+    }
 
-  // If after setting cols, rows*cols is less than totalCards, increase cols slightly
-  // This is a safety to make sure all cards fit, though it might make cols wider.
-  while (rows * cols < totalCards && cols < 10) { // Prevent infinite loop, limit max cols
-      cols++;
-      rows = Math.ceil(totalCards / cols);
-  }
+    // Estimate maximum possible rows based on available height for the board
+    // Roughly calculate available height by subtracting header, stats, and footer heights
+    const headerHeight = document.querySelector('.game-header').offsetHeight;
+    const statsHeight = document.querySelector('.stats').offsetHeight;
+    const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
+    const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
 
-  return {rows, cols, totalCards};
+    // Assuming average card size of 80px (for responsive CSS) + 12px row-gap
+    const estimatedCardHeightWithGap = 80 + 12;
+    let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
+    if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
+
+    const maxCardsCanFit = maxColsPossible * maxRowsPossible;
+
+    // Check if card count should be capped
+    let currentTotalCards = totalCards;
+    let cardCountWasCapped = false;
+
+    if (totalCards > maxCardsCanFit) {
+        currentTotalCards = maxCardsCanFit;
+        cardCountWasCapped = true;
+        // If it's the first time cards are capped, record the level
+        if (!state.isMaxCardsReached) {
+            state.levelCardsCapped = level;
+        }
+        state.isMaxCardsReached = true;
+    } else {
+        // If current totalCards is less than maxCardsCanFit, it means we are not capped yet
+        // or we are on a level below where it was capped previously.
+        state.isMaxCardsReached = false; // Reset if we drop below capacity (e.g. restart from level 1)
+        state.levelCardsCapped = 0;
+    }
+
+    // Now, calculate the actual grid dimensions for the `totalCards` we will display
+    let cols = Math.ceil(Math.sqrt(currentTotalCards));
+    // Ensure cols don't exceed maxColsPossible
+    if (cols > maxColsPossible) {
+        cols = maxColsPossible;
+    }
+    let rows = Math.ceil(currentTotalCards / cols);
+
+    // If totalCards is 0 (shouldn't happen with min 1 pair), default to 2x1 for sizing.
+    if (currentTotalCards === 0) {
+        cols = 2;
+        rows = 1;
+    }
+    
+    return {
+        rows: rows,
+        cols: cols,
+        totalCards: currentTotalCards,
+        isMaxCardsReached: state.isMaxCardsReached // Return the updated state
+    };
 }
 
 
@@ -251,7 +283,7 @@ function startLevel(level) {
   state.matchedCount = 0;
   state.busy = false;
 
-  const {rows,cols,totalCards} = getGridSize(level);
+  const {rows,cols,totalCards, isMaxCardsReached} = getGridSize(level);
   
   // Set CSS variable for grid columns to make it responsive
   board.style.setProperty('--cols', cols);
@@ -273,20 +305,16 @@ function startLevel(level) {
     emoji, flipped:false, matched:false, idx
   }));
   
-  // The grid-template-columns is now set via CSS variable, but update the style attribute as well for older browsers or direct visibility
-  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   board.innerHTML = '';
   state.cards.forEach((card,i)=>{
     const cardEl = document.createElement('div');
-    cardEl.className = 'card cover';
+    cardEl.className = 'card'; // Removed 'cover' class
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
-    // The `card-inner` is the element that flips
+    // Direct front/back children for full card flip
     cardEl.innerHTML = `
-      <div class="card-inner">
-        <div class="front">${card.emoji}</div>
-        <div class="back"></div>
-      </div>
+      <div class="front">${card.emoji}</div>
+      <div class="back"></div>
     `;
     cardEl.addEventListener('click',()=>onCardClick(i));
     cardEl.addEventListener('keydown',e=>{
@@ -295,8 +323,18 @@ function startLevel(level) {
     board.appendChild(cardEl);
   });
   
-  // Timer: 2.5 seconds per card (5 seconds per pair) as requested
-  state.timeLeft = Math.max(10, totalCards * 2.5); // At least 10 seconds, then 2.5s per card
+  // Timer calculation
+  let baseTime = totalCards * 2.5; // Base: 2.5 seconds per card
+  
+  // If max cards are reached and level is higher than where it was capped, reduce time
+  if (isMaxCardsReached && state.levelCardsCapped > 0 && level > state.levelCardsCapped) {
+      const levelsPastCap = level - state.levelCardsCapped;
+      const timeReductionPerLevel = 1; // Decrease by 1 second per level after cap
+      baseTime -= (levelsPastCap * timeReductionPerLevel);
+      baseTime = Math.max(10, baseTime); // Ensure time doesn't go below 10 seconds
+  }
+  
+  state.timeLeft = baseTime;
   updateHUD();
   startTimer();
 }
@@ -316,15 +354,13 @@ function flipCard(index) {
   const card = state.cards[index];
   card.flipped = true;
   const cardEl = board.children[index];
-  cardEl.classList.remove('cover'); // Remove cover to allow flip
-  cardEl.classList.add('flipped');
+  cardEl.classList.add('flipped'); // Add flipped class directly to the card
 }
 function unflipCard(index) {
   const card = state.cards[index];
   card.flipped = false;
   const cardEl = board.children[index];
-  cardEl.classList.remove('flipped');
-  cardEl.classList.add('cover'); // Add cover back to flip to back side
+  cardEl.classList.remove('flipped'); // Remove flipped class directly from the card
 }
 function checkMatch() {
   const [i1,i2] = state.flippedIndices;
@@ -366,7 +402,7 @@ nextLevelBtn.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
   if(state.level<MAX_LEVEL) state.level++;
-  else { state.level=1; state.score=0; }
+  else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
   saveProgress();
   startLevel(state.level);
 };
