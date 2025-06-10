@@ -29,7 +29,7 @@
     </div>
   </div>
   <!-- Auth -->
-  <div id="auth" class="hidden"> <!-- Removed 'popup' class here -->
+  <div id="auth" class="hidden">
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
     <button class="btn" id="loginBtn">Login</button>
@@ -40,23 +40,26 @@
     <div class="game-header">
       <h1>Memory Match</h1>
       <div class="game-controls">
-        <!-- Sound Toggle -->
-        <label for="soundToggle" class="switch-label">
-            <input type="checkbox" id="soundToggle">
-            <span class="switch-slider"></span>
-        </label>
+        <!-- Sound Toggle with text -->
+        <div class="control-item">
+            <label for="soundToggle" class="switch-label">
+                <input type="checkbox" id="soundToggle">
+                <span class="switch-slider"></span>
+            </label>
+            <span class="toggle-text">Sound</span>
+        </div>
         <!-- Pause Button -->
         <button class="pause-btn" id="pauseBtn">||</button>
-        <!-- Vibration Toggle -->
-        <label for="vibrationToggle" class="switch-label">
-            <input type="checkbox" id="vibrationToggle">
-            <span class="switch-slider"></span>
-        </label>
+        <!-- Vibration Toggle with text -->
+        <div class="control-item">
+            <label for="vibrationToggle" class="switch-label">
+                <input type="checkbox" id="vibrationToggle">
+                <span class="switch-slider"></span>
+            </label>
+            <span class="toggle-text">Vibration</span>
+        </div>
       </div>
-      <div class="switch-texts"> <!-- Text for Sound/Vibration toggles -->
-        <span>Sound</span>
-        <span>Vibration</span>
-      </div>
+      <!-- Removed .switch-texts div as text is now with toggles -->
     </div>
     <div class="stats">
       <span id="levelDisplay">Level: 1</span>
@@ -110,4 +113,4 @@
   </footer>
   <script src="script.js"></script>
 </body>
-</html>
+    </html>
