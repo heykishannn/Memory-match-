@@ -20,13 +20,12 @@ footer {
   color: #fff;
   font-weight: bold;
 }
-/* Removed Neon effect for "Powered by" and smaller size */
+/* Removed Neon effect and made font smaller for "Powered by NAS" */
 footer .powered {
   color: #fff;
   font-size: 0.8rem; /* Smaller font size */
   text-shadow: none; /* Removed glow effect */
 }
-/* Removed Neon effect for "NAS" and smaller size */
 footer span span {
   color: #fff;
   font-weight: bold;
@@ -167,6 +166,14 @@ footer span span {
 .result { margin-bottom: 0.6rem; }
 .result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
 
+#game { /* Centering game content vertically */
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
+}
+
 .game-header {
   width: 100vw;
   display: flex;
@@ -185,8 +192,8 @@ footer span span {
   display: flex;
   justify-content: space-between; /* Pushes items to right/left */
   align-items: center;
-  width: 100%;
-  max-width: 400px; /* Control the overall width */
+  width: 90%; /* Max width for controls */
+  max-width: 450px; /* Adjust based on desired spread */
   margin: 0 auto; /* Center the control block */
   padding: 0 10px; /* Add slight padding from screen edges */
   margin-bottom: 0.3rem;
@@ -271,11 +278,13 @@ footer span span {
 }
 #board {
   display: grid;
-  gap: 5px; /* Reduced gap for cards to be pass-pass */
+  /* Adjusting gaps */
+  row-gap: 12px; /* Normal vertical distance */
+  column-gap: 5px; /* Closer horizontal distance */
   justify-content: center;
   align-content: center;
-  margin: 0 auto;
-  margin-top: 24px;
+  margin: auto; /* Vertically center the board in remaining space */
+  /* margin-top: 24px; REMOVED */
   transition: grid-template-columns 0.3s;
 }
 .card {
@@ -307,7 +316,7 @@ footer span span {
 .card.cover .card-inner { background: linear-gradient(135deg, #6a11cb, #2575fc);} /* Purple gradient back (covered) */
 .card.flipped .card-inner { transform: rotateY(180deg);}
 .card .front {
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Dark blue gradient for the front (revealed) */
+  background: linear-gradient(135deg, #6a11cb, #2575fc); /* Changed to Purple gradient for the front (emoji side) */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
   border-radius: 20px;
@@ -325,21 +334,19 @@ footer span span {
   font-size: 2.3rem;
   transform: rotateY(180deg);
 }
+/* Removed glow animation on matched cards */
 .card.matched .card-inner {
-  box-shadow: 0 0 18px 5px #fa71cd;
-  animation: matchedGlow 0.7s;
+  box-shadow: none; /* Removed glow effect */
+  animation: none; /* Removed glow animation */
 }
-@keyframes matchedGlow {
-  0% { box-shadow: 0 0 0 0 #fa71cd;}
-  100% { box-shadow: 0 0 18px 5px #fa71cd;}
-}
+/* Kept the active state for visual feedback on tap */
 .card:active:not(.matched):not(.flipped) .card-inner {
-  box-shadow: 0 0 20px 8px #fa71cd;
+  box-shadow: 0 0 20px 8px #fa71cd; /* Retained this box shadow for tap feedback */
   transform: scale(1.05);
 }
 @media (max-width: 600px) {
   .card { width: 70px; height: 70px; font-size: 1.8rem; border-radius: 18px;} /* Larger cards on mobile */
-  #board { gap: 3px; } /* Even smaller gap on mobile */
+  #board { row-gap: 8px; column-gap: 3px; } /* Adjusted gaps on mobile */
   .ctrl-btn { width: 62px; height: 62px; font-size: 1.3rem;}
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
