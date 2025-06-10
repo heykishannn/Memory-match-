@@ -9,31 +9,29 @@
 <body>
   <!-- Splash -->
   <div id="splash">
-    <h1>Memory Match</h1>
+    <h1>MEMORY MATCH</h1>
     <div class="splash-cards"></div>
   </div>
-  <!-- Login/Signup -->
-  <div id="auth">
+  <!-- Login/Signup (screen, not popup) -->
+  <div id="auth" class="hidden">
     <div class="auth-content">
       <h2>Login / Signup</h2>
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
-      <div class="auth-btns">
-        <button class="btn" id="loginBtn">Login</button>
-        <button class="btn" id="signupBtn">Sign Up</button>
-      </div>
+      <button class="auth-btn" id="loginBtn">Login</button>
+      <button class="auth-btn" id="signupBtn">Sign Up</button>
     </div>
   </div>
   <!-- Home -->
-  <div id="home">
+  <div id="home" class="hidden">
     <div class="home-content">
-      <h1>Memory Match</h1>
+      <h1>MEMORY MATCH</h1>
       <button class="btn" id="startBtn">Start</button>
     </div>
   </div>
   <!-- Resume Popup -->
   <div id="resumePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom big-popup">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>Continue?</h2>
       <button class="btn" id="resumeHomeBtn">Home</button>
       <button class="btn" id="watchAdResumeBtn">Watch Ad (5s) to Continue</button>
@@ -43,29 +41,35 @@
   <!-- Game -->
   <div id="game" class="hidden">
     <div class="game-header">
-      <h1>Memory Match</h1>
+      <h1>MEMORY MATCH</h1>
       <div class="game-controls">
-        <label class="switch-label">Sound
-          <input type="checkbox" id="soundSwitch" checked>
-          <span class="switch-slider"></span>
-        </label>
-        <label class="switch-label">Vibration
-          <input type="checkbox" id="vibrationSwitch" checked>
-          <span class="switch-slider"></span>
-        </label>
-        <button class="ctrl-btn" id="pauseBtn">Pause</button>
+        <div class="switch-col">
+          <label class="switch">
+            <input type="checkbox" id="soundSwitch" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="switch-label">Sound</span>
+        </div>
+        <button class="pause-btn" id="pauseBtn"></button>
+        <div class="switch-col">
+          <label class="switch">
+            <input type="checkbox" id="vibrationSwitch" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="switch-label">Vibration</span>
+        </div>
       </div>
     </div>
     <div class="stats">
-      <span id="levelDisplay">Level: 1</span>
-      <span id="scoreDisplay">Score: 0</span>
-      <span id="timerDisplay">Time: 00</span>
+      <span id="levelDisplay" class="stat-level">Level: 1</span>
+      <span id="scoreDisplay" class="stat-score">Score: 0</span>
+      <span id="timerDisplay" class="stat-time">Time: 00</span>
     </div>
     <div id="board"></div>
   </div>
   <!-- Win Popup -->
   <div id="winPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom big-popup">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>You Win!</h2>
       <div class="result">
         <span id="resultLevel"></span>
@@ -78,7 +82,7 @@
   </div>
   <!-- Lose Popup -->
   <div id="losePopup" class="popup hidden">
-    <div class="popup-content square popup-zoom big-popup">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>You Lost!</h2>
       <div class="result">
         <span id="resultLevelL"></span>
@@ -92,7 +96,7 @@
   </div>
   <!-- Ad Popup -->
   <div id="adPopup" class="popup hidden">
-    <div class="popup-content square popup-zoom big-popup">
+    <div class="popup-content square popup-zoom small-popup">
       <h2>Ad</h2>
       <p>Watching ad... Please wait <span id="adTimer">5</span>s</p>
     </div>
