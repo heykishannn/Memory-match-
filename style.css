@@ -20,20 +20,20 @@ footer {
   color: #fff;
   font-weight: bold;
 }
-/* Removed Neon effect for "Powered by" */
+/* Removed Neon effect for "Powered by" and smaller size */
 footer .powered {
   color: #fff;
-  font-size: 0.9rem; /* Smaller font size */
+  font-size: 0.8rem; /* Smaller font size */
   text-shadow: none; /* Removed glow effect */
 }
-/* Removed Neon effect for "NAS" */
+/* Removed Neon effect for "NAS" and smaller size */
 footer span span {
-  color: #fff; /* Keep white for main text */
+  color: #fff;
   font-weight: bold;
   font-family: 'Arial', sans-serif;
-  letter-spacing: 2px; /* Slightly wider spacing for effect */
-  font-size: 0.9em; /* Smaller font size */
-  text-shadow: none; /* Removed glow effect */
+  letter-spacing: 2px;
+  font-size: 0.8em; /* Smaller font size */
+  text-shadow: none;
   filter: none;
 }
 
@@ -183,16 +183,21 @@ footer span span {
 }
 .game-controls {
   display: flex;
-  justify-content: center;
-  gap: 15px; /* Increased gap for new structure */
-  margin-bottom: 0.3rem;
+  justify-content: space-between; /* Pushes items to right/left */
   align-items: center;
+  width: 100%;
+  max-width: 400px; /* Control the overall width */
+  margin: 0 auto; /* Center the control block */
+  padding: 0 10px; /* Add slight padding from screen edges */
+  margin-bottom: 0.3rem;
 }
 /* New style for toggle groups */
 .control-item {
     display: flex;
     flex-direction: column; /* Stack label and text */
     align-items: center;
+    width: 60px; /* Fixed width to ensure consistent spacing */
+    flex-shrink: 0;
 }
 .toggle-text {
     font-size: 0.9rem;
@@ -207,13 +212,13 @@ footer span span {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 55px; /* Smaller width */
-    height: 35px; /* Smaller height */
+    width: 55px; /* Consistent width */
+    height: 35px; /* Consistent height */
     background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
-    border-radius: 17.5px; /* Adjusted border radius */
+    border-radius: 17.5px;
     position: relative;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Consistent shadow */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: background 0.3s;
 }
 .switch-label input[type="checkbox"] {
@@ -232,20 +237,18 @@ footer span span {
 }
 .switch-label input:checked + .switch-slider {
     transform: translateX(18px); /* Move knob to the right when checked */
-    background: white; /* Knob color when on */
+    background: white;
 }
-/* Removed .switch-label input:checked background change as button is always orange gradient */
-/* Removed .switch-texts and its children rules */
 
 /* Pause Button */
 .pause-btn {
   background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
   border: none;
-  border-radius: 10px; /* Slightly rounded corners */
-  width: 55px; /* Same width as switches */
-  height: 35px; /* Same height as switches */
+  border-radius: 10px;
+  width: 55px; /* Consistent width */
+  height: 35px; /* Consistent height */
   color: white;
-  font-size: 1.2rem; /* For the pause icon */
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,7 +271,7 @@ footer span span {
 }
 #board {
   display: grid;
-  gap: 8px; /* Reduced gap */
+  gap: 5px; /* Reduced gap for cards to be pass-pass */
   justify-content: center;
   align-content: center;
   margin: 0 auto;
@@ -276,10 +279,10 @@ footer span span {
   transition: grid-template-columns 0.3s;
 }
 .card {
-  width: 90px; /* Larger card size */
-  height: 90px; /* Larger card size */
+  width: 100px; /* Larger card size */
+  height: 100px; /* Larger card size */
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient back (covered) */
-  border-radius: 20px; /* Adjusted border radius */
+  border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,11 +296,11 @@ footer span span {
 }
 .card-inner {
   width: 100%; height: 100%;
-  border-radius: 20px; /* Adjusted border radius */
+  border-radius: 20px;
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
   color: #fff;
-  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1); /* Smooth flip animation */
   transform-style: preserve-3d;
   position: relative;
 }
@@ -307,7 +310,7 @@ footer span span {
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Dark blue gradient for the front (revealed) */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 20px; /* Adjusted border radius */
+  border-radius: 20px;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
@@ -316,7 +319,7 @@ footer span span {
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient for the back */
   color: #fff;
   position: absolute; width: 100%; height: 100%;
-  border-radius: 20px; /* Adjusted border radius */
+  border-radius: 20px;
   backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
   font-size: 2.3rem;
@@ -335,13 +338,15 @@ footer span span {
   transform: scale(1.05);
 }
 @media (max-width: 600px) {
-  .card { width: 60px; height: 60px; font-size: 1.6rem; border-radius: 15px;} /* Smaller cards on mobile */
+  .card { width: 70px; height: 70px; font-size: 1.8rem; border-radius: 18px;} /* Larger cards on mobile */
+  #board { gap: 3px; } /* Even smaller gap on mobile */
   .ctrl-btn { width: 62px; height: 62px; font-size: 1.3rem;}
-  .splash-card { width: 70px; height: 110px; border-radius: 18px;} /* Slightly larger splash cards on mobile */
-  .game-header h1 { font-size: 1.7rem;} /* Adjusted for mobile */
+  .splash-card { width: 70px; height: 110px; border-radius: 18px;}
+  .game-header h1 { font-size: 1.7rem;}
   .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
-  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;} /* Adjust pause button size on mobile */
+  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;}
   .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
   .switch-label input:checked + .switch-slider { transform: translateX(15px); }
   .toggle-text { font-size: 0.75rem; margin-top: 3px; }
+  .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
 }
