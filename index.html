@@ -25,7 +25,7 @@
     <div class="popup-content square popup-zoom">
       <h2>Continue?</h2>
       <button class="btn" id="resumeHomeBtn">Home</button>
-      <button class="btn" onclick="window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank')">Watch Ad (5s) to Continue</button>
+      <button class="btn" id="watchAdResumeBtn">Watch Ad (5s) to Continue</button>
       <button class="btn" id="restartFrom1Btn">Restart from Level 1</button>
     </div>
   </div>
@@ -92,7 +92,7 @@
       </div>
       <button class="btn" id="playAgainBtn">Play Again</button>
       <button class="btn" id="loseHomeBtn">Home</button>
-      <button class="btn" onclick="window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank')">Watch Ad (5s) to Continue</button>
+      <button class="btn" id="watchAdBtn">Watch Ad (5s) to Continue</button>
     </div>
   </div>
   <!-- Ad Popup -->
@@ -119,16 +119,18 @@
   <!-- New sound for Continue window -->
   <audio id="audio-koni" src="koni.mp3"></audio>
 
-  <script type="text/javascript">
-    atOptions = {
-      'key' : '8a596a14d2ea184cd9b6372e267b931c',
-      'format' : 'iframe',
-      'height' : 50,
-      'width' : 320,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/8a596a14d2ea184cd9b6372e267b931c/invoke.js"></script>
+  <div id="bannerAdContainer" style="text-align: center; margin-bottom: 10px; margin-top: 10px; position: relative; z-index: 201;">
+    <script type="text/javascript">
+      atOptions = {
+        'key' : '8a596a14d2ea184cd9b6372e267b931c',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/8a596a14d2ea184cd9b6372e267b931c/invoke.js"></script>
+  </div>
   <footer>
     <span class="powered">Powered by <span>NAS</span></span>
   </footer>
