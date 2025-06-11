@@ -19,6 +19,7 @@ const game = document.getElementById('game');
 const board = document.getElementById('board');
 const winPopup = document.getElementById('winPopup');
 const losePopup = document.getElementById('losePopup');
+const continuePopup = document.getElementById('continuePopup'); // Added
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -29,8 +30,18 @@ const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
 const playAgainBtn = document.getElementById('playAgainBtn');
-const loseHomeBtn = document.getElementById('loseHomeBtn');
-const watchAdBtn = document.getElementById('watchAdBtn');
+// const loseHomeBtn = document.getElementById('loseHomeBtn'); // Removed by new buttons
+// const watchAdBtn = document.getElementById('watchAdBtn'); // Removed by new buttons
+
+// Buttons for Continue Popup
+const watchAdContinueBtn = document.getElementById('watchAdContinueBtn');
+const continueHomeBtn = document.getElementById('continueHomeBtn');
+const startFromLevel1Btn = document.getElementById('startFromLevel1Btn');
+
+// Buttons for Lose Popup (new ones)
+const loseWatchAdBtn = document.getElementById('loseWatchAdBtn');
+const loseRestartHomeBtn = document.getElementById('loseRestartHomeBtn');
+const loseStartFromLevel1Btn = document.getElementById('loseStartFromLevel1Btn');
 
 // Changed IDs for input elements for toggle switches
 const soundToggle = document.getElementById('soundToggle');
@@ -82,7 +93,7 @@ let state = {
   // isMaxCardsReached: false, // No longer needed with fixed card/container size
   // levelCardsCapped: 0, // No longer needed
   isGameActive: true, // Added for visibility change sound control
-  awaitingFirstTapAfterAd: false, // Added for new rewarded ad logic
+  awaitingTapForBonusTime: false, // Renamed
   postAdCallback: null, // Added for new rewarded ad logic
   customSoundPlayedForWin: false,
   pausedByVisibility: false
@@ -95,6 +106,23 @@ function showOverlay() {
 
 function hideOverlay() {
   if (pageOverlay) pageOverlay.classList.add('hidden');
+}
+
+// Continue Popup functions
+function showContinuePopup() {
+  if (continuePopup) continuePopup.classList.remove('hidden');
+  showOverlay();
+}
+
+function hideContinuePopup() {
+  if (continuePopup) continuePopup.classList.add('hidden');
+  hideOverlay();
+}
+
+// Lose Popup function
+function hideLosePopup() {
+  if (losePopup) losePopup.classList.add('hidden');
+  hideOverlay();
 }
 
 // Splash: 3 blank gradient cards, flip animation
@@ -178,6 +206,9 @@ function showHome() {
   auth.classList.add('hidden');
   home.classList.remove('hidden');
   game.classList.add('hidden');
+  if (continuePopup) continuePopup.classList.add('hidden'); // Ensure continue popup is hidden
+  if (winPopup) winPopup.classList.add('hidden');
+  if (losePopup) losePopup.classList.add('hidden');
 }
 
 startBtn.onclick = () => {
@@ -190,7 +221,8 @@ startBtn.onclick = () => {
   if (hasResumableStateFlag && state.cards && state.cards.length > 0) {
     // An old user with a resumable game state.
     // The 'state' object should be ready with loaded data.
-    showGame(true); // Directly show the game, resuming from the loaded state.
+    // Instead of directly showing the game, show the continue popup.
+    showContinuePopup();
   } else {
     // New user, no resumable state, or loadFullGameState was technically successful
     // but didn't result in a playable cards array (e.g. corrupted data).
@@ -206,7 +238,7 @@ startBtn.onclick = () => {
     state.matchedCount = 0;
     state.busy = false;
     state.paused = false;
-    state.awaitingFirstTapAfterAd = false;
+    state.awaitingTapForBonusTime = false; // Renamed
     state.postAdCallback = null;
     // Sound and vibration settings (state.soundOn, state.vibrationOn) can retain user preference.
 
@@ -249,6 +281,7 @@ function showGame(resumingSavedGame = false) { // Added resumingSavedGame parame
   game.classList.remove('hidden');
   winPopup.classList.add('hidden');
   losePopup.classList.add('hidden');
+  if (continuePopup) continuePopup.classList.add('hidden'); // Ensure continue popup is hidden
 
   if (resumingSavedGame) {
     // Ensure overlay is hidden if resuming directly to game
@@ -259,18 +292,22 @@ function showGame(resumingSavedGame = false) { // Added resumingSavedGame parame
     setupSwitches(); // Apply loaded sound/vibration settings
 
     // loadFullGameState currently sets state.paused to false.
-    // If we want to preserve a paused state from save, loadFullGameState should also load/set it.
-    // For now, assume we unpause on resume, unless awaitingFirstTapAfterAd is true (handled in onCardClick).
-    if (!state.awaitingFirstTapAfterAd) {
-        state.paused = false;
+    // Correctly set paused state based on awaitingTapForBonusTime and loaded state
+    if (state.awaitingTapForBonusTime) {
+      state.paused = true; // If awaiting tap, game must be paused
+    } else {
+      // If not awaiting tap, honor the loaded 'paused' state from saveGameState,
+      // otherwise default to false (unpaused). loadFullGameState already loads state.paused.
+      // So, state.paused should be correct here if not awaiting tap.
+      // If it's a fresh start (not resumingSavedGame), startLevel will set paused to false.
     }
-    // Ensure pause button text reflects the loaded/actual pause state
-    pauseBtn.textContent = state.paused ? "▶" : "||";
+    if(pauseBtn) pauseBtn.textContent = state.paused ? "▶" : "||";
 
-    if (state.timeLeft > 0 && !state.paused) { // Only start timer if time is left and not paused
+    // Only start timer if time is left, not paused, and not waiting for the first tap for bonus time.
+    if (state.timeLeft > 0 && !state.paused && !state.awaitingTapForBonusTime) {
         startTimer();
     } else {
-        updateHUD(); // Ensure timer display is correct even if not starting (e.g. 0 time left or paused)
+        updateHUD(); // Ensure timer display is correct (e.g., shows bonus time even if timer not started)
     }
 
   } else {
@@ -303,7 +340,8 @@ function getGridSize(level) {
 function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
-  pauseBtn.textContent = "||"; // Set to pause symbol
+  state.awaitingTapForBonusTime = false; // Reset flag
+  if(pauseBtn) pauseBtn.textContent = "||"; // Set to pause symbol
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -365,7 +403,18 @@ function startLevel(level) {
   startTimer();
 }
 function onCardClick(index) {
-  if(state.busy||state.paused) return;
+  if (state.busy) return; // Check busy first
+
+  if (state.awaitingTapForBonusTime) {
+    state.awaitingTapForBonusTime = false;
+    state.paused = false;
+    if (pauseBtn) pauseBtn.textContent = "||";
+    startTimer();
+    // Click proceeds to flip card logic below
+  } else if (state.paused) {
+    return; // If generally paused (and not for bonus tap initiated pause), ignore click
+  }
+
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
   playSound('tap');
@@ -445,8 +494,8 @@ homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
-  // Data should not reset when clicking home button
-  clearFullGameState(); // Added
+  state.awaitingTapForBonusTime = false; // Reset flag
+  clearFullGameState();
   saveGameState();
   showHome();
 };
@@ -463,40 +512,16 @@ playAgainBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
-  state.awaitingFirstTapAfterAd = false;
+  state.awaitingTapForBonusTime = false; // Renamed and reset
   state.postAdCallback = null;
   clearTimeout(state.adTimeout);
   state.paused = false;
   if(pauseBtn) pauseBtn.textContent = "||";
-  clearFullGameState(); // Added
+  clearFullGameState();
   startLevel(state.level);
 };
-loseHomeBtn.onclick = () => {
-  stopAllSounds();
-  losePopup.classList.add('hidden');
-  hideOverlay(); // Hide overlay
-  state.awaitingFirstTapAfterAd = false;
-  state.postAdCallback = null;
-  clearTimeout(state.adTimeout);
-  state.paused = false;
-  if(pauseBtn) pauseBtn.textContent = "||";
-  // Data should not reset when clicking home button
-  clearFullGameState(); // Added
-  saveGameState();
-  showHome();
-};
-watchAdBtn.onclick = () => {
-  saveGameState(); // Added before window.open
-  window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-  losePopup.classList.add('hidden');
-  // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
-  // No need to call hideOverlay() here directly.
-  startInGameAdTimer(() => { // Define original callback for continuing after loss
-    // Assuming loadFullGameState has populated the state.
-    // This will rebuild board, update HUD, and start timer based on loaded state.
-    showGame(true); // Pass true to resume from loaded state
-  });
-};
+// loseHomeBtn.onclick and watchAdBtn.onclick are removed as the buttons themselves are removed/replaced.
+
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
   // Ensure time is formatted with leading zero if less than 10
@@ -598,7 +623,7 @@ function saveGameState() { // Renamed saveProgress to saveGameState
     matchedCount: state.matchedCount,
     soundOn: state.soundOn,
     vibrationOn: state.vibrationOn,
-    awaitingFirstTapAfterAd: state.awaitingFirstTapAfterAd,
+    awaitingTapForBonusTime: state.awaitingTapForBonusTime, // Renamed
     paused: state.paused
   };
   localStorage.setItem('memorymatch_full_state', JSON.stringify(fullState));
@@ -626,8 +651,11 @@ function loadFullGameState() {
         state.matchedCount = loadedState.matchedCount;
         state.soundOn = loadedState.soundOn;
         state.vibrationOn = loadedState.vibrationOn;
+        state.awaitingTapForBonusTime = loadedState.awaitingTapForBonusTime || false; // Load the flag
 
-        state.paused = loadedState.paused || false;
+        // If awaitingTapForBonusTime is true, ensure game is considered paused.
+        // Otherwise, use the loaded paused state.
+        state.paused = state.awaitingTapForBonusTime || (loadedState.paused || false);
 
         // Potentially reset other state properties not in fullState
         // For example, timerId should be cleared and recreated by game logic if resuming.
@@ -713,6 +741,113 @@ function initializeGame() {
   showSplash();        // Always proceed to splash.
 }
 
+// --- Start of Continue Popup Button Event Listeners ---
+if (watchAdContinueBtn) {
+  watchAdContinueBtn.onclick = () => {
+    hideContinuePopup();
+    // In-page 5-second timer
+    let adSeconds = 5;
+    timerDisplay.textContent = `Ad: ${adSeconds}s`;
+
+    const adTimerInterval = setInterval(() => {
+      adSeconds--;
+      timerDisplay.textContent = `Ad: ${adSeconds}s`;
+      if (adSeconds <= 0) {
+        clearInterval(adTimerInterval);
+        // Timer display will be updated by showGame -> updateHUD
+
+        loadFullGameState();
+        state.timeLeft += 10;
+        state.awaitingTapForBonusTime = true;
+        state.paused = true; // Pause the game, waiting for tap
+        if(pauseBtn) pauseBtn.textContent = "▶";
+        saveGameState();
+        showGame(true);
+      }
+    }, 1000);
+  };
+}
+
+if (continueHomeBtn) {
+  continueHomeBtn.onclick = () => {
+    hideContinuePopup();
+    state.awaitingTapForBonusTime = false; // Reset flag
+    clearFullGameState();
+    showHome();
+  };
+}
+
+if (startFromLevel1Btn) {
+  startFromLevel1Btn.onclick = () => {
+    hideContinuePopup();
+    state.level = 1;
+    state.score = 0;
+    state.timeLeft = 0;
+    state.cards = [];
+    state.flippedIndices = [];
+    state.matchedCount = 0;
+    state.busy = false;
+    state.paused = false;
+    state.awaitingTapForBonusTime = false; // Renamed and reset
+    state.postAdCallback = null;
+    clearFullGameState();
+    saveGameState();
+    showGame();
+  };
+}
+// --- End of Continue Popup Button Event Listeners ---
+
+// --- Start of Lose Popup Button Event Listeners (New) ---
+if (loseWatchAdBtn) {
+  loseWatchAdBtn.onclick = () => {
+    hideLosePopup();
+    let adSeconds = 5;
+    timerDisplay.textContent = `Ad: ${adSeconds}s`;
+    const adTimerInterval = setInterval(() => {
+      adSeconds--;
+      timerDisplay.textContent = `Ad: ${adSeconds}s`;
+      if (adSeconds <= 0) {
+        clearInterval(adTimerInterval);
+        state.timeLeft += 10;
+        state.awaitingTapForBonusTime = true;
+        state.paused = true; // Pause the game, waiting for tap
+        if(pauseBtn) pauseBtn.textContent = "▶";
+        saveGameState();
+        showGame(true);
+      }
+    }, 1000);
+  };
+}
+
+if (loseRestartHomeBtn) {
+  loseRestartHomeBtn.onclick = () => {
+    hideLosePopup();
+    state.awaitingTapForBonusTime = false; // Reset flag
+    clearFullGameState();
+    showHome();
+  };
+}
+
+if (loseStartFromLevel1Btn) {
+  loseStartFromLevel1Btn.onclick = () => {
+    hideLosePopup();
+    state.level = 1;
+    state.score = 0;
+    state.timeLeft = 0;
+    state.cards = [];
+    state.flippedIndices = [];
+    state.matchedCount = 0;
+    state.busy = false;
+    state.paused = false;
+    state.awaitingTapForBonusTime = false; // Renamed and reset
+    state.postAdCallback = null;
+    clearFullGameState();
+    saveGameState();
+    showGame();
+  };
+}
+// --- End of Lose Popup Button Event Listeners ---
+
 initializeGame(); // Call the new initialization function
 
 // Event listener for page visibility
@@ -742,6 +877,6 @@ document.addEventListener('visibilitychange', () => {
     }
     // If the game is showing and was paused for other reasons (e.g. ad popup),
     // it should remain paused until user interaction or ad completion.
-    // The existing logic for state.awaitingFirstTapAfterAd should handle ad resumes.
+    // The existing logic for state.awaitingTapForBonusTime should handle ad resumes.
   }
 });
