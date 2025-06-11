@@ -8,22 +8,46 @@ body {
 }
 .hidden { display: none !important; }
 
-footer {
+#pageOverlay {
   position: fixed;
-  bottom: 10px;
+  top: 0;
+  left: 0;
   width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent black */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px); /* For Safari */
+  z-index: 90; /* Below popups, above other content */
+}
+
+#bannerAdContainer {
+  text-align: center; /* Centers the ad if its width is less than container */
+  margin-top: 10px; /* Space from content above */
+  margin-bottom: 10px; /* Space from footer below */
+  position: relative; /* For z-index stacking context if needed */
+  z-index: 50; /* Ensure it's above general content, below popups/overlay */
+}
+
+footer {
+  /* position: fixed; */ /* Changed from fixed to relative */
+  /* bottom: 10px; */
+  width: 100%; /* Fill parent container */
   text-align: center;
-  z-index: 200;
+  position: relative; /* For z-index context */
+  z-index: 50; /* Consistent with ad container, below popups */
+  padding: 5px 0; /* Small padding */
   font-family: 'Arial', sans-serif;
   letter-spacing: 1.5px;
-  color: #fff;
+  /* color: #fff; */ /* Will be overridden by .powered */
   font-weight: bold;
 }
-/* Removed Neon effect and made font smaller for "Powered by NAS" */
+
 footer .powered {
-  color: #fff;
-  font-size: 0.8rem; /* Smaller font size */
-  text-shadow: none; /* Removed glow effect */
+  /* color: #fff; */
+  color: #cccccc; /* Soft grey color */
+  /* font-size: 0.8rem; */
+  font-size: clamp(0.7rem, 2.5vw, 0.9rem); /* Small responsive font */
+  text-shadow: none; /* Ensure no conflicting text-shadows */
 }
 footer span span {
   color: #fff;
@@ -111,7 +135,7 @@ footer span span {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 20;
+  z-index: 100; /* Ensure auth screen is above overlay */
   padding: 20px;
 }
 #auth input {
