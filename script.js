@@ -88,7 +88,9 @@ let state = {
   // levelCardsCapped: 0, // No longer needed
   isGameActive: true, // Added for visibility change sound control
   awaitingFirstTapAfterAd: false, // Added for new rewarded ad logic
-  postAdCallback: null // Added for new rewarded ad logic
+  postAdCallback: null, // Added for new rewarded ad logic
+  customSoundPlayedForWin: false,
+  pausedByVisibility: false
 };
 
 // Overlay helper functions
@@ -386,7 +388,12 @@ function checkMatch() {
 }
 function winLevel() {
   clearInterval(state.timerId);
-  popupSound('win');
+  if (!state.customSoundPlayedForWin) {
+    popupSound('win');
+  }
+  // Always reset the flag after checking, or at the start of a new level.
+  // For safety, let's reset it here.
+  state.customSoundPlayedForWin = false;
   vibrate();
   state.score += state.timeLeft*2;
   saveProgress();
@@ -509,6 +516,7 @@ function popupSound(type) {
 // New function to play specific sound for matched emoji
 function playMatchSound(emoji) {
   if(!state.soundOn || !state.isGameActive) return;
+  state.customSoundPlayedForWin = false;
   stopAllSounds(); // Stop any currently playing sound
 
   let soundToPlay = null;
@@ -527,6 +535,7 @@ function playMatchSound(emoji) {
     soundToPlay.currentTime = 0;
     soundToPlay.play();
     state.playingSound = soundToPlay;
+    state.customSoundPlayedForWin = true;
   }
 }
 
@@ -622,21 +631,29 @@ showSplash();
 // Event listener for page visibility
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    state.isGameActive = false;
-    stopAllSounds();
-    // Optionally, also pause the game timer if desired
-    // if (state.timerId && !state.paused) {
-    //   state.paused = true; // Visually pause the game
-    //   pauseBtn.textContent = "▶";
-    // }
+    state.isGameActive = false; // Keep this
+    stopAllSounds(); // Keep this
+
+    // If the game is active and not already paused by the user or ad flow
+    if (game.classList.contains('hidden') === false && !state.paused) {
+      state.paused = true;
+      state.pausedByVisibility = true;
+      if(pauseBtn) pauseBtn.textContent = "▶";
+      // No need to call popupSound('pause') here as it's a background event
+    }
   } else {
-    state.isGameActive = true;
-    // Optionally, resume game timer if it was paused due to visibility
-    // if (state.timerId && state.paused && pauseBtn.textContent === "▶") {
-    //   // Check if it was paused by visibility, not manually by user
-    //   // This part needs careful handling if you have manual pause too
-    //   state.paused = false;
-    //   pauseBtn.textContent = "||";
-    // }
+    state.isGameActive = true; // Keep this
+
+    // If the game was paused by visibility change
+    if (state.pausedByVisibility) {
+      state.paused = false;
+      state.pausedByVisibility = false;
+      if(pauseBtn) pauseBtn.textContent = "||";
+      // No need to call popupSound('restart') here as it's a background event
+      // The game timer will resume automatically if it was running
+    }
+    // If the game is showing and was paused for other reasons (e.g. ad popup),
+    // it should remain paused until user interaction or ad completion.
+    // The existing logic for state.awaitingFirstTapAfterAd should handle ad resumes.
   }
 });

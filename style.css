@@ -5,6 +5,7 @@ body {
   margin: 0; /* Standard reset for body margin */
   height: 100vh;
   overflow: hidden; /* Prevent all scrolling */
+  padding-bottom: 85px; /* Estimated height for ad (50px) + text + some buffer */
 }
 .hidden { display: none !important; }
 
@@ -20,22 +21,31 @@ body {
   z-index: 90; /* Below popups, above other content */
 }
 
+#stickyFooter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #0d1a2e; /* Optional: a dark background for the footer area if needed, can be adjusted or removed */
+  z-index: 95; /* Ensures it's above general content, but potentially below popups (z-index 100) */
+  padding-bottom: 5px; /* Small padding for the bottom of the footer itself */
+  text-align: center; /* Ensure content within is centered if not already */
+}
+
 #bannerAdContainer {
-  text-align: center; /* Centers the ad if its width is less than container */
-  margin-top: 10px; /* Space from content above */
-  margin-bottom: 10px; /* Space from footer below */
-  position: relative; /* For z-index stacking context if needed */
-  z-index: 50; /* Ensure it's above general content, below popups/overlay */
+  /* text-align: center; */ /* Already handled by #stickyFooter */
+  /* margin-top: 10px; */ /* Remove or adjust */
+  /* margin-bottom: 10px; */ /* Remove or adjust */
+  /* position: relative; */ /* Keep if needed for ad's own scripts */
+  /* z-index: 50; */ /* z-index now managed by #stickyFooter */
 }
 
 footer {
-  /* position: fixed; */ /* Changed from fixed to relative */
-  /* bottom: 10px; */
-  width: 100%; /* Fill parent container */
-  text-align: center;
-  position: relative; /* For z-index context */
-  z-index: 50; /* Consistent with ad container, below popups */
-  padding: 5px 0; /* Small padding */
+  /* width: 100%; */ /* Will be 100% of #stickyFooter */
+  /* text-align: center; */ /* Handled by #stickyFooter */
+  /* position: relative; */
+  /* z-index: 50; */
+  /* padding: 5px 0; */ /* Remove or adjust, #stickyFooter has padding */
   font-family: 'Arial', sans-serif;
   letter-spacing: 1.5px;
   /* color: #fff; */ /* Will be overridden by .powered */
