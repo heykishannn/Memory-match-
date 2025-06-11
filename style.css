@@ -2,9 +2,9 @@ body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue background */
   color: white;
-  margin: 0 auto; /* Center content if screen is wider than max-width */
+  margin: 0; /* Standard reset for body margin */
   height: 100vh;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow: hidden; /* Prevent all scrolling */
 }
 .hidden { display: none !important; }
 
@@ -38,16 +38,19 @@ footer span span {
 .btn {
   background: linear-gradient(to right, #ff8008, #ffc837);
   border: none;
-  padding: 15px 0;
+  /* padding: 15px 0; */
+  padding: clamp(12px, 2.5vw, 18px) 0;
   border-radius: 25px;
   color: white;
   font-weight: bold;
   cursor: pointer;
   margin: 12px 0;
-  font-size: 1.18rem;
+  /* font-size: 1.18rem; */
+  font-size: clamp(0.9rem, 3.5vw, 1.15rem);
   box-shadow: 0 4px 15px rgba(255, 128, 8, 0.2);
-  width: 90%;
-  max-width: 220px;
+  /* width: 90%; */
+  /* max-width: 220px; */
+  width: clamp(160px, 70vw, 220px);
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -158,33 +161,40 @@ footer span span {
   100% { transform: scale(1); opacity:1; }
 }
 .popup-content h2, .popup-content h1 {
-  font-size: 1.2rem;
+  /* font-size: 1.2rem; */
+  font-size: clamp(1rem, 5vw, 1.5rem);
   margin-bottom: 0.6rem;
 }
 .popup-content button { margin: 0.5rem auto; }
 .result { margin-bottom: 0.6rem; }
-.result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
+.result span {
+  /* display: block; font-size: 1rem; margin: 0.1rem 0; */
+  display: block; font-size: clamp(0.8rem, 3.5vw, 1.1rem); margin: 0.1rem 0;
+}
 
-#game { /* Centering game content vertically, but pushing board up */
-  max-width: 1080px;
-  margin: 0 auto; /* Center #game div if body is wider */
+#game {
+  width: 100%; /* Fill available width */
+  /* display: flex; flex-direction: column; align-items: center; are already present and fine */
   display: flex;
   flex-direction: column;
   align-items: center; /* Centers items horizontally */
   background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
   min-height: 100vh; /* Ensure it can fill height */
   box-sizing: border-box; /* Include padding/border in width/height */
+  /* margin: 0 auto; Removed as it's for fixed width centering */
+  /* max-width: 1080px; Removed for full responsiveness */
 }
 
 .game-header {
-  width: 100%;
+  width: 100%; /* This will now fill the responsive #game container */
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 0.7rem;
 }
 .game-header h1 {
-  font-size: 2.2rem; /* Larger font size */
+  /* font-size: 2.2rem; */ /* Larger font size */
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
   font-weight: bold; /* Bold text */
   text-align: center;
   margin-bottom: 0.2rem;
@@ -205,11 +215,13 @@ footer span span {
     display: flex;
     flex-direction: column; /* Stack label and text */
     align-items: center;
-    width: 60px; /* Fixed width to ensure consistent spacing */
+    /* width: 60px; */ /* Fixed width to ensure consistent spacing */
+    width: clamp(50px, 12vw, 70px);
     flex-shrink: 0;
 }
 .toggle-text {
-    font-size: 0.9rem;
+    /* font-size: 0.9rem; */
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
     font-weight: bold;
     color: white;
     text-shadow: 0 0 5px #000;
@@ -221,10 +233,12 @@ footer span span {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 55px; /* Consistent width */
-    height: 35px; /* Consistent height */
+    /* width: 55px; */ /* Consistent width */
+    /* height: 35px; */ /* Consistent height */
+    width: clamp(45px, 10vw, 60px);
+    height: clamp(30px, 7vw, 40px);
     background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
-    border-radius: 17.5px;
+    border-radius: clamp(15px, 3.5vw, 20px); /* half of height */
     position: relative;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -235,17 +249,22 @@ footer span span {
 }
 .switch-slider {
     position: absolute;
-    top: 4px;
-    left: 4px;
-    width: 27px; /* Knob size */
-    height: 27px; /* Knob size */
+    /* top: 4px; */
+    /* left: 4px; */
+    top: clamp(3px, 0.5vw, 5px);
+    left: clamp(3px, 0.5vw, 5px);
+    /* width: 27px; */ /* Knob size */
+    /* height: 27px; */ /* Knob size */
+    width: clamp(22px, 5vw, 28px);
+    height: clamp(22px, 5vw, 28px);
     background: white;
     border-radius: 50%;
     transition: transform 0.3s, background 0.3s;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .switch-label input:checked + .switch-slider {
-    transform: translateX(18px); /* Move knob to the right when checked */
+    /* transform: translateX(18px); */ /* Move knob to the right when checked */
+    transform: translateX(clamp(14px, 3.5vw, 22px));
     background: white;
 }
 
@@ -253,11 +272,15 @@ footer span span {
 .pause-btn {
   background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
   border: none;
-  border-radius: 10px;
-  width: 55px; /* Consistent width */
-  height: 35px; /* Consistent height */
+  /* border-radius: 10px; */
+  border-radius: clamp(8px, 2vw, 12px);
+  /* width: 55px; */ /* Consistent width */
+  /* height: 35px; */ /* Consistent height */
+  width: clamp(45px, 10vw, 60px);
+  height: clamp(30px, 7vw, 40px);
   color: white;
-  font-size: 1.2rem;
+  /* font-size: 1.2rem; */
+  font-size: clamp(1rem, 3vw, 1.5rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,37 +297,35 @@ footer span span {
   width: 100%;
   display: flex;
   justify-content: space-around;
-  font-size: 1.13rem;
+  /* font-size: 1.13rem; */
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
   font-weight: bold;
   text-shadow: 0 0 6px #4a00e0;
 }
 #board {
   display: grid;
-  /* Adjusting gaps */
-  row-gap: 12px; /* Normal vertical distance */
-  column-gap: 5px; /* Closer horizontal distance (pass-pass) */
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: clamp(5px, 2vw, 10px); /* Responsive gaps */
+  padding: clamp(5px, 2vw, 10px); /* Responsive padding */
   justify-content: center;
-  /* Align cards to the top after header/stats, then center */
   margin: 24px auto auto auto; /* Pushed down from top, auto for bottom to push up */
   max-width: calc(100vw - 20px); /* Restrict board width to keep cards in screen */
   flex-grow: 1; /* Allow board to take available space */
   align-content: flex-start; /* Aligns content to the start (top) */
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
-}
-/* This makes cards fill their grid cell, and allows them to shrink */
-#board[style*="--cols"] { /* Use the CSS variable to define columns */
-  grid-template-columns: repeat(var(--cols), 1fr);
+  /* Removed row-gap and column-gap as they are replaced by single 'gap' property */
+  /* Removed #board[style*="--cols"] as it's no longer used */
 }
 
 .card {
-  width: 120px;
-  height: 120px;
+  width: clamp(60px, 18vw, 120px);
+  aspect-ratio: 1 / 1; /* Maintain square shape, height will follow width */
   border: 2px solid black; /* Black border */
-  border-radius: 0px;
+  border-radius: 12px; /* Rounded corners */
   display: flex; /* For centering front/back content */
   justify-content: center; /* For centering front/back content */
   align-items: center; /* For centering front/back content */
-  font-size: 2.8rem; /* Larger emoji size */
+  font-size: clamp(24px, 7vw, 48px); /* Responsive emoji size */
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
   user-select: none;
@@ -325,7 +346,7 @@ footer span span {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 0px; /* Consistent with card radius */
+  border-radius: 12px; /* Match parent card's rounded corners */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -360,14 +381,21 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  /* .card { width: 100%; height: auto; max-width: 110px; max-height: 110px; font-size: 2.2rem; border-radius: 0px;} */ /* Rule for .card removed for fixed size */
-  #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
-  .splash-card { width: 70px; height: 110px; border-radius: 18px;}
-  .game-header h1 { font-size: 1.7rem;}
-  .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
-  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;}
-  .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
-  .switch-label input:checked + .switch-slider { transform: translateX(15px); }
-  .toggle-text { font-size: 0.75rem; margin-top: 3px; }
-  .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
+  /* .card rule already handled by clamp() */
+  #board { /* Keep specific mobile gap adjustments if clamp doesn't cover it well enough, or remove if clamp is sufficient */
+    gap: clamp(5px, 1.5vw, 8px); /* Slightly smaller max gap for mobile */
+    padding: clamp(5px, 1.5vw, 8px);
+    max-width: calc(100vw - 10px);
+  }
+  .splash-card { width: 70px; height: 110px; border-radius: 18px;} /* This is for splash, not in-game card */
+
+  /* Remove specific overrides for elements now using clamp, if clamp covers the sizes well. */
+  /* .game-header h1 { font-size: 1.7rem;} */ /* Covered by clamp */
+  /* .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;} */ /* Popup has its own responsive logic already */
+  /* .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;} */ /* Covered by clamp */
+  /* .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; } */ /* Covered by clamp */
+  /* .switch-label input:checked + .switch-slider { transform: translateX(15px); } */ /* Covered by clamp */
+  /* .toggle-text { font-size: 0.75rem; margin-top: 3px; } */ /* Covered by clamp */
+
+  .game-controls { max-width: 300px; } /* This can remain as a specific mobile constraint */
 }
