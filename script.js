@@ -88,18 +88,14 @@ let state = {
   pausedByVisibility: false
 };
 
-if (typeof global !== 'undefined') { global.state = state; } // Expose state for testing
-
 // Overlay helper functions
 function showOverlay() {
   if (pageOverlay) pageOverlay.classList.remove('hidden');
 }
-if (typeof global !== 'undefined') { global.showOverlay = showOverlay; }
 
 function hideOverlay() {
   if (pageOverlay) pageOverlay.classList.add('hidden');
 }
-if (typeof global !== 'undefined') { global.hideOverlay = hideOverlay; }
 
 // Splash: 3 blank gradient cards, flip animation
 function showSplash() {
@@ -113,17 +109,26 @@ function showSplash() {
     card.className = 'splash-card';
     splashCards.appendChild(card);
   }
-  const splashDuration = (typeof global !== 'undefined') ? 10 : 3000; // Short duration for tests
   setTimeout(() => {
     splash.classList.add('hidden');
-    // checkLogin(); // Removed: Test script will control this call
-  }, splashDuration);
+    checkLogin();
+  }, 3000);
 }
-if (typeof global !== 'undefined') { global.showSplash = showSplash; }
 
 // Auth
 function checkLogin() {
-  const savedUser = JSON.parse(localStorage.getItem('memorymatch_user'));
+  let savedUser = null;
+  try {
+    const savedUserString = localStorage.getItem('memorymatch_user');
+    if (savedUserString) {
+      savedUser = JSON.parse(savedUserString);
+    }
+  } catch (error) {
+    console.error("Error parsing saved user from localStorage:", error);
+    // If parsing fails, treat as no saved user
+    savedUser = null;
+  }
+
   if(savedUser && savedUser.email) {
     state.user = savedUser;
     showHome();
@@ -131,7 +136,6 @@ function checkLogin() {
     showAuth();
   }
 }
-
 
 function showAuth() {
   showOverlay(); // Show overlay
@@ -645,7 +649,6 @@ function loadFullGameState() {
   }
   return false; // No full state found or flag not set
 }
-if (typeof global !== 'undefined') { global.loadFullGameState = loadFullGameState; }
 
 function shuffle(arr) {
   let a = arr.slice();
@@ -707,9 +710,7 @@ function initializeGame() {
   // because `startBtn.onclick` will need to know if a full state *was* loadable.
   // But we won't use the return value to bypass splash/home.
   loadFullGameState(); // Load state if available, but don't act on it yet.
-  if (typeof global === 'undefined') { // Don't auto-run splash in test environment
-    showSplash();        // Always proceed to splash.
-  }
+  showSplash();        // Always proceed to splash.
 }
 
 initializeGame(); // Call the new initialization function
