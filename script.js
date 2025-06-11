@@ -131,7 +131,7 @@ function checkLogin() {
     showAuth();
   }
 }
-if (typeof global !== 'undefined') { global.checkLogin = checkLogin; }
+
 
 function showAuth() {
   showOverlay(); // Show overlay
@@ -175,7 +175,6 @@ function showHome() {
   home.classList.remove('hidden');
   game.classList.add('hidden');
 }
-if (typeof global !== 'undefined') { global.showHome = showHome; }
 
 startBtn.onclick = () => {
   // loadFullGameState() was already called during initializeGame().
