@@ -10,6 +10,7 @@ const MAX_LEVEL = 100;
 const MAX_CARDS_BEFORE_TIMER_DIFFICULTY = 30;
 
 // DOM
+const pageOverlay = document.getElementById('pageOverlay'); // Added pageOverlay
 const splash = document.getElementById('splash');
 const splashCards = document.querySelector('.splash-cards');
 const auth = document.getElementById('auth');
@@ -85,8 +86,19 @@ let state = {
   playingSound: null,
   // isMaxCardsReached: false, // No longer needed with fixed card/container size
   // levelCardsCapped: 0, // No longer needed
-  isGameActive: true // Added for visibility change sound control
+  isGameActive: true, // Added for visibility change sound control
+  awaitingFirstTapAfterAd: false, // Added for new rewarded ad logic
+  postAdCallback: null // Added for new rewarded ad logic
 };
+
+// Overlay helper functions
+function showOverlay() {
+  if (pageOverlay) pageOverlay.classList.remove('hidden');
+}
+
+function hideOverlay() {
+  if (pageOverlay) pageOverlay.classList.add('hidden');
+}
 
 // Splash: 3 blank gradient cards, flip animation
 function showSplash() {
@@ -117,6 +129,7 @@ function checkLogin() {
   }
 }
 function showAuth() {
+  showOverlay(); // Show overlay
   auth.classList.remove('hidden');
   home.classList.add('hidden');
   game.classList.add('hidden');
@@ -130,6 +143,7 @@ loginBtn.onclick = () => {
   const saved = JSON.parse(localStorage.getItem('memorymatch_user'));
   if(saved && saved.email === email && saved.password === password) {
     state.user = {email, password};
+    hideOverlay(); // Hide overlay on successful login
     showHome();
   } else {
     alert('Invalid credentials or user does not exist.');
@@ -142,11 +156,14 @@ signupBtn.onclick = () => {
   localStorage.setItem('memorymatch_user', JSON.stringify({email, password}));
   state.user = {email, password};
   localStorage.setItem('memorymatch_progress', JSON.stringify({level:1, score:0}));
+  hideOverlay(); // Hide overlay on successful signup
   showHome();
 };
 
 // Home
 function showHome() {
+  // Ensure overlay is hidden when navigating to home, in case it was shown by auth
+  hideOverlay();
   auth.classList.add('hidden');
   home.classList.remove('hidden');
   game.classList.add('hidden');
@@ -154,6 +171,7 @@ function showHome() {
 startBtn.onclick = () => {
   const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
   if(progress && progress.level && progress.level > 1) {
+    showOverlay(); // Show overlay for resumePopup
     resumePopup.classList.remove('hidden');
     popupSound('koni'); // Play sound when continue window appears
   } else {
@@ -167,12 +185,20 @@ startBtn.onclick = () => {
 resumeHomeBtn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
+  state.awaitingFirstTapAfterAd = false;
+  state.postAdCallback = null;
+  clearTimeout(state.adTimeout);
+  state.paused = false;
+  if(pauseBtn) pauseBtn.textContent = "||";
   saveProgress(); // Ensure current progress is saved
   showHome();
 };
 watchAdResumeBtn.onclick = () => {
   window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-  resumePopup.classList.add('hidden'); // Hide the resume popup
+  resumePopup.classList.add('hidden');
+  // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
+  // No need to call hideOverlay() here directly as resumePopup is hidden and another (ad timer) popup appears.
   startInGameAdTimer(() => { // Define original callback for resuming
     const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
     state.level = progress.level;
@@ -183,6 +209,12 @@ watchAdResumeBtn.onclick = () => {
 restartFrom1Btn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
+  state.awaitingFirstTapAfterAd = false;
+  state.postAdCallback = null;
+  clearTimeout(state.adTimeout);
+  state.paused = false;
+  if(pauseBtn) pauseBtn.textContent = "||";
   state.level = 1;
   state.score = 0;
   saveProgress();
@@ -285,6 +317,24 @@ function startLevel(level) {
   startTimer();
 }
 function onCardClick(index) {
+  if (state.awaitingFirstTapAfterAd) {
+    state.awaitingFirstTapAfterAd = false;
+    state.paused = false; // Unpause the game logic state
+    if (pauseBtn) pauseBtn.textContent = "||"; // Update UI
+
+    if (typeof state.postAdCallback === 'function') {
+        state.postAdCallback(); // Execute the stored callback
+        state.postAdCallback = null; // Clear it after use
+    } else {
+        // Fallback if no specific callback, though one should always be set by startInGameAdTimer
+        startTimer(); // This starts the main game countdown
+    }
+
+    // Critical: Check if the game is still paused for other reasons or if callback re-paused.
+    // Only proceed with card flip if not paused.
+    if (state.paused) return;
+  }
+
   if(state.busy||state.paused) return;
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
@@ -343,11 +393,13 @@ function winLevel() {
   resultScore.textContent = "Score: " + state.score;
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
   losePopup.classList.add('hidden'); // Ensure losePopup is hidden
+  showOverlay(); // Show overlay for winPopup
   winPopup.classList.remove('hidden');
 }
 nextLevelBtn.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
   if(state.level<MAX_LEVEL) state.level++;
   else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
   saveProgress();
@@ -356,6 +408,7 @@ nextLevelBtn.onclick = () => {
 homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
   // Data should not reset when clicking home button
   saveProgress();
   showHome();
@@ -366,23 +419,38 @@ function loseLevel() {
   resultLevelL.textContent = "Level: " + state.level;
   resultScoreL.textContent = "Score: " + state.score;
   resultTimeL.textContent = "Time Left: 0s";
+  showOverlay(); // Show overlay for losePopup
   losePopup.classList.remove('hidden');
 }
 playAgainBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
+  state.awaitingFirstTapAfterAd = false;
+  state.postAdCallback = null;
+  clearTimeout(state.adTimeout);
+  state.paused = false;
+  if(pauseBtn) pauseBtn.textContent = "||";
   startLevel(state.level);
 };
 loseHomeBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
+  hideOverlay(); // Hide overlay
+  state.awaitingFirstTapAfterAd = false;
+  state.postAdCallback = null;
+  clearTimeout(state.adTimeout);
+  state.paused = false;
+  if(pauseBtn) pauseBtn.textContent = "||";
   // Data should not reset when clicking home button
   saveProgress();
   showHome();
 };
 watchAdBtn.onclick = () => {
   window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-  losePopup.classList.add('hidden'); // Hide the lose popup
+  losePopup.classList.add('hidden');
+  // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
+  // No need to call hideOverlay() here directly.
   startInGameAdTimer(() => { // Define original callback for continuing after loss
     startTimer();
   });
@@ -484,6 +552,7 @@ function shuffle(arr) {
 }
 
 function startInGameAdTimer(callback) {
+  showOverlay(); // Show overlay for ad timer popup
   adPopup.classList.remove('hidden');
   popupSound('pause'); // Optional: play a sound when timer starts
   let secondsLeft = 5;
@@ -495,15 +564,19 @@ function startInGameAdTimer(callback) {
     adTimer.textContent = secondsLeft;
     if (secondsLeft <= 0) {
       clearTimeout(state.adTimeout); // Use clearTimeout as we're using setTimeout for recursion
+      hideOverlay(); // Hide overlay when ad timer finishes
       adPopup.classList.add('hidden');
       stopAllSounds(); // Stop pause sound
 
       state.timeLeft += 10; // Add 10 seconds to game timer
       updateHUD(); // Update timer display
 
-      if (callback) {
-        callback(); // Execute the original game continuation logic
-      }
+      // Instead of calling callback directly, set up for first tap resume
+      state.awaitingFirstTapAfterAd = true;
+      state.paused = true; // Keep game paused
+      if (pauseBtn) pauseBtn.textContent = "▶"; // Update pause button text
+      state.postAdCallback = callback; // Store the original callback
+      // Do not call callback() here anymore
     } else {
       state.adTimeout = setTimeout(tick, 1000);
     }
