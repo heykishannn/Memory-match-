@@ -143,6 +143,7 @@ loginBtn.onclick = () => {
   const saved = JSON.parse(localStorage.getItem('memorymatch_user'));
   if(saved && saved.email === email && saved.password === password) {
     state.user = {email, password};
+    localStorage.setItem('memoryMatchUserEmail', email);
     hideOverlay(); // Hide overlay on successful login
     showHome();
   } else {
@@ -155,6 +156,7 @@ signupBtn.onclick = () => {
   if(!email || !password) { alert('Please enter email and password.'); return; }
   localStorage.setItem('memorymatch_user', JSON.stringify({email, password}));
   state.user = {email, password};
+  localStorage.setItem('memoryMatchUserEmail', email);
   localStorage.setItem('memorymatch_progress', JSON.stringify({level:1, score:0}));
   hideOverlay(); // Hide overlay on successful signup
   showHome();
