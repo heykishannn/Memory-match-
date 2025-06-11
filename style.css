@@ -296,8 +296,8 @@ footer span span {
 .card {
   width: 100%; /* Make card fill its grid cell */
   aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 90px; /* Larger max size for desktop */
-  max-height: 90px; /* Larger max size for desktop */
+  max-width: 140px; /* Larger max size for desktop */
+  max-height: 140px; /* Larger max size for desktop */
   border: 2px solid black; /* Black border */
   border-radius: 0px;
   display: flex; /* For centering front/back content */
@@ -359,7 +359,7 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  .card { width: 100%; height: auto; max-width: 70px; max-height: 70px; font-size: 2.2rem; border-radius: 0px;} /* Larger cards on mobile */
+  .card { width: 100%; height: auto; max-width: 110px; max-height: 110px; font-size: 2.2rem; border-radius: 0px;} /* Larger cards on mobile */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}

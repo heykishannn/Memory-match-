@@ -169,15 +169,16 @@ resumeHomeBtn.onclick = () => {
   saveProgress(); // Ensure current progress is saved
   showHome();
 };
-// watchAdResumeBtn.onclick = () => {
-//   resumePopup.classList.add('hidden');
-//   showAd(() => {
-//     const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-//     state.level = progress.level;
-//     state.score = progress.score;
-//     showGame();
-//   });
-// };
+watchAdResumeBtn.onclick = () => {
+  window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
+  resumePopup.classList.add('hidden'); // Hide the resume popup
+  startInGameAdTimer(() => { // Define original callback for resuming
+    const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
+    state.level = progress.level;
+    state.score = progress.score;
+    showGame(); // This was the original action
+  });
+};
 restartFrom1Btn.onclick = () => {
   stopAllSounds();
   resumePopup.classList.add('hidden');
@@ -227,8 +228,12 @@ function getGridSize(level) {
     const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 0;
     const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - footerHeight - 50; // 50px for extra margins/padding
 
-    // Assuming average card size of 80px (for responsive CSS) + 12px row-gap
-    const estimatedCardHeightWithGap = 80 + 12;
+    let estimatedCardHeightWithGap;
+    if (window.innerWidth <= 600) { // Mobile
+        estimatedCardHeightWithGap = 110 + 8; // 110px card height + 8px mobile row-gap
+    } else { // Desktop
+        estimatedCardHeightWithGap = 140 + 12; // 140px card height + 12px desktop row-gap
+    }
     let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
     if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows
 
@@ -435,16 +440,13 @@ loseHomeBtn.onclick = () => {
   saveProgress();
   showHome();
 };
-// watchAdBtn.onclick = () => {
-//   stopAllSounds();
-//   losePopup.classList.add('hidden');
-//   showAd(()=>{
-//     // +10s reward
-//     state.timeLeft += 10;
-//     updateHUD();
-//     startTimer();
-//   });
-// };
+watchAdBtn.onclick = () => {
+  window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
+  losePopup.classList.add('hidden'); // Hide the lose popup
+  startInGameAdTimer(() => { // Define original callback for continuing after loss
+    startTimer();
+  });
+};
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
   // Ensure time is formatted with leading zero if less than 10
@@ -540,30 +542,59 @@ function shuffle(arr) {
   }
   return a;
 }
-function showAd(callback) {
-  // adPopup.classList.remove('hidden'); // No longer show internal popup
-  // popupSound('pause'); // No longer play internal sound
-  // let t = 5;
-  // adTimer.textContent = t;
-  // state.adTimeout && clearTimeout(state.adTimeout);
-  // function tick() {
-  //   t--;
-  //   adTimer.textContent = t;
-  //   if(t<=0) {
-  //     adPopup.classList.add('hidden');
-  //     stopAllSounds();
-  //     callback && callback(); // Execute callback
-  //   } else {
-  //     state.adTimeout = setTimeout(tick,1000);
-  //   }
-  // }
-  // state.adTimeout = setTimeout(tick,1000);
 
-  // Immediately execute the callback if provided, as ad is external.
-  if (callback) {
-    callback();
+function startInGameAdTimer(callback) {
+  adPopup.classList.remove('hidden');
+  popupSound('pause'); // Optional: play a sound when timer starts
+  let secondsLeft = 5;
+  adTimer.textContent = secondsLeft;
+  state.adTimeout && clearTimeout(state.adTimeout); // Clear any existing ad timeout
+
+  function tick() {
+    secondsLeft--;
+    adTimer.textContent = secondsLeft;
+    if (secondsLeft <= 0) {
+      clearTimeout(state.adTimeout); // Use clearTimeout as we're using setTimeout for recursion
+      adPopup.classList.add('hidden');
+      stopAllSounds(); // Stop pause sound
+
+      state.timeLeft += 10; // Add 10 seconds to game timer
+      updateHUD(); // Update timer display
+
+      if (callback) {
+        callback(); // Execute the original game continuation logic
+      }
+    } else {
+      state.adTimeout = setTimeout(tick, 1000);
+    }
   }
+  state.adTimeout = setTimeout(tick, 1000); // Start the timer
 }
+
+// function showAd(callback) {
+//   // adPopup.classList.remove('hidden'); // No longer show internal popup
+//   // popupSound('pause'); // No longer play internal sound
+//   // let t = 5;
+//   // adTimer.textContent = t;
+//   // state.adTimeout && clearTimeout(state.adTimeout);
+//   // function tick() {
+//   //   t--;
+//   //   adTimer.textContent = t;
+//   //   if(t<=0) {
+//   //     adPopup.classList.add('hidden');
+//   //     stopAllSounds();
+//   //     callback && callback(); // Execute callback
+//   //   } else {
+//   //     state.adTimeout = setTimeout(tick,1000);
+//   //   }
+//   // }
+//   // state.adTimeout = setTimeout(tick,1000);
+//
+//   // Immediately execute the callback if provided, as ad is external.
+//   // if (callback) {
+//   //   callback();
+//   // }
+// }
 
 // Lose/Win/Popup sound only while popup is open
 [winPopup, losePopup, adPopup, resumePopup].forEach(popup => {
