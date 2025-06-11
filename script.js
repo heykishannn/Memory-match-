@@ -17,18 +17,14 @@ const auth = document.getElementById('auth');
 const home = document.getElementById('home');
 const game = document.getElementById('game');
 const board = document.getElementById('board');
-const resumePopup = document.getElementById('resumePopup');
 const winPopup = document.getElementById('winPopup');
 const losePopup = document.getElementById('losePopup');
-const adPopup = document.getElementById('adPopup');
-const adTimer = document.getElementById('adTimer');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const startBtn = document.getElementById('startBtn');
 const resumeHomeBtn = document.getElementById('resumeHomeBtn');
-const watchAdResumeBtn = document.getElementById('watchAdResumeBtn');
 const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
@@ -58,7 +54,6 @@ const audioBirthday = document.getElementById('audio-birthday');
 const audioSitar = document.getElementById('audio-sitar');
 const audioBell = document.getElementById('audio-bell');
 // New sound for Continue window
-const audioKoni = document.getElementById('audio-koni');
 
 
 const resultLevel = document.getElementById('resultLevel');
@@ -130,6 +125,7 @@ function checkLogin() {
     showAuth();
   }
 }
+
 function showAuth() {
   showOverlay(); // Show overlay
   auth.classList.remove('hidden');
@@ -172,6 +168,7 @@ function showHome() {
   home.classList.remove('hidden');
   game.classList.add('hidden');
 }
+
 startBtn.onclick = () => {
   // loadFullGameState() was already called during initializeGame().
   // The 'state' object is populated if a full game state was found and loaded.
@@ -182,9 +179,7 @@ startBtn.onclick = () => {
   if (hasResumableStateFlag && state.cards && state.cards.length > 0) {
     // An old user with a resumable game state.
     // The 'state' object should be ready with loaded data.
-    showOverlay(); // Show overlay for resumePopup
-    resumePopup.classList.remove('hidden'); // This popup will be modified in subsequent steps.
-    popupSound('koni'); // Play sound when continue window appears
+    showGame(true); // Directly show the game, resuming from the loaded state.
   } else {
     // New user, no resumable state, or loadFullGameState was technically successful
     // but didn't result in a playable cards array (e.g. corrupted data).
@@ -207,19 +202,6 @@ startBtn.onclick = () => {
     saveGameState(); // Save this clean initial state (level 1, score 0, and default full state).
     showGame();      // Starts a new game from level 1.
   }
-};
-// Home button clicks from any popup/screen should save data and show resume window
-watchAdResumeBtn.onclick = () => {
-  saveGameState(); // Added before window.open
-  window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-  resumePopup.classList.add('hidden');
-  // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
-  // No need to call hideOverlay() here directly as resumePopup is hidden and another (ad timer) popup appears.
-  startInGameAdTimer(() => { // Define original callback for resuming
-    // Assuming loadFullGameState has already populated the state if page didn't reload,
-    // or it will run on page load.
-    showGame(true); // Pass true to resume from loaded state
-  });
 };
 
 // Game
@@ -256,7 +238,6 @@ function showGame(resumingSavedGame = false) { // Added resumingSavedGame parame
   game.classList.remove('hidden');
   winPopup.classList.add('hidden');
   losePopup.classList.add('hidden');
-  resumePopup.classList.add('hidden');
 
   if (resumingSavedGame) {
     // Ensure overlay is hidden if resuming directly to game
@@ -373,24 +354,6 @@ function startLevel(level) {
   startTimer();
 }
 function onCardClick(index) {
-  if (state.awaitingFirstTapAfterAd) {
-    state.awaitingFirstTapAfterAd = false;
-    state.paused = false; // Unpause the game logic state
-    if (pauseBtn) pauseBtn.textContent = "||"; // Update UI
-
-    if (typeof state.postAdCallback === 'function') {
-        state.postAdCallback(); // Execute the stored callback
-        state.postAdCallback = null; // Clear it after use
-    } else {
-        // Fallback if no specific callback, though one should always be set by startInGameAdTimer
-        startTimer(); // This starts the main game countdown
-    }
-
-    // Critical: Check if the game is still paused for other reasons or if callback re-paused.
-    // Only proceed with card flip if not paused.
-    if (state.paused) return;
-  }
-
   if(state.busy||state.paused) return;
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
@@ -600,8 +563,8 @@ function playMatchSound(emoji) {
 
 function stopAllSounds() {
   [audioTap, audioWin, audioLose, audioPause, audioRestart,
-   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell, audioKoni
-  ].forEach(a=>{ a.pause(); a.currentTime=0; });
+   audioGwak, audioTamatar, audioMor, audioSigma, audioBirthday, audioSitar, audioBell
+  ].forEach(a=>{ if (a) { a.pause(); a.currentTime=0; } }); // Added null check for audioKoni
   state.playingSound = null;
 }
 function vibrate() {
@@ -653,18 +616,7 @@ function loadFullGameState() {
         state.soundOn = loadedState.soundOn;
         state.vibrationOn = loadedState.vibrationOn;
 
-        state.awaitingFirstTapAfterAd = loadedState.awaitingFirstTapAfterAd || false;
         state.paused = loadedState.paused || false;
-
-        if (state.awaitingFirstTapAfterAd) {
-          state.postAdCallback = () => { showGame(true); };
-          // Also ensure the pause button UI is correct if the game loads into this paused state.
-          if (pauseBtn && state.paused) { // Check pauseBtn exists
-            pauseBtn.textContent = "▶";
-          }
-        } else {
-          state.postAdCallback = null;
-        }
 
         // Potentially reset other state properties not in fullState
         // For example, timerId should be cleared and recreated by game logic if resuming.
@@ -696,39 +648,6 @@ function shuffle(arr) {
   return a;
 }
 
-function startInGameAdTimer(callback) {
-  showOverlay(); // Show overlay for ad timer popup
-  adPopup.classList.remove('hidden');
-  popupSound('pause'); // Optional: play a sound when timer starts
-  let secondsLeft = 5;
-  adTimer.textContent = secondsLeft;
-  state.adTimeout && clearTimeout(state.adTimeout); // Clear any existing ad timeout
-
-  function tick() {
-    secondsLeft--;
-    adTimer.textContent = secondsLeft;
-    if (secondsLeft <= 0) {
-      clearTimeout(state.adTimeout); // Use clearTimeout as we're using setTimeout for recursion
-      hideOverlay(); // Hide overlay when ad timer finishes
-      adPopup.classList.add('hidden');
-      stopAllSounds(); // Stop pause sound
-
-      state.timeLeft += 10; // Add 10 seconds to game timer
-      updateHUD(); // Update timer display
-
-      // Instead of calling callback directly, set up for first tap resume
-      state.awaitingFirstTapAfterAd = true;
-      state.paused = true; // Keep game paused
-      if (pauseBtn) pauseBtn.textContent = "▶"; // Update pause button text
-      state.postAdCallback = callback; // Store the original callback
-      // Do not call callback() here anymore
-    } else {
-      state.adTimeout = setTimeout(tick, 1000);
-    }
-  }
-  state.adTimeout = setTimeout(tick, 1000); // Start the timer
-}
-
 // function showAd(callback) {
 //   // adPopup.classList.remove('hidden'); // No longer show internal popup
 //   // popupSound('pause'); // No longer play internal sound
@@ -755,7 +674,7 @@ function startInGameAdTimer(callback) {
 // }
 
 // Lose/Win/Popup sound only while popup is open
-[winPopup, losePopup, adPopup, resumePopup].forEach(popup => {
+[winPopup, losePopup].forEach(popup => {
   if(popup) popup.addEventListener('transitionend', ()=>{ if(popup.classList.contains('hidden')) stopAllSounds(); });
 });
 
