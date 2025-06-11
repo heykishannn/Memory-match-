@@ -173,32 +173,42 @@ function showHome() {
   game.classList.add('hidden');
 }
 startBtn.onclick = () => {
-  const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-  if(progress && progress.level && progress.level > 1) {
+  // loadFullGameState() was already called during initializeGame().
+  // The 'state' object is populated if a full game state was found and loaded.
+  const hasResumableStateFlag = localStorage.getItem('memorymatch_has_full_state') === 'true';
+
+  // We check the flag and also if state.cards has content, as a sign that loadFullGameState
+  // successfully populated the state object from a valid saved state.
+  if (hasResumableStateFlag && state.cards && state.cards.length > 0) {
+    // An old user with a resumable game state.
+    // The 'state' object should be ready with loaded data.
     showOverlay(); // Show overlay for resumePopup
-    resumePopup.classList.remove('hidden');
+    resumePopup.classList.remove('hidden'); // This popup will be modified in subsequent steps.
     popupSound('koni'); // Play sound when continue window appears
   } else {
+    // New user, no resumable state, or loadFullGameState was technically successful
+    // but didn't result in a playable cards array (e.g. corrupted data).
+    // Ensure any potentially inconsistent full state is cleared.
+    clearFullGameState();
+
+    // Reset to default for a new game.
     state.level = 1;
     state.score = 0;
-    saveGameState(); // saveProgress -> saveGameState
-    showGame();
+    state.timeLeft = 0; // Ensure timeLeft is also reset for a new game.
+    state.cards = [];
+    state.flippedIndices = [];
+    state.matchedCount = 0;
+    state.busy = false;
+    state.paused = false;
+    state.awaitingFirstTapAfterAd = false;
+    state.postAdCallback = null;
+    // Sound and vibration settings (state.soundOn, state.vibrationOn) can retain user preference.
+
+    saveGameState(); // Save this clean initial state (level 1, score 0, and default full state).
+    showGame();      // Starts a new game from level 1.
   }
 };
 // Home button clicks from any popup/screen should save data and show resume window
-resumeHomeBtn.onclick = () => {
-  stopAllSounds();
-  resumePopup.classList.add('hidden');
-  hideOverlay(); // Hide overlay
-  state.awaitingFirstTapAfterAd = false;
-  state.postAdCallback = null;
-  clearTimeout(state.adTimeout);
-  state.paused = false;
-  if(pauseBtn) pauseBtn.textContent = "||";
-  clearFullGameState(); // Added
-  saveGameState();
-  showHome();
-};
 watchAdResumeBtn.onclick = () => {
   saveGameState(); // Added before window.open
   window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
@@ -210,21 +220,6 @@ watchAdResumeBtn.onclick = () => {
     // or it will run on page load.
     showGame(true); // Pass true to resume from loaded state
   });
-};
-restartFrom1Btn.onclick = () => {
-  stopAllSounds();
-  resumePopup.classList.add('hidden');
-  hideOverlay(); // Hide overlay
-  state.awaitingFirstTapAfterAd = false;
-  state.postAdCallback = null;
-  clearTimeout(state.adTimeout);
-  state.paused = false;
-  if(pauseBtn) pauseBtn.textContent = "||";
-  clearFullGameState(); // Added
-  state.level = 1;
-  state.score = 0;
-  saveGameState();
-  showGame();
 };
 
 // Game
@@ -769,18 +764,23 @@ function startInGameAdTimer(callback) {
 
 // Initial game load sequence
 function initializeGame() {
-  if (loadFullGameState()) {
-    // Successfully loaded a full game state
-    splash.classList.add('hidden'); // Ensure splash is hidden
-    auth.classList.add('hidden');   // Ensure auth is hidden
-    home.classList.add('hidden');   // Ensure home is hidden
-    // game.classList.remove('hidden'); // showGame will handle this
-    hideOverlay(); // Ensure no overlay is showing from a previous session if not handled
-    showGame(true); // Resume the game
-  } else {
-    // No full game state found, or error during load, proceed with normal splash and login flow
-    showSplash();
-  }
+  // Always start with the splash screen.
+  // The decision to load and resume a game will be handled later,
+  // typically after user interaction on the home screen.
+  // loadFullGameState() might still be useful to call here if we want to
+  // ensure that any saved state is loaded into the 'state' object early,
+  // even if not acted upon immediately. However, for the current requirement
+  // of always showing splash/home, and then handling resume via start button,
+  // deferring the active loading part makes sense.
+  // For now, let's keep it simple and just show splash.
+  // The `loadFullGameState()` function itself doesn't show/hide anything, it just loads state.
+  // So, we can still call it to populate `state` if needed, but not act on its return value here.
+
+  // Let's refine: we still want to load the state if it exists,
+  // because `startBtn.onclick` will need to know if a full state *was* loadable.
+  // But we won't use the return value to bypass splash/home.
+  loadFullGameState(); // Load state if available, but don't act on it yet.
+  showSplash();        // Always proceed to splash.
 }
 
 initializeGame(); // Call the new initialization function
