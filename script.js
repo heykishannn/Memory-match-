@@ -7,6 +7,7 @@ const EMOJIS = [
   "🦚","🪕" // Added Peacock and Banjo emojis for sound effects as per list
 ];
 const MAX_LEVEL = 100;
+const MAX_CARDS_BEFORE_TIMER_DIFFICULTY = 30;
 
 // DOM
 const splash = document.getElementById('splash');
@@ -203,89 +204,20 @@ function showGame() {
 function getGridSize(level) {
     let pairs;
     if (level === 1) {
-        pairs = 1; // Level 1 has 1 pair (2 cards)
+        pairs = 1;
     } else {
-        pairs = 1 + Math.floor((level - 1) / 2); // Add 1 pair every 2 levels from level 2 onwards
+        pairs = 1 + Math.floor((level - 1) / 2); // Existing progression
     }
-    // Card dimensions and gaps from CSS
-    const cardWidth = 120;
-    const cardHeight = 120;
-    const columnGap = 5; // From #board rule
-    const rowGap = 12;   // From #board rule
+    let totalCardsForLevel = pairs * 2;
+    // Ensure it's an even number, at least 2.
+    if (totalCardsForLevel % 2 !== 0) totalCardsForLevel++; // Should not happen with current pair logic
+    totalCardsForLevel = Math.max(2, totalCardsForLevel);
 
-    // Max columns based on 1080px container and card width + gap
-    const maxColsPossible = Math.floor(1080 / (cardWidth + columnGap));
-
-    // Available height for the board calculation
-    const headerHeight = document.querySelector('.game-header')?.offsetHeight || 70; // Approx fallback
-    const statsHeight = document.querySelector('.stats')?.offsetHeight || 30; // Approx fallback
-    const bannerAdHeight = document.getElementById('bannerAdContainer')?.offsetHeight || 0; // Ad container
-    // #game is min-height 100vh. Margins for #board are 24px auto auto auto.
-    // Consider space taken by header, stats, ad, and some padding for the board itself within #game.
-    const availableHeightForBoard = window.innerHeight - headerHeight - statsHeight - bannerAdHeight - 24 - 20; // 24px top margin of board, 20px other vertical spacing
-
-    const estimatedCardHeightWithGap = cardHeight + rowGap;
-    let maxRowsPossible = Math.floor(availableHeightForBoard / estimatedCardHeightWithGap);
-    if (maxRowsPossible < 2) maxRowsPossible = 2; // Minimum 2 rows, even if they overflow vertically.
-
-    const maxPhysicalCards = maxColsPossible * maxRowsPossible;
-
-    // Determine total cards based on level (progression logic)
-    let pairsForLevel;
-    if (level === 1) {
-        pairsForLevel = 1;
-    } else {
-        pairsForLevel = 1 + Math.floor((level - 1) / 2); // Existing progression
-    }
-    let totalCardsForLevel = pairsForLevel * 2;
-
-    // Determine actual cards to display: minimum of level requirement and physical capacity
-    let actualCardsToDisplay = Math.min(totalCardsForLevel, maxPhysicalCards);
-
-    // Ensure actualCardsToDisplay is an even number
-    if (actualCardsToDisplay % 2 !== 0) {
-        actualCardsToDisplay--;
-    }
-    // Ensure at least 1 pair
-    if (actualCardsToDisplay < 2) {
-        actualCardsToDisplay = 2;
-    }
-
-    // Calculate columns and rows for the actual cards to display
-    let cols = Math.ceil(Math.sqrt(actualCardsToDisplay));
-    if (cols > maxColsPossible) {
-        cols = maxColsPossible;
-    }
-    let rows = Math.ceil(actualCardsToDisplay / cols);
-    if (rows > maxRowsPossible) {
-        rows = maxRowsPossible;
-    }
-
-    // Final adjustment to actualCardsToDisplay based on calculated grid, ensuring it doesn't exceed level requirement
-    actualCardsToDisplay = Math.min(totalCardsForLevel, cols * rows);
-    if (actualCardsToDisplay % 2 !== 0) {
-        actualCardsToDisplay--;
-    }
-    if (actualCardsToDisplay < 2) {
-        actualCardsToDisplay = 2;
-    }
-    
-    // Recalculate rows and cols if actualCardsToDisplay changed again (e.g. due to making it even)
-    // This ensures cols is optimal for the final actualCardsToDisplay
-    cols = Math.ceil(Math.sqrt(actualCardsToDisplay));
-    if (cols > maxColsPossible) {
-        cols = maxColsPossible;
-    }
-    rows = Math.ceil(actualCardsToDisplay / cols);
-    // No need to check rows > maxRowsPossible again if actualCardsToDisplay was derived from a capped rows/cols product.
-
-    return {
-        rows: rows,
-        cols: cols,
-        actualCardsToDisplay: actualCardsToDisplay, // totalCards used by startLevel
-        totalCardsForLevel: totalCardsForLevel,
-        maxPhysicalCards: maxPhysicalCards
-    };
+    // Removed all layout calculations like maxColsPossible, maxRowsPossible, etc.
+    // actualCardsToDisplay will be totalCardsForLevel, as the grid will auto-fit.
+    // The timer difficulty logic will need to be adjusted in a subsequent step
+    // as maxPhysicalCards is no longer calculated here.
+    return { totalCardsForLevel: totalCardsForLevel };
 }
 
 function startLevel(level) {
@@ -296,17 +228,14 @@ function startLevel(level) {
   state.matchedCount = 0;
   state.busy = false;
 
-  const { rows, cols, actualCardsToDisplay, totalCardsForLevel, maxPhysicalCards } = getGridSize(level);
+  const { totalCardsForLevel } = getGridSize(level);
+  const actualCardsToDisplay = totalCardsForLevel; // For auto-fitting grid, we display all cards for the level.
   
-  if (state.maxPhysicalCards === undefined) { // Store it once
-      state.maxPhysicalCards = maxPhysicalCards;
-  }
-
-  // Set CSS variable for grid columns to make it responsive
-  board.style.setProperty('--cols', cols);
+  // state.maxPhysicalCards is no longer set here or used by this simplified layout approach.
+  // board.style.setProperty('--cols', cols); // Removed, CSS auto-fit handles columns.
 
   // Use actualCardsToDisplay for board setup
-  const totalPairs = Math.floor(actualCardsToDisplay/2);
+  const totalPairs = Math.floor(actualCardsToDisplay / 2);
   let emojisForLevel = shuffle(EMOJIS).slice(0,totalPairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]);
   
@@ -341,22 +270,15 @@ function startLevel(level) {
     board.appendChild(cardEl);
   });
   
+
   // Timer calculation
   let baseTime;
-  // Check if the number of cards determined by level progression exceeds what physically fits
-  if (totalCardsForLevel > state.maxPhysicalCards) {
-      // Screen is full, start reducing time as per new difficulty logic
-      // Calculate how many "effective" levels we are past the point where cards maxed out.
-      // Assuming each increment of 2 in totalCardsForLevel represents one difficulty step.
-      const levelsPastMax = Math.floor((totalCardsForLevel - state.maxPhysicalCards) / 2);
-
-      // Base time for a full screen of cards (using actualCardsToDisplay as it's capped by maxPhysicalCards here)
-      const timeForMaxCards = actualCardsToDisplay * 2.5;
-
-      baseTime = Math.max(10, timeForMaxCards - (levelsPastMax * 2)); // Reduce by 2s per level past max, min 10s
+  if (actualCardsToDisplay > MAX_CARDS_BEFORE_TIMER_DIFFICULTY) {
+      const levelsPastThreshold = Math.floor((actualCardsToDisplay - MAX_CARDS_BEFORE_TIMER_DIFFICULTY) / 2); // Assuming 2 cards per effective difficulty step
+      const timeForThresholdCards = MAX_CARDS_BEFORE_TIMER_DIFFICULTY * 2.0; // Base time for 30 cards, e.g., 2.0 seconds per card
+      baseTime = Math.max(10, timeForThresholdCards - (levelsPastThreshold * 2)); // Reduce by 2s per step, min 10s
   } else {
-      // Screen is not yet full, calculate time as before
-      baseTime = actualCardsToDisplay * 2.5;
+      baseTime = actualCardsToDisplay * 2.0; // Time for cards up to the threshold, e.g., 2.0 seconds per card
   }
   state.timeLeft = baseTime;
   updateHUD();
