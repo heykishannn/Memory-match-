@@ -2,9 +2,9 @@ body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue background */
   color: white;
-  margin: 0;
+  margin: 0 auto; /* Center content if screen is wider than max-width */
   height: 100vh;
-  overflow: hidden; /* Prevents scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 .hidden { display: none !important; }
 
@@ -166,15 +166,18 @@ footer span span {
 .result span { display: block; font-size: 1rem; margin: 0.1rem 0; }
 
 #game { /* Centering game content vertically, but pushing board up */
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  max-width: 1080px;
+  margin: 0 auto; /* Center #game div if body is wider */
   display: flex;
   flex-direction: column;
   align-items: center; /* Centers items horizontally */
   background: linear-gradient(to right, #4facfe, #00f2fe); /* Gradient blue */
+  min-height: 100vh; /* Ensure it can fill height */
+  box-sizing: border-box; /* Include padding/border in width/height */
 }
 
 .game-header {
-  width: 100vw;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -268,7 +271,7 @@ footer span span {
 
 .stats {
   margin: 0.6rem 0 0.1rem 0;
-  width: 100vw;
+  width: 100%;
   display: flex;
   justify-content: space-around;
   font-size: 1.13rem;
@@ -294,10 +297,8 @@ footer span span {
 }
 
 .card {
-  width: 100%; /* Make card fill its grid cell */
-  aspect-ratio: 1 / 1; /* Keep it square regardless of width changes */
-  max-width: 140px; /* Larger max size for desktop */
-  max-height: 140px; /* Larger max size for desktop */
+  width: 120px;
+  height: 120px;
   border: 2px solid black; /* Black border */
   border-radius: 0px;
   display: flex; /* For centering front/back content */
@@ -359,7 +360,7 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  .card { width: 100%; height: auto; max-width: 110px; max-height: 110px; font-size: 2.2rem; border-radius: 0px;} /* Larger cards on mobile */
+  /* .card { width: 100%; height: auto; max-width: 110px; max-height: 110px; font-size: 2.2rem; border-radius: 0px;} */ /* Rule for .card removed for fixed size */
   #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
   .splash-card { width: 70px; height: 110px; border-radius: 18px;}
   .game-header h1 { font-size: 1.7rem;}
