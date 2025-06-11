@@ -3,7 +3,7 @@ const EMOJIS = [
   "🥥","🥭","🍐","🍊","🍈","🍏","🥑","🍅","🥕","🌽",
   "🌷","🪷","🌸","🪻","🌺","🌼","🐼","🦄","🍂","🍄","🌿",
   "🐥","🐔","🦜","🕊️","🦢","🦋","🍨","🍧","🍭",
-  "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🔔",
+  "🍬","☕","🗿","🎂","🧸","🎹","💎","🔮","🐱",
   "🦚","🪕" // Added Peacock and Banjo emojis for sound effects as per list
 ];
 const MAX_LEVEL = 100;
@@ -519,7 +519,7 @@ function playMatchSound(emoji) {
     case "🗿": soundToPlay = audioSigma; break;
     case "🎂": soundToPlay = audioBirthday; break;
     case "🪕": soundToPlay = audioSitar; break;
-    case "🔔": soundToPlay = audioBell; break;
+    case "🐱": soundToPlay = audioBell; break;
     default: break; // No specific sound for other emojis
   }
 
