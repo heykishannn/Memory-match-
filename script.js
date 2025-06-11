@@ -181,7 +181,7 @@ startBtn.onclick = () => {
   } else {
     state.level = 1;
     state.score = 0;
-    saveProgress();
+    saveGameState(); // saveProgress -> saveGameState
     showGame();
   }
 };
@@ -195,19 +195,20 @@ resumeHomeBtn.onclick = () => {
   clearTimeout(state.adTimeout);
   state.paused = false;
   if(pauseBtn) pauseBtn.textContent = "||";
-  saveProgress(); // Ensure current progress is saved
+  clearFullGameState(); // Added
+  saveGameState();
   showHome();
 };
 watchAdResumeBtn.onclick = () => {
+  saveGameState(); // Added before window.open
   window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
   resumePopup.classList.add('hidden');
   // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
   // No need to call hideOverlay() here directly as resumePopup is hidden and another (ad timer) popup appears.
   startInGameAdTimer(() => { // Define original callback for resuming
-    const progress = JSON.parse(localStorage.getItem('memorymatch_progress'));
-    state.level = progress.level;
-    state.score = progress.score;
-    showGame(); // This was the original action
+    // Assuming loadFullGameState has already populated the state if page didn't reload,
+    // or it will run on page load.
+    showGame(true); // Pass true to resume from loaded state
   });
 };
 restartFrom1Btn.onclick = () => {
@@ -219,22 +220,78 @@ restartFrom1Btn.onclick = () => {
   clearTimeout(state.adTimeout);
   state.paused = false;
   if(pauseBtn) pauseBtn.textContent = "||";
+  clearFullGameState(); // Added
   state.level = 1;
   state.score = 0;
-  saveProgress();
+  saveGameState();
   showGame();
 };
 
 // Game
-function showGame() {
+function rebuildBoardFromState() {
+  board.innerHTML = '';
+  state.cards.forEach((card, i) => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'card';
+    cardEl.dataset.index = i;
+    cardEl.tabIndex = 0; // For accessibility
+    cardEl.innerHTML = `
+      <div class="front">${card.emoji}</div>
+      <div class="back"></div>
+    `;
+    if (card.flipped) {
+      cardEl.classList.add('flipped');
+    }
+    if (card.matched) {
+      cardEl.classList.add('matched');
+    }
+    cardEl.addEventListener('click', () => onCardClick(i));
+    cardEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onCardClick(i);
+      }
+    });
+    board.appendChild(cardEl);
+  });
+}
+
+function showGame(resumingSavedGame = false) { // Added resumingSavedGame parameter
   home.classList.add('hidden');
   game.classList.remove('hidden');
   winPopup.classList.add('hidden');
   losePopup.classList.add('hidden');
   resumePopup.classList.add('hidden');
-  updateHUD();
-  setupSwitches();
-  startLevel(state.level);
+
+  if (resumingSavedGame) {
+    // Ensure overlay is hidden if resuming directly to game
+    hideOverlay();
+
+    rebuildBoardFromState();
+    updateHUD(); // Update with loaded level, score, time
+    setupSwitches(); // Apply loaded sound/vibration settings
+
+    // loadFullGameState currently sets state.paused to false.
+    // If we want to preserve a paused state from save, loadFullGameState should also load/set it.
+    // For now, assume we unpause on resume, unless awaitingFirstTapAfterAd is true (handled in onCardClick).
+    if (!state.awaitingFirstTapAfterAd) {
+        state.paused = false;
+    }
+    // Ensure pause button text reflects the loaded/actual pause state
+    pauseBtn.textContent = state.paused ? "▶" : "||";
+
+    if (state.timeLeft > 0 && !state.paused) { // Only start timer if time is left and not paused
+        startTimer();
+    } else {
+        updateHUD(); // Ensure timer display is correct even if not starting (e.g. 0 time left or paused)
+    }
+
+  } else {
+    // This is for starting a new game/level normally (not resuming a saved full state)
+    updateHUD();
+    setupSwitches();
+    startLevel(state.level); // This creates a new board, resets score for level etc.
+  }
 }
 
 function getGridSize(level) {
@@ -396,7 +453,7 @@ function winLevel() {
   state.customSoundPlayedForWin = false;
   vibrate();
   state.score += state.timeLeft*2;
-  saveProgress();
+  saveGameState(); // saveProgress -> saveGameState
   updateHUD();
   resultLevel.textContent = "Level: " + state.level;
   resultScore.textContent = "Score: " + state.score;
@@ -409,9 +466,10 @@ nextLevelBtn.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
+  clearFullGameState(); // Added
   if(state.level<MAX_LEVEL) state.level++;
   else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
-  saveProgress();
+  saveGameState();
   startLevel(state.level);
 };
 homeBtn1.onclick = () => {
@@ -419,7 +477,8 @@ homeBtn1.onclick = () => {
   winPopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
   // Data should not reset when clicking home button
-  saveProgress();
+  clearFullGameState(); // Added
+  saveGameState();
   showHome();
 };
 function loseLevel() {
@@ -440,6 +499,7 @@ playAgainBtn.onclick = () => {
   clearTimeout(state.adTimeout);
   state.paused = false;
   if(pauseBtn) pauseBtn.textContent = "||";
+  clearFullGameState(); // Added
   startLevel(state.level);
 };
 loseHomeBtn.onclick = () => {
@@ -452,16 +512,20 @@ loseHomeBtn.onclick = () => {
   state.paused = false;
   if(pauseBtn) pauseBtn.textContent = "||";
   // Data should not reset when clicking home button
-  saveProgress();
+  clearFullGameState(); // Added
+  saveGameState();
   showHome();
 };
 watchAdBtn.onclick = () => {
+  saveGameState(); // Added before window.open
   window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
   losePopup.classList.add('hidden');
   // Overlay for startInGameAdTimer will be handled by startInGameAdTimer itself.
   // No need to call hideOverlay() here directly.
   startInGameAdTimer(() => { // Define original callback for continuing after loss
-    startTimer();
+    // Assuming loadFullGameState has populated the state.
+    // This will rebuild board, update HUD, and start timer based on loaded state.
+    showGame(true); // Pass true to resume from loaded state
   });
 };
 function updateHUD() {
@@ -548,11 +612,71 @@ function stopAllSounds() {
 function vibrate() {
   if(state.vibrationOn && window.navigator && window.navigator.vibrate) window.navigator.vibrate(220);
 }
-function saveProgress() {
+function saveGameState() { // Renamed saveProgress to saveGameState
+  // Existing functionality: save level and score to memorymatch_progress
   localStorage.setItem('memorymatch_progress', JSON.stringify({
-    level: state.level, score: state.score
+    level: state.level,
+    score: state.score
   }));
+
+  // New functionality: save full state to memorymatch_full_state
+  const fullState = {
+    level: state.level,
+    score: state.score,
+    timeLeft: state.timeLeft,
+    cards: state.cards, // Ensure cards are serializable (they should be)
+    flippedIndices: state.flippedIndices,
+    matchedCount: state.matchedCount,
+    soundOn: state.soundOn,
+    vibrationOn: state.vibrationOn
+  };
+  localStorage.setItem('memorymatch_full_state', JSON.stringify(fullState));
+  localStorage.setItem('memorymatch_has_full_state', 'true');
 }
+
+function clearFullGameState() {
+  localStorage.removeItem('memorymatch_full_state');
+  localStorage.setItem('memorymatch_has_full_state', 'false');
+}
+
+function loadFullGameState() {
+  if (localStorage.getItem('memorymatch_has_full_state') === 'true') {
+    try {
+      const fullStateString = localStorage.getItem('memorymatch_full_state');
+      if (fullStateString) {
+        const loadedState = JSON.parse(fullStateString);
+
+        // Update global state object
+        state.level = loadedState.level;
+        state.score = loadedState.score;
+        state.timeLeft = loadedState.timeLeft;
+        state.cards = loadedState.cards;
+        state.flippedIndices = loadedState.flippedIndices;
+        state.matchedCount = loadedState.matchedCount;
+        state.soundOn = loadedState.soundOn;
+        state.vibrationOn = loadedState.vibrationOn;
+
+        // Potentially reset other state properties not in fullState
+        // For example, timerId should be cleared and recreated by game logic if resuming.
+        state.timerId = null;
+        state.paused = false; // Or true, depending on desired resume behavior
+        state.busy = false;
+        // Consider other transient state properties like awaitingFirstTapAfterAd, postAdCallback etc.
+        // For now, only loading the core persistent state.
+
+        return true; // Successfully loaded and applied state
+      }
+    } catch (error) {
+      console.error("Error loading full game state:", error);
+      // Optionally, clear the possibly corrupted state
+      // localStorage.removeItem('memorymatch_full_state');
+      // localStorage.removeItem('memorymatch_has_full_state');
+      return false; // Parsing failed
+    }
+  }
+  return false; // No full state found or flag not set
+}
+
 function shuffle(arr) {
   let a = arr.slice();
   for(let i=a.length-1;i>0;i--) {
@@ -626,11 +750,30 @@ function startInGameAdTimer(callback) {
 });
 
 // Init
-showSplash();
+// showSplash(); // Will be called by initializeGame if needed
+
+// Initial game load sequence
+function initializeGame() {
+  if (loadFullGameState()) {
+    // Successfully loaded a full game state
+    splash.classList.add('hidden'); // Ensure splash is hidden
+    auth.classList.add('hidden');   // Ensure auth is hidden
+    home.classList.add('hidden');   // Ensure home is hidden
+    // game.classList.remove('hidden'); // showGame will handle this
+    hideOverlay(); // Ensure no overlay is showing from a previous session if not handled
+    showGame(true); // Resume the game
+  } else {
+    // No full game state found, or error during load, proceed with normal splash and login flow
+    showSplash();
+  }
+}
+
+initializeGame(); // Call the new initialization function
 
 // Event listener for page visibility
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
+    saveGameState(); // Save full game state when page is hidden
     state.isGameActive = false; // Keep this
     stopAllSounds(); // Keep this
 
