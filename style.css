@@ -21,6 +21,47 @@ body {
   z-index: 90; /* Below popups, above other content */
 }
 
+#adOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7); /* Darker overlay for more focus */
+  backdrop-filter: blur(8px); /* Stronger blur */
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 110; /* Above other popups and pageOverlay */
+  display: flex; /* Use flexbox for centering */
+  align-items: center; /* Vertical centering */
+  justify-content: center; /* Horizontal centering */
+  text-align: center;
+}
+
+#adOverlay .popup-content { /* Re-style or ensure it doesn't conflict with .popup .popup-content */
+  background: linear-gradient(135deg, #3f0c76, #290150); /* Darker purple, more serious tone */
+  padding: 2rem; /* More padding */
+  border-radius: 15px; /* Standard border radius */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4); /* More pronounced shadow */
+  color: white;
+  /* Remove fixed width/aspect-ratio if it's meant to be a simple message box */
+  max-width: 320px;
+  width: 80vw;
+}
+
+#adOverlayMessage {
+  font-size: clamp(1.1rem, 4vw, 1.4rem); /* Responsive font size */
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+#adOverlayTimer {
+  font-size: clamp(1.8rem, 7vw, 2.5rem); /* Larger, responsive font size for timer */
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #ffc837; /* Highlight color for timer */
+}
+
+
 #stickyFooter {
   position: fixed;
   bottom: 0;

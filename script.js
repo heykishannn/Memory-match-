@@ -20,6 +20,11 @@ const board = document.getElementById('board');
 const winPopup = document.getElementById('winPopup');
 const losePopup = document.getElementById('losePopup');
 const continuePopup = document.getElementById('continuePopup'); // Added
+const adOverlay = document.getElementById('adOverlay');
+const adOverlayMessage = document.getElementById('adOverlayMessage');
+const adOverlayTimer = document.getElementById('adOverlayTimer');
+const stickyFooter = document.getElementById('stickyFooter');
+const bannerAdContainer = document.getElementById('bannerAdContainer'); // Though likely controlled by stickyFooter visibility
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -107,8 +112,48 @@ function hideOverlay() {
   if (pageOverlay) pageOverlay.classList.add('hidden');
 }
 
+// Footer and Banner visibility functions
+function showFooterAndBanner() {
+  if (stickyFooter) stickyFooter.classList.remove('hidden');
+  // If bannerAdContainer had its own 'hidden' class management:
+  // if (bannerAdContainer) bannerAdContainer.classList.remove('hidden');
+}
+
+function hideFooterAndBanner() {
+  if (stickyFooter) stickyFooter.classList.add('hidden');
+  // If bannerAdContainer had its own 'hidden' class management:
+  // if (bannerAdContainer) bannerAdContainer.classList.add('hidden');
+}
+
+// Ad Overlay function
+let adOverlayTimeoutId = null; // To store timeout ID for clearing if needed
+function showAdOverlay(message, duration, callback) {
+  hideFooterAndBanner(); // Hide footer when ad overlay is shown
+  if (adOverlayMessage) adOverlayMessage.textContent = message;
+  if (adOverlayTimer) adOverlayTimer.textContent = duration;
+
+  if (adOverlay) adOverlay.classList.remove('hidden');
+  showOverlay(); // Show the general page overlay to disable background clicks
+
+  let countdown = duration;
+  if (adOverlayTimeoutId) clearInterval(adOverlayTimeoutId); // Clear any existing timer
+
+  adOverlayTimeoutId = setInterval(() => {
+    countdown--;
+    if (adOverlayTimer) adOverlayTimer.textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(adOverlayTimeoutId);
+      adOverlayTimeoutId = null;
+      if (adOverlay) adOverlay.classList.add('hidden');
+      hideOverlay(); // Hide general page overlay
+      if (callback) callback();
+    }
+  }, 1000);
+}
+
 // Continue Popup functions
 function showContinuePopup() {
+  hideFooterAndBanner(); // Hide footer when continue popup is shown
   if (continuePopup) continuePopup.classList.remove('hidden');
   showOverlay();
 }
@@ -126,6 +171,7 @@ function hideLosePopup() {
 
 // Splash: 3 blank gradient cards, flip animation
 function showSplash() {
+  showFooterAndBanner(); // Show footer on splash screen
   splash.classList.remove('hidden');
   home.classList.add('hidden');
   game.classList.add('hidden');
@@ -200,6 +246,7 @@ signupBtn.onclick = () => {
 
 // Home
 function showHome() {
+  showFooterAndBanner(); // Show footer on home screen
   // Ensure overlay is hidden when navigating to home, in case it was shown by auth
   hideOverlay();
   auth.classList.add('hidden');
@@ -266,6 +313,7 @@ function rebuildBoardFromState() {
 }
 
 function showGame(resumingSavedGame = false) { // Added resumingSavedGame parameter
+  hideFooterAndBanner(); // Hide footer when game screen is shown
   home.classList.add('hidden');
   game.classList.remove('hidden');
   winPopup.classList.add('hidden');
@@ -466,6 +514,7 @@ function winLevel() {
   resultScore.textContent = "Score: " + state.score;
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
   losePopup.classList.add('hidden'); // Ensure losePopup is hidden
+  hideFooterAndBanner(); // Hide footer when win popup is shown
   showOverlay(); // Show overlay for winPopup
   winPopup.classList.remove('hidden');
 }
@@ -483,9 +532,8 @@ homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
-  // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
-  clearFullGameState(); // This now also resets the in-memory state
-  // saveGameState(); // saveGameState is not typically needed when just going to Home
+  // REMOVE: clearFullGameState();
+  saveGameState(); // ADD THIS to save current game progress
   showHome();
 };
 function loseLevel() {
@@ -494,6 +542,7 @@ function loseLevel() {
   resultLevelL.textContent = "Level: " + state.level;
   resultScoreL.textContent = "Score: " + state.score;
   resultTimeL.textContent = "Time Left: 0s";
+  hideFooterAndBanner(); // Hide footer when lose popup is shown
   showOverlay(); // Show overlay for losePopup
   losePopup.classList.remove('hidden');
 }
@@ -744,36 +793,49 @@ function initializeGame() {
 // --- Start of Continue Popup Button Event Listeners ---
 if (watchAdContinueBtn) {
   watchAdContinueBtn.onclick = () => {
-    window.location.href = 'https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9';
-    hideContinuePopup();
-    // In-page 5-second timer
-    let adSeconds = 5;
-    timerDisplay.textContent = `Ad: ${adSeconds}s`;
+    // Open ad in a new tab
+    window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
 
-    const adTimerInterval = setInterval(() => {
-      adSeconds--;
-      timerDisplay.textContent = `Ad: ${adSeconds}s`;
-      if (adSeconds <= 0) {
-        clearInterval(adTimerInterval);
-        // Timer display will be updated by showGame -> updateHUD
+    // Hide the continue popup immediately
+    hideContinuePopup(); // Ensure it's hidden before overlay
 
-        loadFullGameState();
-        state.timeLeft += 10;
-        state.awaitingTapForBonusTime = true;
-        state.paused = true; // Pause the game, waiting for tap
-        if(pauseBtn) pauseBtn.textContent = "▶";
-        saveGameState();
-        showGame(true);
+    // Show custom ad overlay and define callback for reward
+    showAdOverlay('Please wait... unlocking your reward', 5, () => {
+      // Reward Logic for Continue Window:
+      loadFullGameState(); // Ensure the most recent state, though state should be current
+
+      // The request is to "resume game from last level".
+      // This implies restoring the board as it was, and unpausing.
+      // No time is added here as per the new requirements for continue.
+      state.paused = false;
+      state.awaitingTapForBonusTime = false; // No bonus tap needed, direct resume
+      if(pauseBtn) pauseBtn.textContent = "||";
+
+      saveGameState(); // Save the unpaused state
+      showGame(true);  // Rebuilds board and sets up the game visually
+
+      // FIX: Check for win condition immediately after restoring and showing the game
+      // This is important if the game was already won when it was paused/saved.
+      if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
+        // All pairs were already matched.
+        // Adding a small delay can help ensure the UI is ready before showing the win popup.
+        setTimeout(winLevel, 100); // 100ms delay, can be adjusted or removed if not needed.
+      } else if (state.timeLeft > 0 && !state.paused) {
+        // If not won and timer should run, ensure it does.
+        // startTimer(); // showGame should handle timer restart if conditions are met.
+        // Re-check: showGame already calls startTimer if timeLeft > 0 and not paused and not awaitingTap.
+        // So, an explicit startTimer() here might be redundant or even cause issues if not handled carefully.
+        // The existing logic in showGame and startTimer should be sufficient.
       }
-    }, 1000);
+    });
   };
 }
 
 if (continueHomeBtn) {
   continueHomeBtn.onclick = () => {
     hideContinuePopup();
-    // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
-    clearFullGameState(); // This now also resets the in-memory state
+    // REMOVE: clearFullGameState();
+    saveGameState(); // ADD THIS to save current game progress
     showHome();
   };
 }
@@ -801,31 +863,32 @@ if (startFromLevel1Btn) {
 // --- Start of Lose Popup Button Event Listeners (New) ---
 if (loseWatchAdBtn) {
   loseWatchAdBtn.onclick = () => {
-    window.location.href = 'https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9';
-    hideLosePopup();
-    let adSeconds = 5;
-    timerDisplay.textContent = `Ad: ${adSeconds}s`;
-    const adTimerInterval = setInterval(() => {
-      adSeconds--;
-      timerDisplay.textContent = `Ad: ${adSeconds}s`;
-      if (adSeconds <= 0) {
-        clearInterval(adTimerInterval);
-        state.timeLeft += 10;
-        state.awaitingTapForBonusTime = true;
-        state.paused = true; // Pause the game, waiting for tap
-        if(pauseBtn) pauseBtn.textContent = "▶";
-        saveGameState();
-        showGame(true);
-      }
-    }, 1000);
+    // Open ad in a new tab
+    window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
+
+    // Hide the lose popup immediately
+    hideLosePopup(); // Ensure it's hidden before overlay
+
+    // Show custom ad overlay and define callback for reward
+    showAdOverlay('Please wait... unlocking your reward', 5, () => {
+      // Reward Logic for Lose Window:
+      state.timeLeft += 10;
+      state.awaitingTapForBonusTime = true;
+      state.paused = true; // Game is paused, waiting for tap to use bonus time
+      if(pauseBtn) pauseBtn.textContent = "▶"; // Update pause button to show "resume"
+
+      updateHUD(); // Show the new time immediately on the HUD
+      saveGameState(); // Save the state with added time and awaiting tap
+      showGame(true); // Rebuild and display the game, it will be paused awaiting tap
+    });
   };
 }
 
 if (loseRestartHomeBtn) {
   loseRestartHomeBtn.onclick = () => {
     hideLosePopup();
-    // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
-    clearFullGameState(); // This now also resets the in-memory state
+    // REMOVE: clearFullGameState();
+    saveGameState(); // ADD THIS to save current game progress
     showHome();
   };
 }
