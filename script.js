@@ -41,7 +41,6 @@ const startFromLevel1Btn = document.getElementById('startFromLevel1Btn');
 // Buttons for Lose Popup (new ones)
 const loseWatchAdBtn = document.getElementById('loseWatchAdBtn');
 const loseRestartHomeBtn = document.getElementById('loseRestartHomeBtn');
-const loseStartFromLevel1Btn = document.getElementById('loseStartFromLevel1Btn');
 
 // Changed IDs for input elements for toggle switches
 const soundToggle = document.getElementById('soundToggle');
@@ -227,20 +226,10 @@ startBtn.onclick = () => {
     // New user, no resumable state, or loadFullGameState was technically successful
     // but didn't result in a playable cards array (e.g. corrupted data).
     // Ensure any potentially inconsistent full state is cleared.
-    clearFullGameState();
+    clearFullGameState(); // This now also resets the in-memory state
 
-    // Reset to default for a new game.
-    state.level = 1;
-    state.score = 0;
-    state.timeLeft = 0; // Ensure timeLeft is also reset for a new game.
-    state.cards = [];
-    state.flippedIndices = [];
-    state.matchedCount = 0;
-    state.busy = false;
-    state.paused = false;
-    state.awaitingTapForBonusTime = false; // Renamed
-    state.postAdCallback = null;
     // Sound and vibration settings (state.soundOn, state.vibrationOn) can retain user preference.
+    // Explicit state resets are removed as they are handled by clearFullGameState()
 
     saveGameState(); // Save this clean initial state (level 1, score 0, and default full state).
     showGame();      // Starts a new game from level 1.
@@ -494,9 +483,9 @@ homeBtn1.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
   hideOverlay(); // Hide overlay
-  state.awaitingTapForBonusTime = false; // Reset flag
-  clearFullGameState();
-  saveGameState();
+  // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
+  clearFullGameState(); // This now also resets the in-memory state
+  // saveGameState(); // saveGameState is not typically needed when just going to Home
   showHome();
 };
 function loseLevel() {
@@ -633,6 +622,17 @@ function saveGameState() { // Renamed saveProgress to saveGameState
 function clearFullGameState() {
   localStorage.removeItem('memorymatch_full_state');
   localStorage.setItem('memorymatch_has_full_state', 'false');
+  // Add these lines to reset the in-memory state:
+  state.level = 1;
+  state.score = 0;
+  state.timeLeft = 0;
+  state.cards = [];
+  state.flippedIndices = [];
+  state.matchedCount = 0;
+  state.busy = false;
+  state.paused = false;
+  state.awaitingTapForBonusTime = false;
+  state.postAdCallback = null;
 }
 
 function loadFullGameState() {
@@ -744,6 +744,7 @@ function initializeGame() {
 // --- Start of Continue Popup Button Event Listeners ---
 if (watchAdContinueBtn) {
   watchAdContinueBtn.onclick = () => {
+    window.location.href = 'https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9';
     hideContinuePopup();
     // In-page 5-second timer
     let adSeconds = 5;
@@ -771,8 +772,8 @@ if (watchAdContinueBtn) {
 if (continueHomeBtn) {
   continueHomeBtn.onclick = () => {
     hideContinuePopup();
-    state.awaitingTapForBonusTime = false; // Reset flag
-    clearFullGameState();
+    // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
+    clearFullGameState(); // This now also resets the in-memory state
     showHome();
   };
 }
@@ -800,6 +801,7 @@ if (startFromLevel1Btn) {
 // --- Start of Lose Popup Button Event Listeners (New) ---
 if (loseWatchAdBtn) {
   loseWatchAdBtn.onclick = () => {
+    window.location.href = 'https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9';
     hideLosePopup();
     let adSeconds = 5;
     timerDisplay.textContent = `Ad: ${adSeconds}s`;
@@ -822,28 +824,9 @@ if (loseWatchAdBtn) {
 if (loseRestartHomeBtn) {
   loseRestartHomeBtn.onclick = () => {
     hideLosePopup();
-    state.awaitingTapForBonusTime = false; // Reset flag
-    clearFullGameState();
+    // state.awaitingTapForBonusTime = false; // Reset flag - This is now handled by clearFullGameState
+    clearFullGameState(); // This now also resets the in-memory state
     showHome();
-  };
-}
-
-if (loseStartFromLevel1Btn) {
-  loseStartFromLevel1Btn.onclick = () => {
-    hideLosePopup();
-    state.level = 1;
-    state.score = 0;
-    state.timeLeft = 0;
-    state.cards = [];
-    state.flippedIndices = [];
-    state.matchedCount = 0;
-    state.busy = false;
-    state.paused = false;
-    state.awaitingTapForBonusTime = false; // Renamed and reset
-    state.postAdCallback = null;
-    clearFullGameState();
-    saveGameState();
-    showGame();
   };
 }
 // --- End of Lose Popup Button Event Listeners ---
