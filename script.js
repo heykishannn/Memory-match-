@@ -521,12 +521,30 @@ function winLevel() {
 nextLevelBtn.onclick = () => {
   stopAllSounds();
   winPopup.classList.add('hidden');
-  hideOverlay(); // Hide overlay
-  clearFullGameState(); // Added
-  if(state.level<MAX_LEVEL) state.level++;
-  else { state.level=1; state.score=0; } // Restart if MAX_LEVEL is reached
-  saveGameState();
-  startLevel(state.level);
+  hideOverlay();
+
+  // state.level should have been saved by winLevel() already.
+  // We just need to increment it if it's less than MAX_LEVEL.
+  if (state.level < MAX_LEVEL) {
+    state.level++;
+  }
+  // If state.level is MAX_LEVEL, it will just reload MAX_LEVEL.
+  // No need to reset score here, as startLevel doesn't use the old score.
+  // Score for the new level will accumulate from 0 within that level.
+  // clearFullGameState() should NOT be called here as it resets level and score unnecessarily.
+
+  // Reset only parts of the state relevant for starting a new level,
+  // but preserve global score and the new level.
+  // Most of this is handled by startLevel() anyway.
+  state.timeLeft = 0;
+  state.flippedIndices = [];
+  state.matchedCount = 0;
+  state.busy = false;
+  state.paused = false;
+  state.awaitingTapForBonusTime = false;
+
+  saveGameState(); // Save the new state.level and potentially other things like sound settings
+  startLevel(state.level); // Start the next level (or MAX_LEVEL again if capped)
 };
 homeBtn1.onclick = () => {
   stopAllSounds();
@@ -549,14 +567,28 @@ function loseLevel() {
 playAgainBtn.onclick = () => {
   stopAllSounds();
   losePopup.classList.add('hidden');
-  hideOverlay(); // Hide overlay
-  state.awaitingTapForBonusTime = false; // Renamed and reset
-  state.postAdCallback = null;
-  clearTimeout(state.adTimeout);
+  hideOverlay();
+
+  // Reset state for replaying the current level
+  // state.level remains the same (the level the user just lost on)
+  // state.score also remains the same (score accumulated from previous levels)
+  state.timeLeft = 0; // Will be set by startLevel
+  state.flippedIndices = [];
+  state.matchedCount = 0;
+  state.busy = false;
   state.paused = false;
+  state.awaitingTapForBonusTime = false;
+  state.postAdCallback = null; // Ensure any pending ad callback is cleared
+  clearTimeout(state.adTimeout); // Clear any pending ad timer
+
   if(pauseBtn) pauseBtn.textContent = "||";
-  clearFullGameState();
-  startLevel(state.level);
+
+  // Do NOT call clearFullGameState() as it resets state.level to 1 and state.score to 0.
+  // We want to replay the current state.level.
+  // The accumulated state.score should be preserved.
+
+  saveGameState(); // Save the state (e.g., sound settings, current level to replay)
+  startLevel(state.level); // Restart the current level
 };
 // loseHomeBtn.onclick and watchAdBtn.onclick are removed as the buttons themselves are removed/replaced.
 
