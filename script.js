@@ -802,30 +802,17 @@ if (watchAdContinueBtn) {
     // Show custom ad overlay and define callback for reward
     showAdOverlay('Please wait... unlocking your reward', 5, () => {
       // Reward Logic for Continue Window:
-      loadFullGameState(); // Ensure the most recent state, though state should be current
+      loadFullGameState();
 
-      // The request is to "resume game from last level".
-      // This implies restoring the board as it was, and unpausing.
-      // No time is added here as per the new requirements for continue.
       state.paused = false;
-      state.awaitingTapForBonusTime = false; // No bonus tap needed, direct resume
+      state.awaitingTapForBonusTime = false;
       if(pauseBtn) pauseBtn.textContent = "||";
 
-      saveGameState(); // Save the unpaused state
-      showGame(true);  // Rebuilds board and sets up the game visually
+      saveGameState();
+      showGame(true);
 
-      // FIX: Check for win condition immediately after restoring and showing the game
-      // This is important if the game was already won when it was paused/saved.
       if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
-        // All pairs were already matched.
-        // Adding a small delay can help ensure the UI is ready before showing the win popup.
-        setTimeout(winLevel, 100); // 100ms delay, can be adjusted or removed if not needed.
-      } else if (state.timeLeft > 0 && !state.paused) {
-        // If not won and timer should run, ensure it does.
-        // startTimer(); // showGame should handle timer restart if conditions are met.
-        // Re-check: showGame already calls startTimer if timeLeft > 0 and not paused and not awaitingTap.
-        // So, an explicit startTimer() here might be redundant or even cause issues if not handled carefully.
-        // The existing logic in showGame and startTimer should be sufficient.
+        setTimeout(winLevel, 100);
       }
     });
   };
@@ -874,12 +861,12 @@ if (loseWatchAdBtn) {
       // Reward Logic for Lose Window:
       state.timeLeft += 10;
       state.awaitingTapForBonusTime = true;
-      state.paused = true; // Game is paused, waiting for tap to use bonus time
-      if(pauseBtn) pauseBtn.textContent = "▶"; // Update pause button to show "resume"
+      state.paused = true;
+      if(pauseBtn) pauseBtn.textContent = "▶";
 
-      updateHUD(); // Show the new time immediately on the HUD
-      saveGameState(); // Save the state with added time and awaiting tap
-      showGame(true); // Rebuild and display the game, it will be paused awaiting tap
+      updateHUD();
+      saveGameState();
+      showGame(true);
     });
   };
 }
