@@ -30,7 +30,11 @@ const rewardCountdownTimer = document.getElementById('rewardCountdownTimer');
 const rewardGuaranteedLabel = document.getElementById('rewardGuaranteedLabel');
 const rewardBackButton = document.getElementById('rewardBackButton');
 const rewardTopRightContainer = document.getElementById('rewardTopRightContainer');
-const rewardAdBannerContainer = document.getElementById('rewardAdBannerContainer');
+// const rewardAdBannerContainer = document.getElementById('rewardAdBannerContainer'); // Old one, replaced
+const immediateAdPlaceholder = document.getElementById('immediateAdPlaceholder');
+const rewardAdBannerContainer_468x60 = document.getElementById('rewardAdBannerContainer_468x60');
+const rewardAdBannerContainer_300x250 = document.getElementById('rewardAdBannerContainer_300x250');
+const rewardAdBannerContainer_responsive = document.getElementById('rewardAdBannerContainer_responsive');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -185,18 +189,27 @@ function showCustomRewardScreen(originalContext) {
 
   // Setup initial UI state for the reward screen
   if (customRewardScreen) customRewardScreen.classList.remove('hidden');
+
+  // Show Immediate Ad Placeholder Text
+  if (immediateAdPlaceholder) {
+    immediateAdPlaceholder.innerHTML = ''; // Clear previous
+    immediateAdPlaceholder.textContent = ''; // Placeholder for the immediate ad.
+  }
+
   if (rewardCountdownTimer) {
     rewardCountdownTimer.textContent = '5';
     rewardCountdownTimer.classList.remove('hidden');
   }
-  if (rewardBackButton) rewardBackButton.classList.add('hidden'); // Back button initially hidden
-
-  // Top-right container (label + ad) is initially hidden
+  if (rewardBackButton) rewardBackButton.classList.add('hidden');
   if (rewardTopRightContainer) rewardTopRightContainer.classList.add('hidden');
-  if (rewardAdBannerContainer) rewardAdBannerContainer.innerHTML = ''; // Clear any previous ad
+
+  // Clear previous ads in top-right
+  if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
+  if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
+  if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
 
   let countdown = 5;
-  if (rewardScreenTimerId) clearInterval(rewardScreenTimerId); // Clear any existing timer
+  if (rewardScreenTimerId) clearInterval(rewardScreenTimerId);
 
   rewardScreenTimerId = setInterval(() => {
     countdown--;
@@ -206,60 +219,87 @@ function showCustomRewardScreen(originalContext) {
       rewardScreenTimerId = null;
 
       if (rewardCountdownTimer) rewardCountdownTimer.classList.add('hidden');
-      if (rewardBackButton) rewardBackButton.classList.remove('hidden'); // Show styled back button
-
-      // Show top-right container (label and ad area)
+      if (rewardBackButton) rewardBackButton.classList.remove('hidden');
       if (rewardTopRightContainer) rewardTopRightContainer.classList.remove('hidden');
 
-      // Inject Ad Script into rewardAdBannerContainer
-      if (rewardAdBannerContainer) {
-        // Clear previous ad content just in case
-        rewardAdBannerContainer.innerHTML = '';
+      // Inject Ad 1 (468x60)
+      if (rewardAdBannerContainer_468x60) {
+        rewardAdBannerContainer_468x60.innerHTML = ''; // Clear
+        const script1_opt = document.createElement('script');
+        script1_opt.type = 'text/javascript';
+        script1_opt.textContent = "atOptions = {'key' : 'f3980c7d80f3803dbaf4228f02da605b', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};";
+        rewardAdBannerContainer_468x60.appendChild(script1_opt);
+        const script1_invoke = document.createElement('script');
+        script1_invoke.type = 'text/javascript';
+        script1_invoke.src = '//www.highperformanceformat.com/f3980c7d80f3803dbaf4228f02da605b/invoke.js';
+        script1_invoke.async = true;
+        rewardAdBannerContainer_468x60.appendChild(script1_invoke);
+      }
 
-        const script1 = document.createElement('script');
-        script1.type = 'text/javascript';
-        // Using textContent for inline script content is safer
-        script1.textContent = "atOptions = {'key' : 'f3980c7d80f3803dbaf4228f02da605b', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};";
-        rewardAdBannerContainer.appendChild(script1);
+      // Inject Ad 2 (300x250)
+      if (rewardAdBannerContainer_300x250) {
+        rewardAdBannerContainer_300x250.innerHTML = ''; // Clear
+        const script2_opt = document.createElement('script');
+        script2_opt.type = 'text/javascript';
+        script2_opt.textContent = "atOptions = {'key' : '3606c322c11ecc95fb215e54122b24b9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};";
+        rewardAdBannerContainer_300x250.appendChild(script2_opt);
+        const script2_invoke = document.createElement('script');
+        script2_invoke.type = 'text/javascript';
+        script2_invoke.src = '//www.highperformanceformat.com/3606c322c11ecc95fb215e54122b24b9/invoke.js';
+        script2_invoke.async = true;
+        rewardAdBannerContainer_300x250.appendChild(script2_invoke);
+      }
 
-        const script2 = document.createElement('script');
-        script2.type = 'text/javascript';
-        script2.src = '//www.highperformanceformat.com/f3980c7d80f3803dbaf4228f02da605b/invoke.js';
-        script2.async = true;
-        rewardAdBannerContainer.appendChild(script2);
+      // Inject Ad 3 (Responsive)
+      if (rewardAdBannerContainer_responsive) {
+        rewardAdBannerContainer_responsive.innerHTML = ''; // Clear
+        const script3_invoke = document.createElement('script');
+        script3_invoke.async = true;
+        script3_invoke.setAttribute('data-cfasync', 'false');
+        script3_invoke.src = '//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js';
+        rewardAdBannerContainer_responsive.appendChild(script3_invoke);
+        const ad3_div = document.createElement('div');
+        ad3_div.id = 'container-ce2d3cde4fcc3769cce04418ad7b7d93';
+        rewardAdBannerContainer_responsive.appendChild(ad3_div);
       }
     }
   }, 1000);
 
-  // Assign onclick for the back button (only once or ensure it's correctly reassigned)
-  // It's better to define it outside if it's always the same, or ensure this function is called such that it's fresh.
-  // For this plan, let's define it here for clarity of context.
+  // Back button onClick assignment - ENSURE THIS IS CORRECT AND FIRING
   if (rewardBackButton) {
-    rewardBackButton.onclick = () => {
+    // Remove any old listener to prevent multiple firings if showCustomRewardScreen is called multiple times
+    const newBackButton = rewardBackButton.cloneNode(true);
+    rewardBackButton.parentNode.replaceChild(newBackButton, rewardBackButton);
+    // Update the reference
+    const currentRewardBackButton = document.getElementById('rewardBackButton'); // Re-fetch after replacing
+
+    currentRewardBackButton.onclick = () => {
       if (customRewardScreen) customRewardScreen.classList.add('hidden');
-      if (rewardAdBannerContainer) rewardAdBannerContainer.innerHTML = ''; // Clear ad when leaving screen
+
+      // Clear ad containers
+      if (immediateAdPlaceholder) immediateAdPlaceholder.innerHTML = '';
+      if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
+      if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
+      if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
 
       state.timeLeft += 10;
+      updateHUD(); // Update HUD immediately after time change
 
       if (originalContext === 'continuePopup') {
-        loadFullGameState(); // Ensure state is fresh
+        loadFullGameState();
         state.paused = false;
         state.awaitingTapForBonusTime = false;
         if (pauseBtn) pauseBtn.textContent = "||";
-        updateHUD(); // Reflect new time
-        saveGameState();
+        saveGameState(); // Save before showing game
         showGame(true);
-        // Check win condition
         if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
           setTimeout(winLevel, 100);
         }
       } else if (originalContext === 'losePopup') {
-        // state.timeLeft was already incremented by 10 (common reward)
         state.awaitingTapForBonusTime = true;
         state.paused = true;
         if (pauseBtn) pauseBtn.textContent = "▶";
-        updateHUD(); // Reflect new time
-        saveGameState();
+        saveGameState(); // Save before showing game
         showGame(true);
       }
     };
