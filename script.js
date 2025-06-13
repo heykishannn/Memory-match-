@@ -29,6 +29,8 @@ const customRewardScreen = document.getElementById('customRewardScreen');
 const rewardCountdownTimer = document.getElementById('rewardCountdownTimer');
 const rewardGuaranteedLabel = document.getElementById('rewardGuaranteedLabel');
 const rewardBackButton = document.getElementById('rewardBackButton');
+const rewardTopRightContainer = document.getElementById('rewardTopRightContainer');
+const rewardAdBannerContainer = document.getElementById('rewardAdBannerContainer');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -187,8 +189,11 @@ function showCustomRewardScreen(originalContext) {
     rewardCountdownTimer.textContent = '5';
     rewardCountdownTimer.classList.remove('hidden');
   }
-  if (rewardBackButton) rewardBackButton.classList.add('hidden');
-  if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.add('hidden');
+  if (rewardBackButton) rewardBackButton.classList.add('hidden'); // Back button initially hidden
+
+  // Top-right container (label + ad) is initially hidden
+  if (rewardTopRightContainer) rewardTopRightContainer.classList.add('hidden');
+  if (rewardAdBannerContainer) rewardAdBannerContainer.innerHTML = ''; // Clear any previous ad
 
   let countdown = 5;
   if (rewardScreenTimerId) clearInterval(rewardScreenTimerId); // Clear any existing timer
@@ -199,9 +204,30 @@ function showCustomRewardScreen(originalContext) {
     if (countdown <= 0) {
       clearInterval(rewardScreenTimerId);
       rewardScreenTimerId = null;
+
       if (rewardCountdownTimer) rewardCountdownTimer.classList.add('hidden');
-      if (rewardBackButton) rewardBackButton.classList.remove('hidden');
-      if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.remove('hidden');
+      if (rewardBackButton) rewardBackButton.classList.remove('hidden'); // Show styled back button
+
+      // Show top-right container (label and ad area)
+      if (rewardTopRightContainer) rewardTopRightContainer.classList.remove('hidden');
+
+      // Inject Ad Script into rewardAdBannerContainer
+      if (rewardAdBannerContainer) {
+        // Clear previous ad content just in case
+        rewardAdBannerContainer.innerHTML = '';
+
+        const script1 = document.createElement('script');
+        script1.type = 'text/javascript';
+        // Using textContent for inline script content is safer
+        script1.textContent = "atOptions = {'key' : 'f3980c7d80f3803dbaf4228f02da605b', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};";
+        rewardAdBannerContainer.appendChild(script1);
+
+        const script2 = document.createElement('script');
+        script2.type = 'text/javascript';
+        script2.src = '//www.highperformanceformat.com/f3980c7d80f3803dbaf4228f02da605b/invoke.js';
+        script2.async = true;
+        rewardAdBannerContainer.appendChild(script2);
+      }
     }
   }, 1000);
 
@@ -211,8 +237,8 @@ function showCustomRewardScreen(originalContext) {
   if (rewardBackButton) {
     rewardBackButton.onclick = () => {
       if (customRewardScreen) customRewardScreen.classList.add('hidden');
+      if (rewardAdBannerContainer) rewardAdBannerContainer.innerHTML = ''; // Clear ad when leaving screen
 
-      // Common reward: +10 seconds
       state.timeLeft += 10;
 
       if (originalContext === 'continuePopup') {

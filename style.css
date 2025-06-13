@@ -485,20 +485,22 @@ footer span span {
   background: linear-gradient(135deg, #4a00e0, #8e2de2); /* Purple gradient (reverse of popups) */
   z-index: 150; /* Higher than other popups/overlays */
   display: flex;
-  flex-direction: column; /* Or row, depending on main content layout needs */
-  justify-content: space-between; /* For top/bottom alignment of content */
-  align-items: stretch; /* Default, stretches children to fill cross axis */
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
   color: white;
   padding: 20px;
   box-sizing: border-box;
+  overflow: hidden; /* Prevent scrollbars */
 }
 
 #rewardTopLeftContainer {
   position: absolute;
   top: 20px;
   left: 20px;
-  display: flex; /* To allow items to sit side-by-side if needed, or stack */
-  align-items: center; /* Vertically align items if they are side-by-side */
+  display: flex;
+  align-items: center;
+  z-index: 1; /* To be above other screen content */
 }
 
 #rewardCountdownTimer {
@@ -507,27 +509,44 @@ footer span span {
   padding: 10px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
-  /* Timer will be replaced by back button, so they won't show at the same time in this container */
 }
 
 #rewardBackButton {
-  /* .btn styles are applied via class="btn" in HTML */
-  /* Overrides or specific styles for back button if needed */
-  padding: 10px 20px; /* Example: Specific padding */
-  font-size: 1em;   /* Example: Specific font size */
-  margin: 0; /* Remove default btn margins if it's too much for the corner */
-  /* width: auto; */ /* Override btn width if it's fixed and too large for a corner button */
-  /* max-width: none; */ /* Remove max-width from .btn if needed */
-  /* display: inline-block; */ /* If .btn is block, might need to adjust for corner placement */
+  background-color: rgba(0,0,0,0.3);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px; /* Adjust for arrow icon size */
+  line-height: 38px; /* Adjust for vertical centering of arrow */
+  text-align: center;
+  cursor: pointer;
+  padding: 0; /* Remove any default padding */
 }
 
-#rewardGuaranteedLabel {
+#rewardTopRightContainer {
   position: absolute;
   top: 20px;
   right: 20px;
-  font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Align items (label, ad) to the right */
+  z-index: 1; /* To be above other screen content */
+}
+
+#rewardGuaranteedLabel {
+  font-family: 'Arial', sans-serif;
+  font-size: 0.9em;
   font-weight: bold;
-  padding: 10px;
+  padding: 8px 12px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
+  margin-bottom: 10px; /* Space between label and ad banner */
+}
+
+#rewardAdBannerContainer {
+  width: 468px;
+  height: 60px;
+  background-color: rgba(0,0,0,0.1); /* Optional: slight background for placeholder */
 }
