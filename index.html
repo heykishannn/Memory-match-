@@ -107,9 +107,15 @@
   <div id="customRewardScreen" class="hidden">
     <div id="rewardTopLeftContainer">
       <div id="rewardCountdownTimer">5</div>
-      <button id="rewardBackButton" class="btn hidden">Back</button>
+      <!-- Changed button text to an arrow, removed btn class for custom styling -->
+      <button id="rewardBackButton" class="hidden">←</button>
     </div>
-    <div id="rewardGuaranteedLabel" class="hidden">Reward Guaranteed</div>
+    <div id="rewardTopRightContainer" class="hidden"> <!-- This container will also be hidden initially -->
+      <div id="rewardGuaranteedLabel">Reward Guaranteed</div>
+      <div id="rewardAdBannerContainer">
+        <!-- Ad script will be injected here by JavaScript -->
+      </div>
+    </div>
   </div>
   <!-- Sounds -->
   <audio id="audio-tap" src="tap.mp3"></audio>
