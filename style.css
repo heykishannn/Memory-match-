@@ -503,6 +503,7 @@ footer span span {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 30px; /* Lowered slightly */
 }
 
 #immediateAdPlaceholder {
@@ -517,12 +518,12 @@ footer span span {
 
 
 #rewardTopLeftContainer {
-  position: absolute;
-  top: 20px; /* Ensure top-left positioning */
+  position: fixed; /* Changed to fixed for robust screen positioning */
+  top: 20px;
   left: 20px;
   display: flex;
   align-items: center;
-  z-index: 1;
+  z-index: 100; /* Increased z-index */
 }
 
 #rewardCountdownTimer {
@@ -545,16 +546,22 @@ footer span span {
   text-align: center;
   cursor: pointer;
   padding: 0;
+  display: flex; /* Added for centering content (arrow) */
+  align-items: center; /* Added for centering content (arrow) */
+  justify-content: center; /* Added for centering content (arrow) */
 }
 
+/* Repositioned to be part of normal flow, centered by #customRewardScreen */
 #rewardTopRightContainer {
-  position: absolute;
-  top: 20px; /* Ensure top-right positioning */
-  right: 20px;
+  /* position: absolute; */ /* Removed absolute positioning */
+  /* top: 90px; */
+  /* right: 20px; */
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  z-index: 1;
+  align-items: center; /* Changed from flex-end to center children */
+  /* z-index: 1; */ /* No longer needed for absolute positioning */
+  margin-top: 10px; /* Spacing below immediateAdContainerTop */
+  width: 100%; /* Allow it to be centered if content is narrower */
 }
 
 #rewardGuaranteedLabel {
@@ -564,7 +571,11 @@ footer span span {
   padding: 8px 12px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */ /* Removed as it's fixed positioned now */
+  position: fixed; /* Fixed position to viewport */
+  top: 10px;
+  right: 20px;
+  z-index: 100; /* Ensure it's above other content */
 }
 
 #rewardAdBannerContainer_468x60 {
