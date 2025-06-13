@@ -491,70 +491,72 @@ footer span span {
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: hidden;   /* Allow vertical scroll if content overflows */
+  overflow-y: auto;   /* Explicitly allow vertical scroll */
 }
 
 #immediateAdContainerTop {
   width: 100%;
   padding: 10px 0;
-  text-align: center;
+  /* text-align: center; */ /* Flex centering is used */
   box-sizing: border-box;
   min-height: 80px; /* For a 60px ad + 20px total vertical padding */
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 20px; /* Move down slightly */
+  position: relative; /* For positioning rewardGuaranteedLabel */
 }
 
 #immediateAdPlaceholder {
   width: 468px;
   height: 60px;
   background-color: rgba(0,0,0,0.1); /* Placeholder visual */
-  /* display: inline-block; */ /* Not needed if parent is flex centering */
-  /* color: #ccc; */ /* Text content removed, so not needed */
-  /* display: flex; align-items: center; justify-content: center; */ /* Not needed for ad iframe */
-  /* font-size: 0.8em; */ /* Not needed */
+  /* Centered by parent's flex properties */
 }
 
 
 #rewardTopLeftContainer {
-  position: absolute;
+  position: fixed; /* Fixed position to viewport */
   top: 20px;
   left: 20px;
   display: flex;
   align-items: center;
-  z-index: 1;
+  z-index: 10; /* Ensure it's above other content */
 }
 
 #rewardCountdownTimer {
-  font-size: 2em;
+  font-size: 1.5em; /* Slightly smaller for a less intrusive look */
   font-weight: bold;
   padding: 10px;
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0,0,0,0.3); /* Slightly darker background */
   border-radius: 5px;
 }
 
 #rewardBackButton {
-  background: linear-gradient(to right, #ff8008, #ffc837);
+  background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;
-  line-height: 38px;
+  width: 40px; /* Small and rounded */
+  height: 40px; /* Small and rounded */
+  font-size: 20px; /* Adjusted for "small" */
+  line-height: 40px; /* Center arrow vertically */
   text-align: center;
   cursor: pointer;
   padding: 0;
 }
 
+/* This container will now hold the ads below the immediateAdPlaceholder and be centered by #customRewardScreen */
 #rewardTopRightContainer {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  /* position: absolute; */ /* Removed absolute positioning */
+  /* top: 90px; */
+  /* right: 20px; */
   display: flex;
   flex-direction: column;
-  align-items: center; /* Changed from flex-end to center children */
-  z-index: 1;
+  align-items: center; /* Center its children (ad containers) */
+  /* z-index: 1; */ /* Not needed if in normal flow */
+  width: 100%; /* Take full width to allow children to center within it */
+  margin-top: 10px; /* Space below immediateAdContainerTop */
 }
 
 #rewardGuaranteedLabel {
@@ -564,27 +566,35 @@ footer span span {
   padding: 8px 12px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */ /* Removed, will be positioned absolutely */
+  position: absolute;
+  top: -30px; /* Adjust to be above immediateAdContainerTop */
+  right: 0; /* Align to the right of immediateAdContainerTop */
+  /* To make it align to the right of the content area if immediateAdContainerTop is not full width:
+     This would require immediateAdContainerTop to have a defined width or max-width for right:0 to make sense.
+     If immediateAdContainerTop is 100% width, then right:0 is screen right.
+     For now, assuming right:0 of immediateAdContainerTop itself.
+  */
 }
 
 #rewardAdBannerContainer_468x60 {
   width: 468px;
   height: 60px;
-  margin-top: 10px;
+  margin: 10px auto; /* Vertical spacing, auto for horizontal centering */
   background-color: rgba(0,0,0,0.1);
 }
 
 #rewardAdBannerContainer_300x250 {
   width: 300px;
   height: 250px;
-  margin-top: 10px;
+  margin: 10px auto; /* Vertical spacing, auto for horizontal centering */
   background-color: rgba(0,0,0,0.1);
 }
 
 #rewardAdBannerContainer_responsive {
   width: 100%;
-  max-width: 320px;
+  max-width: 320px; /* Or whatever max width is desired */
   min-height: 50px;
-  margin-top: 10px;
+  margin: 10px auto; /* Vertical spacing, auto for horizontal centering */
   background-color: rgba(0,0,0,0.1);
 }
