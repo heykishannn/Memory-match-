@@ -11,7 +11,7 @@ const MAX_CARDS_BEFORE_TIMER_DIFFICULTY = 30;
 
 // Ad Keys
 const IMMEDIATE_TOP_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b'; // For immediate top-center 468x60 ad
-const TOP_RIGHT_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b'; // Placeholder for the 468x60 ad in top-right stack
+const TOP_RIGHT_AD_KEY_468x60 = 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60'; // Placeholder for the 468x60 ad in top-right stack
 const MIDDLE_AD_KEY_300x250 = '3606c322c11ecc95fb215e54122b24b9';
 const RESPONSIVE_AD_SCRIPT_SRC = '//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js';
 const RESPONSIVE_AD_CONTAINER_ID = 'container-ce2d3cde4fcc3769cce04418ad7b7d93';
@@ -195,56 +195,7 @@ function showCustomRewardScreen(originalContext) {
 
   if (customRewardScreen) customRewardScreen.classList.remove('hidden');
 
-  // --- Ad Injection for rewardTopRightContainer (moved up) ---
-  // Clear previous ads in top-right stack
-  if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
-  if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
-  if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
-
-  // Ad 1 (468x60) - Top in stack
-  if (rewardAdBannerContainer_468x60) {
-    if (TOP_RIGHT_AD_KEY_468x60 !== 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60') { // Condition might need update if key name changes or is used directly
-      const script1_opt = document.createElement('script');
-      script1_opt.type = 'text/javascript';
-      script1_opt.textContent = `atOptions = {'key' : '${TOP_RIGHT_AD_KEY_468x60}', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};`;
-      rewardAdBannerContainer_468x60.appendChild(script1_opt);
-      const script1_invoke = document.createElement('script');
-      script1_invoke.type = 'text/javascript';
-      script1_invoke.src = `//www.highperformanceformat.com/${TOP_RIGHT_AD_KEY_468x60}/invoke.js`;
-      script1_invoke.async = true;
-      rewardAdBannerContainer_468x60.appendChild(script1_invoke);
-    } else {
-      rewardAdBannerContainer_468x60.textContent = 'Placeholder for 468x60 Ad (Key Missing)';
-    }
-  }
-
-  // Ad 2 (300x250) - Middle in stack
-  if (rewardAdBannerContainer_300x250) {
-    const script2_opt = document.createElement('script');
-    script2_opt.type = 'text/javascript';
-    script2_opt.textContent = `atOptions = {'key' : '${MIDDLE_AD_KEY_300x250}', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};`;
-    rewardAdBannerContainer_300x250.appendChild(script2_opt);
-    const script2_invoke = document.createElement('script');
-    script2_invoke.type = 'text/javascript';
-    script2_invoke.src = `//www.highperformanceformat.com/${MIDDLE_AD_KEY_300x250}/invoke.js`;
-    script2_invoke.async = true;
-    rewardAdBannerContainer_300x250.appendChild(script2_invoke);
-  }
-
-  // Ad 3 (Responsive) - Bottom in stack
-  if (rewardAdBannerContainer_responsive) {
-    const ad3_script = document.createElement('script');
-    ad3_script.async = true;
-    ad3_script.setAttribute('data-cfasync', 'false');
-    ad3_script.src = RESPONSIVE_AD_SCRIPT_SRC;
-    rewardAdBannerContainer_responsive.appendChild(ad3_script);
-    const ad3_div = document.createElement('div');
-    ad3_div.id = RESPONSIVE_AD_CONTAINER_ID;
-    rewardAdBannerContainer_responsive.appendChild(ad3_div);
-  }
-
   // --- Immediate Ad Injection (Top-Center 468x60) ---
-  // This ad is separate and was already immediate.
   if (immediateAdPlaceholder) {
     immediateAdPlaceholder.innerHTML = ''; // Clear previous
     const script_opt = document.createElement('script');
@@ -258,16 +209,18 @@ function showCustomRewardScreen(originalContext) {
     immediateAdPlaceholder.appendChild(script_invoke);
   }
 
-  // --- Countdown Timer & Initial UI State ---
+  // --- Countdown Timer & Initial UI State for elements appearing after countdown ---
   if (rewardCountdownTimer) {
     rewardCountdownTimer.textContent = '5';
-    rewardCountdownTimer.classList.remove('hidden'); // Timer visible
+    rewardCountdownTimer.classList.remove('hidden');
   }
-  if (rewardBackButton) rewardBackButton.classList.add('hidden'); // Back button hidden
-  if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.add('hidden'); // Guaranteed label hidden
-  if (rewardTopRightContainer) rewardTopRightContainer.classList.remove('hidden'); // Ad container visible
+  if (rewardBackButton) rewardBackButton.classList.add('hidden');
+  if (rewardTopRightContainer) rewardTopRightContainer.classList.add('hidden');
 
-  // Ads for rewardTopRightContainer are now injected above, before this section.
+  // Clear previous ads in top-right stack
+  if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
+  if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
+  if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
 
   let countdown = 5;
   if (rewardScreenTimerId) clearInterval(rewardScreenTimerId);
@@ -279,12 +232,55 @@ function showCustomRewardScreen(originalContext) {
       clearInterval(rewardScreenTimerId);
       rewardScreenTimerId = null;
 
-      if (rewardCountdownTimer) rewardCountdownTimer.classList.add('hidden'); // Timer hidden
-      if (rewardBackButton) rewardBackButton.classList.remove('hidden'); // Back button visible
-      if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.remove('hidden'); // Guaranteed label visible
-      // rewardTopRightContainer is already visible
+      if (rewardCountdownTimer) rewardCountdownTimer.classList.add('hidden');
+      if (rewardBackButton) rewardBackButton.classList.remove('hidden');
+      if (rewardTopRightContainer) rewardTopRightContainer.classList.remove('hidden');
 
-      // Ads were injected at the beginning of the function.
+      // --- Inject Ads in Top-Right Stack ---
+      // Ad 1 (468x60) - Top in stack
+      if (rewardAdBannerContainer_468x60) {
+        rewardAdBannerContainer_468x60.innerHTML = '';
+        if (TOP_RIGHT_AD_KEY_468x60 !== 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60') {
+          const script1_opt = document.createElement('script');
+          script1_opt.type = 'text/javascript';
+          script1_opt.textContent = `atOptions = {'key' : '${TOP_RIGHT_AD_KEY_468x60}', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};`;
+          rewardAdBannerContainer_468x60.appendChild(script1_opt);
+          const script1_invoke = document.createElement('script');
+          script1_invoke.type = 'text/javascript';
+          script1_invoke.src = `//www.highperformanceformat.com/${TOP_RIGHT_AD_KEY_468x60}/invoke.js`;
+          script1_invoke.async = true;
+          rewardAdBannerContainer_468x60.appendChild(script1_invoke);
+        } else {
+          rewardAdBannerContainer_468x60.textContent = 'Placeholder for 468x60 Ad (Key Missing)';
+        }
+      }
+
+      // Ad 2 (300x250) - Middle in stack
+      if (rewardAdBannerContainer_300x250) {
+        rewardAdBannerContainer_300x250.innerHTML = '';
+        const script2_opt = document.createElement('script');
+        script2_opt.type = 'text/javascript';
+        script2_opt.textContent = `atOptions = {'key' : '${MIDDLE_AD_KEY_300x250}', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};`;
+        rewardAdBannerContainer_300x250.appendChild(script2_opt);
+        const script2_invoke = document.createElement('script');
+        script2_invoke.type = 'text/javascript';
+        script2_invoke.src = `//www.highperformanceformat.com/${MIDDLE_AD_KEY_300x250}/invoke.js`;
+        script2_invoke.async = true;
+        rewardAdBannerContainer_300x250.appendChild(script2_invoke);
+      }
+
+      // Ad 3 (Responsive) - Bottom in stack
+      if (rewardAdBannerContainer_responsive) {
+        rewardAdBannerContainer_responsive.innerHTML = '';
+        const ad3_script = document.createElement('script');
+        ad3_script.async = true;
+        ad3_script.setAttribute('data-cfasync', 'false');
+        ad3_script.src = RESPONSIVE_AD_SCRIPT_SRC;
+        rewardAdBannerContainer_responsive.appendChild(ad3_script);
+        const ad3_div = document.createElement('div');
+        ad3_div.id = RESPONSIVE_AD_CONTAINER_ID;
+        rewardAdBannerContainer_responsive.appendChild(ad3_div);
+      }
     }
   }, 1000);
 
