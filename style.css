@@ -491,7 +491,7 @@ footer span span {
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto;   /* Allow vertical scroll if content overflows */
+  overflow-y: hidden;   /* Allow vertical scroll if content overflows */
 }
 
 #immediateAdContainerTop {
@@ -518,7 +518,7 @@ footer span span {
 
 #rewardTopLeftContainer {
   position: absolute;
-  top: 90px; /* Adjusted: e.g. 80px for top ad area + 10px spacing */
+  top: 20px;
   left: 20px;
   display: flex;
   align-items: center;
@@ -534,7 +534,7 @@ footer span span {
 }
 
 #rewardBackButton {
-  background: linear-gradient(to right, #ff7e5f, #feb47b); /* New gradient */
+  background: linear-gradient(to right, #ff8008, #ffc837);
   color: white;
   border: none;
   border-radius: 50%;
@@ -549,11 +549,11 @@ footer span span {
 
 #rewardTopRightContainer {
   position: absolute;
-  top: 90px; /* Adjusted: e.g. 80px for top ad area + 10px spacing */
+  top: 20px;
   right: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center; /* Changed from flex-end to center children */
   z-index: 1;
 }
 
