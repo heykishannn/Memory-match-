@@ -9,6 +9,13 @@ const EMOJIS = [
 const MAX_LEVEL = 100;
 const MAX_CARDS_BEFORE_TIMER_DIFFICULTY = 30;
 
+// Ad Keys
+const IMMEDIATE_TOP_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b'; // For immediate top-center 468x60 ad
+const TOP_RIGHT_AD_KEY_468x60 = 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60'; // Placeholder for the 468x60 ad in top-right stack
+const MIDDLE_AD_KEY_300x250 = '3606c322c11ecc95fb215e54122b24b9';
+const RESPONSIVE_AD_SCRIPT_SRC = '//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js';
+const RESPONSIVE_AD_CONTAINER_ID = 'container-ce2d3cde4fcc3769cce04418ad7b7d93';
+
 // DOM
 const pageOverlay = document.getElementById('pageOverlay'); // Added pageOverlay
 const splash = document.getElementById('splash');
@@ -179,23 +186,30 @@ function hideLosePopup() {
   hideOverlay();
 }
 
-let rewardScreenTimerId = null; // Variable to hold the interval ID
+let rewardScreenTimerId = null;
 
 function showCustomRewardScreen(originalContext) {
-  // Hide footer and other popups/overlays if necessary
   hideFooterAndBanner();
-  if (adOverlay) adOverlay.classList.add('hidden'); // Hide the old ad overlay if it was somehow visible
-  hideOverlay(); // Hide general page overlay
+  if (adOverlay) adOverlay.classList.add('hidden');
+  hideOverlay();
 
-  // Setup initial UI state for the reward screen
   if (customRewardScreen) customRewardScreen.classList.remove('hidden');
 
-  // Show Immediate Ad Placeholder Text
+  // --- Immediate Ad Injection (Top-Center 468x60) ---
   if (immediateAdPlaceholder) {
     immediateAdPlaceholder.innerHTML = ''; // Clear previous
-    immediateAdPlaceholder.textContent = ''; // Placeholder for the immediate ad.
+    const script_opt = document.createElement('script');
+    script_opt.type = 'text/javascript';
+    script_opt.textContent = `atOptions = {'key' : '${IMMEDIATE_TOP_AD_KEY_468x60}', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};`;
+    immediateAdPlaceholder.appendChild(script_opt);
+    const script_invoke = document.createElement('script');
+    script_invoke.type = 'text/javascript';
+    script_invoke.src = `//www.highperformanceformat.com/${IMMEDIATE_TOP_AD_KEY_468x60}/invoke.js`;
+    script_invoke.async = true;
+    immediateAdPlaceholder.appendChild(script_invoke);
   }
 
+  // --- Countdown Timer & Initial UI State for elements appearing after countdown ---
   if (rewardCountdownTimer) {
     rewardCountdownTimer.textContent = '5';
     rewardCountdownTimer.classList.remove('hidden');
@@ -203,7 +217,7 @@ function showCustomRewardScreen(originalContext) {
   if (rewardBackButton) rewardBackButton.classList.add('hidden');
   if (rewardTopRightContainer) rewardTopRightContainer.classList.add('hidden');
 
-  // Clear previous ads in top-right
+  // Clear previous ads in top-right stack
   if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
   if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
   if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
@@ -222,75 +236,81 @@ function showCustomRewardScreen(originalContext) {
       if (rewardBackButton) rewardBackButton.classList.remove('hidden');
       if (rewardTopRightContainer) rewardTopRightContainer.classList.remove('hidden');
 
-      // Inject Ad 1 (468x60)
+      // --- Inject Ads in Top-Right Stack ---
+      // Ad 1 (468x60) - Top in stack
       if (rewardAdBannerContainer_468x60) {
-        rewardAdBannerContainer_468x60.innerHTML = ''; // Clear
-        const script1_opt = document.createElement('script');
-        script1_opt.type = 'text/javascript';
-        script1_opt.textContent = "atOptions = {'key' : 'f3980c7d80f3803dbaf4228f02da605b', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};";
-        rewardAdBannerContainer_468x60.appendChild(script1_opt);
-        const script1_invoke = document.createElement('script');
-        script1_invoke.type = 'text/javascript';
-        script1_invoke.src = '//www.highperformanceformat.com/f3980c7d80f3803dbaf4228f02da605b/invoke.js';
-        script1_invoke.async = true;
-        rewardAdBannerContainer_468x60.appendChild(script1_invoke);
+        rewardAdBannerContainer_468x60.innerHTML = '';
+        if (TOP_RIGHT_AD_KEY_468x60 !== 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60') {
+          const script1_opt = document.createElement('script');
+          script1_opt.type = 'text/javascript';
+          script1_opt.textContent = `atOptions = {'key' : '${TOP_RIGHT_AD_KEY_468x60}', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {}};`;
+          rewardAdBannerContainer_468x60.appendChild(script1_opt);
+          const script1_invoke = document.createElement('script');
+          script1_invoke.type = 'text/javascript';
+          script1_invoke.src = `//www.highperformanceformat.com/${TOP_RIGHT_AD_KEY_468x60}/invoke.js`;
+          script1_invoke.async = true;
+          rewardAdBannerContainer_468x60.appendChild(script1_invoke);
+        } else {
+          rewardAdBannerContainer_468x60.textContent = 'Placeholder for 468x60 Ad (Key Missing)';
+        }
       }
 
-      // Inject Ad 2 (300x250)
+      // Ad 2 (300x250) - Middle in stack
       if (rewardAdBannerContainer_300x250) {
-        rewardAdBannerContainer_300x250.innerHTML = ''; // Clear
+        rewardAdBannerContainer_300x250.innerHTML = '';
         const script2_opt = document.createElement('script');
         script2_opt.type = 'text/javascript';
-        script2_opt.textContent = "atOptions = {'key' : '3606c322c11ecc95fb215e54122b24b9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};";
+        script2_opt.textContent = `atOptions = {'key' : '${MIDDLE_AD_KEY_300x250}', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {}};`;
         rewardAdBannerContainer_300x250.appendChild(script2_opt);
         const script2_invoke = document.createElement('script');
         script2_invoke.type = 'text/javascript';
-        script2_invoke.src = '//www.highperformanceformat.com/3606c322c11ecc95fb215e54122b24b9/invoke.js';
+        script2_invoke.src = `//www.highperformanceformat.com/${MIDDLE_AD_KEY_300x250}/invoke.js`;
         script2_invoke.async = true;
         rewardAdBannerContainer_300x250.appendChild(script2_invoke);
       }
 
-      // Inject Ad 3 (Responsive)
+      // Ad 3 (Responsive) - Bottom in stack
       if (rewardAdBannerContainer_responsive) {
-        rewardAdBannerContainer_responsive.innerHTML = ''; // Clear
-        const script3_invoke = document.createElement('script');
-        script3_invoke.async = true;
-        script3_invoke.setAttribute('data-cfasync', 'false');
-        script3_invoke.src = '//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js';
-        rewardAdBannerContainer_responsive.appendChild(script3_invoke);
+        rewardAdBannerContainer_responsive.innerHTML = '';
+        const ad3_script = document.createElement('script');
+        ad3_script.async = true;
+        ad3_script.setAttribute('data-cfasync', 'false');
+        ad3_script.src = RESPONSIVE_AD_SCRIPT_SRC;
+        rewardAdBannerContainer_responsive.appendChild(ad3_script);
         const ad3_div = document.createElement('div');
-        ad3_div.id = 'container-ce2d3cde4fcc3769cce04418ad7b7d93';
+        ad3_div.id = RESPONSIVE_AD_CONTAINER_ID;
         rewardAdBannerContainer_responsive.appendChild(ad3_div);
       }
     }
   }, 1000);
 
-  // Back button onClick assignment - ENSURE THIS IS CORRECT AND FIRING
+  // --- Back Button onClick Assignment ---
   if (rewardBackButton) {
-    // Remove any old listener to prevent multiple firings if showCustomRewardScreen is called multiple times
-    const newBackButton = rewardBackButton.cloneNode(true);
-    rewardBackButton.parentNode.replaceChild(newBackButton, rewardBackButton);
-    // Update the reference
-    const currentRewardBackButton = document.getElementById('rewardBackButton'); // Re-fetch after replacing
+    const newBackButton = rewardBackButton.cloneNode(true); // Clone to remove old listeners
+    if (rewardBackButton.parentNode) {
+        rewardBackButton.parentNode.replaceChild(newBackButton, rewardBackButton);
+    }
+    // Update the variable to point to the new button in the DOM
+    const currentRewardBackButton = document.getElementById('rewardBackButton');
 
     currentRewardBackButton.onclick = () => {
       if (customRewardScreen) customRewardScreen.classList.add('hidden');
 
-      // Clear ad containers
+      // Clear all ad containers when leaving screen
       if (immediateAdPlaceholder) immediateAdPlaceholder.innerHTML = '';
       if (rewardAdBannerContainer_468x60) rewardAdBannerContainer_468x60.innerHTML = '';
       if (rewardAdBannerContainer_300x250) rewardAdBannerContainer_300x250.innerHTML = '';
       if (rewardAdBannerContainer_responsive) rewardAdBannerContainer_responsive.innerHTML = '';
 
       state.timeLeft += 10;
-      updateHUD(); // Update HUD immediately after time change
+      updateHUD();
 
       if (originalContext === 'continuePopup') {
         loadFullGameState();
         state.paused = false;
         state.awaitingTapForBonusTime = false;
         if (pauseBtn) pauseBtn.textContent = "||";
-        saveGameState(); // Save before showing game
+        saveGameState();
         showGame(true);
         if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
           setTimeout(winLevel, 100);
@@ -299,7 +319,7 @@ function showCustomRewardScreen(originalContext) {
         state.awaitingTapForBonusTime = true;
         state.paused = true;
         if (pauseBtn) pauseBtn.textContent = "▶";
-        saveGameState(); // Save before showing game
+        saveGameState();
         showGame(true);
       }
     };

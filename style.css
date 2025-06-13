@@ -486,12 +486,12 @@ footer span span {
   z-index: 150; /* Higher than other popups/overlays */
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */ /* Commented out to allow top ad to push content */
-  align-items: center; /* Center children like immediateAdContainerTop */
+  align-items: center;
   color: white;
-  padding: 0; /* Changed from 20px to 0 to allow immediateAdContainerTop to span full width */
+  padding: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-y: auto;   /* Allow vertical scroll if content overflows */
 }
 
 #immediateAdContainerTop {
@@ -499,30 +499,26 @@ footer span span {
   padding: 10px 0;
   text-align: center;
   box-sizing: border-box;
-  min-height: 70px; /* 50px ad + 20px padding */
-  display: flex; /* To center placeholder */
-  align-items: center;
+  min-height: 80px; /* For a 60px ad + 20px total vertical padding */
+  display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 #immediateAdPlaceholder {
-  display: inline-block;
-  width: 100%;
-  max-width: 728px;
-  height: auto;
-  min-height: 50px;
-  background-color: rgba(0,0,0,0.05);
-  color: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8em;
+  width: 468px;
+  height: 60px;
+  background-color: rgba(0,0,0,0.1); /* Placeholder visual */
+  /* display: inline-block; */ /* Not needed if parent is flex centering */
+  /* color: #ccc; */ /* Text content removed, so not needed */
+  /* display: flex; align-items: center; justify-content: center; */ /* Not needed for ad iframe */
+  /* font-size: 0.8em; */ /* Not needed */
 }
 
 
 #rewardTopLeftContainer {
   position: absolute;
-  top: 90px; /* Adjusted: 20px initial screen padding + 70px for top ad area */
+  top: 90px; /* Adjusted: e.g. 80px for top ad area + 10px spacing */
   left: 20px;
   display: flex;
   align-items: center;
@@ -553,7 +549,7 @@ footer span span {
 
 #rewardTopRightContainer {
   position: absolute;
-  top: 90px; /* Adjusted: 20px initial screen padding + 70px for top ad area */
+  top: 90px; /* Adjusted: e.g. 80px for top ad area + 10px spacing */
   right: 20px;
   display: flex;
   flex-direction: column;
@@ -570,8 +566,6 @@ footer span span {
   border-radius: 5px;
   margin-bottom: 10px;
 }
-
-/* Removed old #rewardAdBannerContainer style */
 
 #rewardAdBannerContainer_468x60 {
   width: 468px;
