@@ -4,7 +4,7 @@ body {
   color: white;
   margin: 0; /* Standard reset for body margin */
   height: 100vh;
-  overflow: hidden; /* Prevent all scrolling */
+  overflow: hidden; /* Prevent all scrolling (especially horizontal) */
   padding-bottom: 85px; /* Estimated height for ad (50px) + text + some buffer */
 }
 .hidden { display: none !important; }
@@ -379,10 +379,11 @@ footer span span {
 }
 #board {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: clamp(5px, 2vw, 10px); /* Responsive gaps */
-  padding: clamp(5px, 2vw, 10px); /* Responsive padding */
+  /* Adjusting gaps */
+  row-gap: 12px; /* Normal vertical distance */
+  column-gap: 5px; /* Closer horizontal distance (pass-pass) */
   justify-content: center;
+  /* Align cards to the top after header/stats, then center */
   margin: 24px auto auto auto; /* Pushed down from top, auto for bottom to push up */
   max-width: calc(100vw - 20px); /* Restrict board width to keep cards in screen */
   flex-grow: 1; /* Allow board to take available space */
@@ -393,26 +394,31 @@ footer span span {
 }
 
 .card {
-  width: clamp(60px, 18vw, 120px);
+  width: clamp(70px, 20vw, 160px); /* Larger minimum, to match approx iOS icon size */
   aspect-ratio: 1 / 1; /* Maintain square shape, height will follow width */
   border: 2px solid black; /* Black border */
-  border-radius: 12px; /* Rounded corners */
-  display: flex; /* For centering front/back content */
-  justify-content: center; /* For centering front/back content */
-  align-items: center; /* For centering front/back content */
-  font-size: clamp(24px, 7vw, 48px); /* Responsive emoji size */
+  border-radius: 20px;
+  user-select: none;
+  perspective: 600px; /* Applies to the parent that contains the flipping element */
+  position: relative; /* For absolute positioning of inner elements */
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Adjusted shadow */
-  user-select: none;
-  perspective: 600px; /* For 3D transform */
-  position: relative;
-  /* Transition for the entire card flip */
-  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
-  transform-style: preserve-3d; /* Enable 3D transform on the card itself */
 }
 
-/* When flipped, rotate the entire card */
-.card.flipped {
+/* New .card-inner container for the flip effect */
+.card-inner {
+  width: 100%; height: 100%;
+  border-radius: 20px; /* Match parent card's border-radius */
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(28px, 8vw, 48px); /* Larger Emoji size */
+  color: #fff;
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1); /* Smooth flip animation */
+  transform-style: preserve-3d; /* Key for 3D transform */
+  position: relative; /* For absolute positioning of front/back */
+}
+
+/* When .card has 'flipped' class, its .card-inner flips */
+.card.flipped .card-inner {
   transform: rotateY(180deg);
 }
 
@@ -421,7 +427,7 @@ footer span span {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 12px; /* Match parent card's rounded corners */
+  border-radius: 20px; /* Consistent with card radius */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -432,7 +438,7 @@ footer span span {
 .card .front {
   background: linear-gradient(to right, #a8ff78, #78ffd6); /* Light green gradient */
   color: #fff;
-  /* This is the side that shows when FLIPPED, so it starts rotated */
+  /* This side should be visible when card-inner is FLIPPED (180deg), so it needs to start at 180deg */
   transform: rotateY(180deg);
 }
 
@@ -440,8 +446,8 @@ footer span span {
 .card .back {
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Purple gradient */
   color: #fff;
-  /* This is the side that shows when UNFLIPPED, so it faces forward initially */
-  /* Default transform is rotateY(0deg) */
+  /* This side should be visible when card-inner is UNFLIPPED (0deg), so it faces forward initially */
+  transform: rotateY(0deg); /* Explicitly set to 0deg */
 }
 
 /* Removed glow animation on matched cards as requested */
@@ -456,23 +462,19 @@ footer span span {
 }
 
 @media (max-width: 600px) {
-  /* .card rule already handled by clamp() */
-  #board { /* Keep specific mobile gap adjustments if clamp doesn't cover it well enough, or remove if clamp is sufficient */
-    gap: clamp(5px, 1.5vw, 8px); /* Slightly smaller max gap for mobile */
-    padding: clamp(5px, 1.5vw, 8px);
-    max-width: calc(100vw - 10px);
-  }
-  .splash-card { width: 70px; height: 110px; border-radius: 18px;} /* This is for splash, not in-game card */
+  .card { width: clamp(80px, 20vw, 120px); height: auto; font-size: clamp(28px, 8vw, 48px); border-radius: 10px;} /* Larger cards on mobile, smaller border-radius */
+  .card-inner { border-radius: 10px; } /* Match parent card border-radius */
+  .card .front, .card .back { border-radius: 10px; } /* Match parent card border-radius */
 
-  /* Remove specific overrides for elements now using clamp, if clamp covers the sizes well. */
-  /* .game-header h1 { font-size: 1.7rem;} */ /* Covered by clamp */
-  /* .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;} */ /* Popup has its own responsive logic already */
-  /* .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;} */ /* Covered by clamp */
-  /* .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; } */ /* Covered by clamp */
-  /* .switch-label input:checked + .switch-slider { transform: translateX(15px); } */ /* Covered by clamp */
-  /* .toggle-text { font-size: 0.75rem; margin-top: 3px; } */ /* Covered by clamp */
-
-  .game-controls { max-width: 300px; } /* This can remain as a specific mobile constraint */
+  #board { row-gap: 8px; column-gap: 3px; max-width: calc(100vw - 10px); } /* Adjusted gaps and max-width on mobile */
+  .splash-card { width: 70px; height: 110px; border-radius: 18px;}
+  .game-header h1 { font-size: 1.7rem;}
+  .popup-content { padding: 0.6rem 0.2rem; max-width: 220px; min-width: 120px;}
+  .pause-btn, .switch-label { width: 45px; height: 30px; border-radius: 10px;}
+  .switch-slider { top: 3px; left: 3px; width: 24px; height: 24px; }
+  .switch-label input:checked + .switch-slider { transform: translateX(15px); }
+  .toggle-text { font-size: 0.75rem; margin-top: 3px; }
+  .game-controls { max-width: 300px; } /* Adjusted max-width for mobile */
 }
 
 /* Custom Reward Screen Styles */
@@ -486,46 +488,34 @@ footer span span {
   z-index: 150; /* Higher than other popups/overlays */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Centers content horizontally */
+  justify-content: center; /* Centers content vertically if there's space */
   color: white;
   padding: 0;
   box-sizing: border-box;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto;   /* Allow vertical scroll if content overflows */
+  overflow: hidden; /* Lock page, no scrolling */
 }
 
-#immediateAdContainerTop {
-  width: 100%;
-  padding: 10px 0;
-  text-align: center;
-  box-sizing: border-box;
-  min-height: 80px; /* For a 60px ad + 20px total vertical padding */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 30px; /* Lowered slightly */
-}
-
-#immediateAdPlaceholder {
-  width: 468px;
-  height: 60px;
-  background-color: rgba(0,0,0,0.1); /* Placeholder visual */
-  /* display: inline-block; */ /* Not needed if parent is flex centering */
-  /* color: #ccc; */ /* Text content removed, so not needed */
-  /* display: flex; align-items: center; justify-content: center; */ /* Not needed for ad iframe */
-  /* font-size: 0.8em; */ /* Not needed */
-}
-
-
+/* Containers for fixed elements on Custom Reward Screen */
 #rewardTopLeftContainer {
-  position: fixed; /* Changed to fixed for robust screen positioning */
+  position: fixed; /* Fixed position to viewport */
   top: 20px;
   left: 20px;
   display: flex;
   align-items: center;
   z-index: 100; /* Increased z-index */
 }
+#rewardTopRightContainer { /* This container now holds ads and the "Reward Guaranteed" label */
+  position: fixed; /* Fixed position to viewport */
+  top: 20px; /* Aligned to the top */
+  right: 20px; /* Aligned to the right */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: flex-end; /* Align children to the right */
+  z-index: 100; /* Ensure it's above other content */
+}
 
+/* Styles for Countdown Timer and Back Button */
 #rewardCountdownTimer {
   font-size: 2em;
   font-weight: bold;
@@ -533,37 +523,25 @@ footer span span {
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
 }
-
 #rewardBackButton {
   background: linear-gradient(to right, #ff8008, #ffc837); /* Orange gradient */
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 50%; /* Rounded style */
   width: 40px; /* Small */
   height: 40px; /* Small */
   font-size: 20px; /* Adjusted for arrow size */
-  line-height: 40px; /* Center arrow */
+  line-height: 40px; /* Center arrow vertically */
   text-align: center;
   cursor: pointer;
   padding: 0;
-  display: flex; /* Added for centering content (arrow) */
-  align-items: center; /* Added for centering content (arrow) */
-  justify-content: center; /* Added for centering content (arrow) */
+  display: flex; /* For perfect centering of arrow */
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Add shadow for button feel */
 }
 
-/* Repositioned to be part of normal flow, centered by #customRewardScreen */
-#rewardTopRightContainer {
-  /* position: absolute; */ /* Removed absolute positioning */
-  /* top: 90px; */
-  /* right: 20px; */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Changed from flex-end to center children */
-  /* z-index: 1; */ /* No longer needed for absolute positioning */
-  margin-top: 10px; /* Spacing below immediateAdContainerTop */
-  width: 100%; /* Allow it to be centered if content is narrower */
-}
-
+/* Style for Reward Guaranteed Label */
 #rewardGuaranteedLabel {
   font-family: 'Arial', sans-serif;
   font-size: 0.8em; /* Adjusted font size */
@@ -571,31 +549,61 @@ footer span span {
   padding: 8px 12px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
-  /* margin-bottom: 10px; */ /* Removed as it's fixed positioned now */
-  position: fixed; /* Fixed position to viewport */
-  top: 10px;
-  right: 20px;
-  z-index: 100; /* Ensure it's above other content */
+  margin-bottom: 10px; /* Space between label and ads if ads are below it */
+}
+
+/* Styles for Ad Containers (Centered on screen) */
+/* The ads themselves are within rewardTopRightContainer, but they need to appear centered below */
+/* This requires a change in approach. Let's make ads central to #customRewardScreen,
+   and #rewardTopLeftContainer and #rewardTopRightContainer fixed. */
+
+#immediateAdContainerTop,
+#rewardAdBannerContainer_468x60,
+#rewardAdBannerContainer_300x250,
+#rewardAdBannerContainer_responsive {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Take full width for centering */
+  margin-top: 10px; /* Spacing between ad units */
+  background-color: rgba(0,0,0,0.1); /* Placeholder visual */
+  box-sizing: border-box;
+}
+
+#immediateAdContainerTop {
+  min-height: 60px; /* Height for 468x60 ad */
+  margin-top: 50px; /* Push ads down from fixed header elements */
 }
 
 #rewardAdBannerContainer_468x60 {
-  width: 468px;
-  height: 60px;
-  margin-top: 10px;
-  background-color: rgba(0,0,0,0.1);
+  min-height: 60px; /* Height for 468x60 ad */
 }
 
 #rewardAdBannerContainer_300x250 {
-  width: 300px;
-  height: 250px;
-  margin-top: 10px;
-  background-color: rgba(0,0,0,0.1);
+  min-height: 250px; /* Height for 300x250 ad */
 }
 
 #rewardAdBannerContainer_responsive {
-  width: 100%;
-  max-width: 320px;
-  min-height: 50px;
-  margin-top: 10px;
-  background-color: rgba(0,0,0,0.1);
+  min-height: 50px; /* Height for responsive ad */
 }
+
+/* Specific styles for ad placeholders if needed */
+#immediateAdPlaceholder {
+  width: 468px; /* Fixed width for this specific ad */
+  height: 60px; /* Fixed height for this specific ad */
+  display: flex; justify-content: center; align-items: center; /* Center the iframe within placeholder */
+}
+
+/* Responsive adjustments for ads */
+@media (max-width: 600px) {
+  #immediateAdPlaceholder {
+    width: 320px; /* Adjust for smaller mobile screens */
+    height: 50px; /* Standard mobile banner height */
+  }
+  #rewardAdBannerContainer_468x60 {
+    width: 100%;
+    max-width: 320px; /* Max width for mobile */
+    min-height: 50px;
+  }
+  #rewardAdBannerContainer_300x250 {
+    wi
