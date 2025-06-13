@@ -25,6 +25,10 @@ const adOverlayMessage = document.getElementById('adOverlayMessage');
 const adOverlayTimer = document.getElementById('adOverlayTimer');
 const stickyFooter = document.getElementById('stickyFooter');
 const bannerAdContainer = document.getElementById('bannerAdContainer'); // Though likely controlled by stickyFooter visibility
+const customRewardScreen = document.getElementById('customRewardScreen');
+const rewardCountdownTimer = document.getElementById('rewardCountdownTimer');
+const rewardGuaranteedLabel = document.getElementById('rewardGuaranteedLabel');
+const rewardBackButton = document.getElementById('rewardBackButton');
 const loginBtn = document.getElementById('loginBtn');
 const signupBtn = document.getElementById('signupBtn');
 const emailInput = document.getElementById('email');
@@ -167,6 +171,73 @@ function hideContinuePopup() {
 function hideLosePopup() {
   if (losePopup) losePopup.classList.add('hidden');
   hideOverlay();
+}
+
+let rewardScreenTimerId = null; // Variable to hold the interval ID
+
+function showCustomRewardScreen(originalContext) {
+  // Hide footer and other popups/overlays if necessary
+  hideFooterAndBanner();
+  if (adOverlay) adOverlay.classList.add('hidden'); // Hide the old ad overlay if it was somehow visible
+  hideOverlay(); // Hide general page overlay
+
+  // Setup initial UI state for the reward screen
+  if (customRewardScreen) customRewardScreen.classList.remove('hidden');
+  if (rewardCountdownTimer) {
+    rewardCountdownTimer.textContent = '5';
+    rewardCountdownTimer.classList.remove('hidden');
+  }
+  if (rewardBackButton) rewardBackButton.classList.add('hidden');
+  if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.add('hidden');
+
+  let countdown = 5;
+  if (rewardScreenTimerId) clearInterval(rewardScreenTimerId); // Clear any existing timer
+
+  rewardScreenTimerId = setInterval(() => {
+    countdown--;
+    if (rewardCountdownTimer) rewardCountdownTimer.textContent = countdown;
+    if (countdown <= 0) {
+      clearInterval(rewardScreenTimerId);
+      rewardScreenTimerId = null;
+      if (rewardCountdownTimer) rewardCountdownTimer.classList.add('hidden');
+      if (rewardBackButton) rewardBackButton.classList.remove('hidden');
+      if (rewardGuaranteedLabel) rewardGuaranteedLabel.classList.remove('hidden');
+    }
+  }, 1000);
+
+  // Assign onclick for the back button (only once or ensure it's correctly reassigned)
+  // It's better to define it outside if it's always the same, or ensure this function is called such that it's fresh.
+  // For this plan, let's define it here for clarity of context.
+  if (rewardBackButton) {
+    rewardBackButton.onclick = () => {
+      if (customRewardScreen) customRewardScreen.classList.add('hidden');
+
+      // Common reward: +10 seconds
+      state.timeLeft += 10;
+
+      if (originalContext === 'continuePopup') {
+        loadFullGameState(); // Ensure state is fresh
+        state.paused = false;
+        state.awaitingTapForBonusTime = false;
+        if (pauseBtn) pauseBtn.textContent = "||";
+        updateHUD(); // Reflect new time
+        saveGameState();
+        showGame(true);
+        // Check win condition
+        if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
+          setTimeout(winLevel, 100);
+        }
+      } else if (originalContext === 'losePopup') {
+        // state.timeLeft was already incremented by 10 (common reward)
+        state.awaitingTapForBonusTime = true;
+        state.paused = true;
+        if (pauseBtn) pauseBtn.textContent = "▶";
+        updateHUD(); // Reflect new time
+        saveGameState();
+        showGame(true);
+      }
+    };
+  }
 }
 
 // Splash: 3 blank gradient cards, flip animation
@@ -825,28 +896,8 @@ function initializeGame() {
 // --- Start of Continue Popup Button Event Listeners ---
 if (watchAdContinueBtn) {
   watchAdContinueBtn.onclick = () => {
-    // Open ad in a new tab
-    window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-
-    // Hide the continue popup immediately
-    hideContinuePopup(); // Ensure it's hidden before overlay
-
-    // Show custom ad overlay and define callback for reward
-    showAdOverlay('Please wait... unlocking your reward', 5, () => {
-      // Reward Logic for Continue Window:
-      loadFullGameState();
-
-      state.paused = false;
-      state.awaitingTapForBonusTime = false;
-      if(pauseBtn) pauseBtn.textContent = "||";
-
-      saveGameState();
-      showGame(true);
-
-      if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
-        setTimeout(winLevel, 100);
-      }
-    });
+    hideContinuePopup(); // Hide the continue popup
+    showCustomRewardScreen('continuePopup');
   };
 }
 
@@ -882,24 +933,8 @@ if (startFromLevel1Btn) {
 // --- Start of Lose Popup Button Event Listeners (New) ---
 if (loseWatchAdBtn) {
   loseWatchAdBtn.onclick = () => {
-    // Open ad in a new tab
-    window.open('https://www.profitableratecpm.com/cbqpeyncv?key=41a7ead40af57cd33ff5f4604f778cb9', '_blank');
-
-    // Hide the lose popup immediately
-    hideLosePopup(); // Ensure it's hidden before overlay
-
-    // Show custom ad overlay and define callback for reward
-    showAdOverlay('Please wait... unlocking your reward', 5, () => {
-      // Reward Logic for Lose Window:
-      state.timeLeft += 10;
-      state.awaitingTapForBonusTime = true;
-      state.paused = true;
-      if(pauseBtn) pauseBtn.textContent = "▶";
-
-      updateHUD();
-      saveGameState();
-      showGame(true);
-    });
+    hideLosePopup(); // Hide the lose popup
+    showCustomRewardScreen('losePopup');
   };
 }
 
