@@ -6,6 +6,7 @@
   <!-- viewport meta tag with user-scalable=no for Android resolution consideration -->
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="style.css">
+  <!-- Social Bar Ad - as per FINAL PROMPT, already present -->
   <script type='text/javascript' src='//pl26859944.profitableratecpm.com/0d/45/39/0d4539f09727c641fc77330a16feaa38.js'></script>
 </head>
 <body>
@@ -97,7 +98,7 @@
       <button class="btn" id="startFromLevel1Btn">Start from Level 1</button>
     </div>
   </div>
-  <!-- Ad Overlay Popup -->
+  <!-- Ad Overlay Popup (Simple 5-second ad before customRewardScreen for context) -->
   <div id="adOverlay" class="popup hidden">
     <div class="popup-content">
       <h2 id="adOverlayMessage">Please wait... unlocking your reward</h2>
@@ -111,10 +112,13 @@
     </div>
     <div id="rewardTopLeftContainer">
       <div id="rewardCountdownTimer">5</div>
-      <button id="rewardBackButton" class="hidden">←</button>
+      <button id="rewardBackButton" class="hidden">←</button> <!-- Back arrow symbol -->
     </div>
-    <div id="rewardTopRightContainer" class="hidden">
-      <div id="rewardGuaranteedLabel">Reward Guaranteed</div>
+    <div id="rewardTopRightContainer">
+      <div id="rewardGuaranteedLabel" class="hidden">Reward Guaranteed</div> <!-- Hidden initially -->
+    </div>
+    <!-- Main ad stack container, centered by flex properties in CSS -->
+    <div id="rewardAdStackContainer">
       <div id="rewardAdBannerContainer_468x60">
         <!-- Ad 1 (468x60) script injected here -->
       </div>
@@ -140,6 +144,8 @@
   <audio id="audio-birthday" src="birthday.mp3"></audio>
   <audio id="audio-sitar" src="sitar.mp3"></audio>
   <audio id="audio-bell" src="bell.mp3"></audio>
+  <!-- New sound for Continue window -->
+  <audio id="audio-koni" src="koni.mp3"></audio>
 
   <div id="stickyFooter">
     <div id="bannerAdContainer">
