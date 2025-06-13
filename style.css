@@ -486,21 +486,47 @@ footer span span {
   z-index: 150; /* Higher than other popups/overlays */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: stretch;
+  /* justify-content: space-between; */ /* Commented out to allow top ad to push content */
+  align-items: center; /* Center children like immediateAdContainerTop */
   color: white;
-  padding: 20px;
+  padding: 0; /* Changed from 20px to 0 to allow immediateAdContainerTop to span full width */
   box-sizing: border-box;
-  overflow: hidden; /* Prevent scrollbars */
+  overflow: hidden;
 }
+
+#immediateAdContainerTop {
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+  box-sizing: border-box;
+  min-height: 70px; /* 50px ad + 20px padding */
+  display: flex; /* To center placeholder */
+  align-items: center;
+  justify-content: center;
+}
+
+#immediateAdPlaceholder {
+  display: inline-block;
+  width: 100%;
+  max-width: 728px;
+  height: auto;
+  min-height: 50px;
+  background-color: rgba(0,0,0,0.05);
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+}
+
 
 #rewardTopLeftContainer {
   position: absolute;
-  top: 20px;
+  top: 90px; /* Adjusted: 20px initial screen padding + 70px for top ad area */
   left: 20px;
   display: flex;
   align-items: center;
-  z-index: 1; /* To be above other screen content */
+  z-index: 1;
 }
 
 #rewardCountdownTimer {
@@ -512,27 +538,27 @@ footer span span {
 }
 
 #rewardBackButton {
-  background-color: rgba(0,0,0,0.3);
+  background: linear-gradient(to right, #ff7e5f, #feb47b); /* New gradient */
   color: white;
   border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  font-size: 24px; /* Adjust for arrow icon size */
-  line-height: 38px; /* Adjust for vertical centering of arrow */
+  font-size: 24px;
+  line-height: 38px;
   text-align: center;
   cursor: pointer;
-  padding: 0; /* Remove any default padding */
+  padding: 0;
 }
 
 #rewardTopRightContainer {
   position: absolute;
-  top: 20px;
+  top: 90px; /* Adjusted: 20px initial screen padding + 70px for top ad area */
   right: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Align items (label, ad) to the right */
-  z-index: 1; /* To be above other screen content */
+  align-items: flex-end;
+  z-index: 1;
 }
 
 #rewardGuaranteedLabel {
@@ -542,11 +568,29 @@ footer span span {
   padding: 8px 12px;
   background-color: rgba(0,0,0,0.2);
   border-radius: 5px;
-  margin-bottom: 10px; /* Space between label and ad banner */
+  margin-bottom: 10px;
 }
 
-#rewardAdBannerContainer {
+/* Removed old #rewardAdBannerContainer style */
+
+#rewardAdBannerContainer_468x60 {
   width: 468px;
   height: 60px;
-  background-color: rgba(0,0,0,0.1); /* Optional: slight background for placeholder */
+  margin-top: 10px;
+  background-color: rgba(0,0,0,0.1);
+}
+
+#rewardAdBannerContainer_300x250 {
+  width: 300px;
+  height: 250px;
+  margin-top: 10px;
+  background-color: rgba(0,0,0,0.1);
+}
+
+#rewardAdBannerContainer_responsive {
+  width: 100%;
+  max-width: 320px;
+  min-height: 50px;
+  margin-top: 10px;
+  background-color: rgba(0,0,0,0.1);
 }
