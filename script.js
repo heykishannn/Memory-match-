@@ -52,18 +52,16 @@ const resumeHomeBtn = document.getElementById('resumeHomeBtn');
 const restartFrom1Btn = document.getElementById('restartFrom1Btn');
 const nextLevelBtn = document.getElementById('nextLevelBtn');
 const homeBtn1 = document.getElementById('homeBtn1');
-const playAgainBtn = document.getElementById('playAgainBtn');
-// const loseHomeBtn = document.getElementById('loseHomeBtn'); // Removed by new buttons
-// const watchAdBtn = document.getElementById('watchAdBtn'); // Removed by new buttons
+const playAgainBtn = document.getElementById('playAgainBtn'); // This is for the lose popup's "Play Again"
+const winPlayAgainBtn = document.getElementById('winPlayAgainBtn'); // For the win popup's "Play Again"
+const loseWatchAdBtn = document.getElementById('loseWatchAdBtn'); // For the lose popup's "Watch Ad"
+const loseRestartHomeBtn = document.getElementById('loseRestartHomeBtn'); // For the lose popup's "Home"
 
 // Buttons for Continue Popup
-const watchAdContinueBtn = document.getElementById('watchAdContinueBtn');
+// const watchAdContinueBtn = document.getElementById('watchAdContinueBtn'); // Replaced by continueGameBtn
+const continueGameBtn = document.getElementById('continueGameBtn'); // New ID
 const continueHomeBtn = document.getElementById('continueHomeBtn');
 const startFromLevel1Btn = document.getElementById('startFromLevel1Btn');
-
-// Buttons for Lose Popup (new ones)
-const loseWatchAdBtn = document.getElementById('loseWatchAdBtn');
-const loseRestartHomeBtn = document.getElementById('loseRestartHomeBtn');
 
 // Changed IDs for input elements for toggle switches
 const soundToggle = document.getElementById('soundToggle');
@@ -178,22 +176,220 @@ if (callback) callback();
 }
 
 function showContinuePopup() {
-hideFooterAndBanner(); // Hide footer when continue popup is shown
-if (continuePopup) continuePopup.classList.remove('hidden');
-showOverlay();
+  hideFooterAndBanner(); // Ensure footer is hidden
+  if (continuePopup) continuePopup.classList.remove('hidden');
+  showOverlay();
 }
 
 function hideContinuePopup() {
-if (continuePopup) continuePopup.classList.add('hidden');
-hideOverlay();
+  if (continuePopup) continuePopup.classList.add('hidden');
+  hideOverlay();
+}
+
+// Helper function to clear game state for starting over
+function clearFullGameState() {
+  state.level = 1;
+  state.score = 0;
+  state.cards = [];
+  state.timeLeft = 0; // Will be reset by initializeNewLevel
+  state.matchedCount = 0;
+  state.flippedIndices = [];
+  state.paused = false;
+  // state.user remains
+  // state.soundOn and state.vibrationOn remain as user preferences
+
+  localStorage.removeItem('memorymatch_gameState');
+  console.log('Full game state cleared.');
+}
+
+// Win Popup specific functions
+function showWinPopup() {
+  if (resultLevel) resultLevel.textContent = `Level: ${state.level}`;
+  if (resultScore) resultScore.textContent = `Score: ${state.score}`;
+  if (resultTime) resultTime.textContent = `Time Left: ${state.timeLeft}s`;
+
+  hideFooterAndBanner(); // Ensure footer is hidden
+  if (winPopup) winPopup.classList.remove('hidden');
+  showOverlay(); // Show semi-transparent background overlay
+}
+
+function hideWinPopup() {
+  if (winPopup) winPopup.classList.add('hidden');
+  hideOverlay(); // Hide semi-transparent background overlay
+}
+
+// Lose Popup specific functions
+function showLosePopup() {
+  if (resultLevelL) resultLevelL.textContent = `Level: ${state.level}`;
+  if (resultScoreL) resultScoreL.textContent = `Score: ${state.score}`;
+  // resultTimeL is for time left, but when losing, time is 0.
+  if (resultTimeL) resultTimeL.textContent = `Time Left: 0s`;
+
+  hideFooterAndBanner(); // Ensure footer is hidden
+  if (losePopup) losePopup.classList.remove('hidden');
+  showOverlay(); // Show semi-transparent background overlay
 }
 
 function hideLosePopup() {
-if (losePopup) losePopup.classList.add('hidden');
-hideOverlay();
+  if (losePopup) losePopup.classList.add('hidden');
+  hideOverlay(); // Hide semi-transparent background overlay
+}
+
+// GAME LEVEL AND CARD GENERATION LOGIC
+function calculateCardsForLevel(level) {
+  // Level 1, 2: 2 pairs (4 cards)
+  // Level 3, 4: 3 pairs (6 cards)
+  // ...
+  const calculatedUniqueItems = 2 + Math.floor((Math.max(1, level) - 1) / 2);
+  return Math.min(calculatedUniqueItems, EMOJIS.length); // Cap by available unique emojis
+}
+
+function generateCardsForLevel(level) {
+  const numUniqueItems = calculateCardsForLevel(level);
+
+  // Shuffle EMOJIS to get a random selection for each level
+  // Create a copy before shuffling to not alter the original EMOJIS array
+  const shuffledEmojis = [...EMOJIS].sort(() => 0.5 - Math.random());
+  const selectedEmojis = shuffledEmojis.slice(0, numUniqueItems);
+
+  const newCards = [];
+  for (let emoji of selectedEmojis) {
+    // Add two cards for each selected emoji
+    newCards.push({ emoji: emoji, flipped: false, matched: false, id: null }); // id can be assigned later if needed for DOM
+    newCards.push({ emoji: emoji, flipped: false, matched: false, id: null });
+  }
+
+  // Shuffle the final set of cards to randomize their positions on the board
+  state.cards = newCards.sort(() => 0.5 - Math.random());
+  state.matchedCount = 0;
+  state.flippedIndices = [];
+  state.busy = false; // Reset busy state for the new level
+
+  // Assign unique IDs after shuffling, if necessary for DOM linking or advanced logic
+  // For now, card.dataset.index in rebuildBoardFromState serves as a temporary ID
+  // state.cards.forEach((card, index) => card.id = index);
+}
+
+function initializeNewLevel() {
+  // state.level is assumed to be set correctly before this call
+  // (e.g., by startBtn.onclick or when proceeding to the next level after a win)
+
+  generateCardsForLevel(state.level);
+  rebuildBoardFromState(); // Create/update card elements in the DOM
+  // state.timeLeft is set by startTimer
+  startTimer(); // Start timer for the new level
+  updateHUD(); // Update displayed level, score, time
+
+  // Any other level-specific setup would go here
+  console.log(`Initializing level ${state.level} with ${state.cards.length} cards (${state.cards.length / 2} pairs).`);
+  // saveGameState(); // Game state is saved at the end of this function in the previous version.
+                  // It's better to save after all initialization is complete.
+                  // However, startBtn.onclick and other callers of initializeNewLevel handle saving.
 }
 
 // GAME BOARD/LOGIC HELPERS
+
+function saveGameState() {
+  const gameStateToSave = {
+    level: state.level,
+    score: state.score,
+    timeLeft: state.timeLeft,
+    cards: state.cards,
+    soundOn: state.soundOn,
+    vibrationOn: state.vibrationOn,
+    matchedCount: state.matchedCount,
+    paused: state.paused // Save pause state
+    // flippedIndices: state.flippedIndices, // Usually transient, might not be needed
+    // user: state.user // User info might be saved separately (e.g. memorymatch_user)
+  };
+  localStorage.setItem('memorymatch_gameState', JSON.stringify(gameStateToSave));
+  console.log('Game state saved.');
+}
+
+function winLevel() {
+  stopTimer();
+  if (state.soundOn && audioWin) audioWin.play();
+  console.log("Level Won! Score:", state.score, "Time Left:", state.timeLeft);
+  saveGameState(); // Save state at the moment of winning (before level increment)
+  showWinPopup();
+}
+
+function loseLevel() {
+  stopTimer();
+  if (state.soundOn && audioLose) audioLose.play();
+  console.log("Level Lost! Score:", state.score);
+  saveGameState(); // Save state at the moment of losing
+  showLosePopup();
+}
+
+function onCardClick(index) {
+  if (state.busy || state.cards[index].flipped || state.cards[index].matched) {
+    return;
+  }
+
+  const clickedCard = state.cards[index];
+  clickedCard.flipped = true;
+  state.flippedIndices.push(index);
+
+  // Update DOM
+  const cardElement = board.children[index];
+  if (cardElement) { // Check if element exists
+    cardElement.classList.add('flipped');
+  } else {
+    console.error(`Card element at index ${index} not found in DOM.`);
+    // Fallback or error handling, though ideally DOM should always match state.cards
+  }
+
+
+  if (state.soundOn && audioTap) audioTap.play();
+
+  if (state.flippedIndices.length === 2) {
+    state.busy = true;
+    const [index1, index2] = state.flippedIndices;
+    const card1 = state.cards[index1];
+    const card2 = state.cards[index2];
+
+    if (card1.emoji === card2.emoji) {
+      card1.matched = true;
+      card2.matched = true;
+      state.matchedCount++;
+      state.score += 10; // Or dynamic score based on level/time
+
+      if (board.children[index1]) board.children[index1].classList.add('matched');
+      if (board.children[index2]) board.children[index2].classList.add('matched');
+
+      // Play a specific match sound, e.g., gwak
+      if (state.soundOn && audioGwak) audioGwak.play();
+
+
+      state.flippedIndices = [];
+      state.busy = false;
+
+      if (state.matchedCount * 2 === state.cards.length) {
+        winLevel();
+      }
+    } else {
+      // Play wrong match sound (e.g., bell or a new one)
+      if (state.soundOn && audioBell) audioBell.play();
+      if (state.vibrationOn && navigator.vibrate) navigator.vibrate(200);
+
+      setTimeout(() => {
+        card1.flipped = false;
+        card2.flipped = false;
+        if (board.children[index1]) board.children[index1].classList.remove('flipped');
+        if (board.children[index2]) board.children[index2].classList.remove('flipped');
+
+        state.flippedIndices = [];
+        state.busy = false;
+        updateHUD(); // Update HUD after cards are flipped back
+        saveGameState(); // Save state after non-match resolution
+      }, 1000);
+    }
+  }
+  updateHUD();
+  saveGameState(); // Save state after each valid flip or match resolution
+}
+
 function rebuildBoardFromState() {
 board.innerHTML = '';
 state.cards.forEach((card, i) => {
@@ -244,6 +440,7 @@ if (resumingSavedGame && state.cards && state.cards.length > 0) {
 }
 
 function showAuth() {
+hideFooterAndBanner(); // Ensure footer is hidden on auth screen
 showOverlay(); // Show overlay
 auth.classList.remove('hidden');
 home.classList.add('hidden');
@@ -278,10 +475,17 @@ savedUser = null;
 }
 
 if(savedUser && savedUser.email) {
-state.user = savedUser;
-showHome();
+  state.user = savedUser;
+  // check for resumable game state
+  const canResume = loadGameState(); // loadGameState now also fully restores state if resumable
+  if (canResume && state.cards && state.cards.length > 0 && !isTrivialState()) {
+    // isTrivialState helps avoid showing continue for a game that's effectively new
+    showContinuePopup();
+  } else {
+    showHome();
+  }
 } else {
-showAuth();
+  showAuth();
 }
 }
 
@@ -407,27 +611,26 @@ currentRewardBackButton.onclick = () => {
   updateHUD(); // Update display
 
   // Logic to return to the correct game state based on where the reward screen was triggered from
-  if (originalContext === 'continuePopup') {
-    // This implies the user chose to watch an ad to continue
-    // loadFullGameState(); // This might be needed if state was cleared or is complex
-    state.paused = false;
-    state.awaitingTapForBonusTime = false; // Or similar flag
-    if (pauseBtn) pauseBtn.textContent = "||";
-    // saveGameState(); // Save the new state (e.g., with bonus time)
-    showGame(true); // Resume game
-    // Check if level was already won (e.g. if ad shown after win condition met)
-    // if (state.cards && state.cards.length > 0 && state.matchedCount === Math.floor(state.cards.length / 2)) {
-    //   setTimeout(winLevel, 100); // winLevel needs to be defined
-    // }
-  } else if (originalContext === 'losePopup') {
-    // This implies user watched ad for an extra chance after losing
-    state.awaitingTapForBonusTime = true; // Or a specific state to handle post-ad interaction
-    state.paused = true; // Keep game paused until user interacts
-    if (pauseBtn) pauseBtn.textContent = "▶";
-    // saveGameState();
-    showGame(true); // Show game, but it might be in a "tap to use bonus" state
+  state.paused = false; // Ensure game is not paused
+  state.busy = false;   // Ensure game is not busy
+
+  if (originalContext === 'losePopup') {
+    // state.timeLeft was already increased by 10 in the previous version of this handler.
+    // Now, we ensure it's applied correctly.
+    updateHUD(); // Reflect new timeLeft (if it was changed, though not in this version)
+    showGame(true); // Show the game screen, cards should be as they were
+    startTimer();   // Restart the timer with the current timeLeft (which includes the bonus)
+  } else if (originalContext === 'continuePopup') {
+    // This context is for a potential "continue game after closing app" feature,
+    // which might have different logic (e.g. from showContinuePopup).
+    // For now, let's assume similar behavior to 'losePopup' if it were implemented.
+    updateHUD();
+    showGame(true);
+    startTimer();
   }
   // Potentially other contexts if showCustomRewardScreen is used elsewhere
+
+  saveGameState(); // Save the new state (e.g., with bonus time and unpaused)
 };
 }
 }
@@ -448,7 +651,7 @@ splashCards.appendChild(card);
 setTimeout(() => {
 splash.classList.add('hidden');
 checkLogin();
-}, 3000);
+}, 2500); // Adjusted timeout to 2.5 seconds
 }
 
 // EVENT HANDLER ASSIGNMENTS
@@ -480,40 +683,248 @@ showHome();
 };
 
 startBtn.onclick = () => {
-// const hasResumableStateFlag = localStorage.getItem('memorymatch_has_full_state') === 'true';
-// if (hasResumableStateFlag && state.cards && state.cards.length > 0 && state.resumeData) {
-// showContinuePopup();
-// } else {
-// clearFullGameState(); // Reset state for a new game
-state.level = 1; // Start from level 1
-state.score = 0; // Reset score
-state.timeLeft = calculateTimeForLevel(state.level); // Calculate initial time
-// initializeNewLevel(); // This would generate cards, set up board, update HUD
-// For now, let's assume initializeNewLevel does:
-// - state.cards = generateCardsForLevel(state.level);
-// - state.matchedCount = 0;
-// - state.flippedIndices = [];
-// - rebuildBoardFromState();
-// - updateHUD();
-// - startTimer(); // Needs to be defined
-saveGameState(); // Save the initial state of the new game.
-showGame(); // Show the game screen.
-// }
+  const canResume = loadGameState(); // Attempt to load, also get status
+  if (canResume && state.cards && state.cards.length > 0 && !isTrivialState()) {
+    showContinuePopup();
+  } else {
+    // No resumable game or user chose not to continue from a previous prompt
+    clearFullGameState(); // Ensure a fresh start
+    // state.level, state.score, etc. are reset by clearFullGameState
+    initializeNewLevel();
+    showGame(); // Show the game screen for the new game
+    // saveGameState(); // initializeNewLevel or subsequent actions will save.
+  }
 };
 
-// DOMContentLoaded listener calling showSplash()
+// Helper to determine if the loaded state is a "trivial" state (e.g. fresh game)
+function isTrivialState() {
+  // A game is trivial if it's level 1, score 0, and essentially full time for that level, and no cards flipped/matched
+  // This helps avoid showing "Continue?" for a game that was just started and immediately exited.
+  const isDefaultLevelAndScore = state.level === 1 && state.score === 0;
+  const isFullTime = state.timeLeft >= calculateTimeForLevel(1) - 2; // Allow a couple seconds difference
+  const noProgressInLevel = state.matchedCount === 0 && state.flippedIndices.length === 0;
+
+  // If cards array is empty, it's trivial (or not properly loaded for resume)
+  if (!state.cards || state.cards.length === 0) return true;
+
+  return isDefaultLevelAndScore && isFullTime && noProgressInLevel && !state.paused;
+}
+
+// DOMContentLoaded listener
 document.addEventListener('DOMContentLoaded', () => {
+  loadGameState(); // Load game state on start
+  // Set initial state of toggles based on loaded state or defaults
+  if (soundToggle) soundToggle.checked = state.soundOn;
+  if (vibrationToggle) vibrationToggle.checked = state.vibrationOn;
   showSplash();
 });
 
-// Functions like winLevel, loseLevel, initializeNewLevel, startTimer, onCardClick,
-// saveGameState, loadFullGameState, clearFullGameState, calculateTimeForLevel, generateCardsForLevel
-// are referenced but not fully defined/provided in the original script snippet for reordering.
-// Their definitions would be needed for the game to be fully functional.
-// For example, onCardClick is defined inline in rebuildBoardFromState.
-// loadFullGameState, saveGameState, clearFullGameState were mentioned in comments for startBtn.onclick
-// but their definitions are not present.
-// I've added comments where these would integrate.
-// The reordering focuses on the explicitly provided functions.
-// The `currentRewardBackButton.onclick` is an example of an event handler
-// that is logically part of `showCustomRewardScreen` and is kept there.
+// TIMER FUNCTIONS
+function calculateTimeForLevel(level) {
+  // Example: Base 60s, -2s per level, +5s per unique pair beyond the initial 2.
+  // Max time 120s, Min time 15s.
+  const baseTime = 60;
+  const timeReductionPerLevel = (level -1) * 1.5; // Gets more aggressive faster
+  const uniquePairs = calculateCardsForLevel(level);
+  const timeBonusForPairs = Math.max(0, (uniquePairs - 2)) * 5; // Bonus for more than 2 pairs
+
+  let calculatedTime = baseTime - timeReductionPerLevel + timeBonusForPairs;
+  return Math.max(15, Math.min(calculatedTime, 120)); // Clamp between 15 and 120 seconds
+}
+
+function startTimer() {
+  if (state.timerId) clearInterval(state.timerId); // Clear existing timer
+  state.timeLeft = calculateTimeForLevel(state.level);
+  updateHUD(); // Initial display of time
+
+  state.timerId = setInterval(() => {
+    if (state.paused) return; // Don't count down if paused
+
+    state.timeLeft--;
+    updateHUD();
+
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerId);
+      state.timerId = null;
+      loseLevel();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(state.timerId);
+  state.timerId = null;
+}
+
+
+// Function to load game state from localStorage
+function loadGameState() {
+  const savedStateString = localStorage.getItem('memorymatch_gameState');
+  if (savedStateString) {
+    try {
+      const savedState = JSON.parse(savedStateString);
+      // Restore only what's necessary and makes sense
+      // Avoid restoring transient state like flippedIndices or busy
+      state.level = savedState.level || 1;
+      state.score = savedState.score || 0;
+      state.level = savedState.level || 1;
+      state.score = savedState.score || 0;
+      state.timeLeft = savedState.timeLeft || 0; // Restore timeLeft
+      state.soundOn = typeof savedState.soundOn === 'boolean' ? savedState.soundOn : true;
+      state.vibrationOn = typeof savedState.vibrationOn === 'boolean' ? savedState.vibrationOn : true;
+      state.paused = typeof savedState.paused === 'boolean' ? savedState.paused : false;
+
+      // Restore card state only if it seems valid (e.g., not an empty array if level > 1 or score > 0)
+      // And generally, only if the game was paused. If it was won/lost, level should restart.
+      if (savedState.cards && savedState.cards.length > 0 && (state.paused || state.timeLeft < calculateTimeForLevel(state.level))) {
+         state.cards = savedState.cards;
+         state.matchedCount = savedState.matchedCount || 0;
+         state.flippedIndices = savedState.flippedIndices || []; // Restore flipped cards if mid-turn
+      } else {
+        // If not restoring cards (e.g. level completed, or no valid card array), ensure they are reset
+        // for a clean start of the loaded level if `continueGameBtn` is pressed.
+        // However, `initializeNewLevel` would typically handle this if not resuming.
+        // For now, we rely on `isTrivialState` and `startFromLevel1Btn` to manage fresh starts.
+        state.cards = savedState.cards || []; // Keep potentially valid cards for isTrivialState check
+        state.matchedCount = savedState.matchedCount || 0;
+        state.flippedIndices = savedState.flippedIndices || [];
+      }
+
+      console.log('Game state loaded.');
+      if (pauseBtn) pauseBtn.textContent = state.paused ? "▶" : "||";
+      return true; // Indicate successful load
+    } catch (error) {
+      console.error('Error loading game state:', error);
+      localStorage.removeItem('memorymatch_gameState');
+      // clearFullGameState(); // Call the new helper to reset state vars
+      // Manual reset for now as clearFullGameState might not be defined yet in this part of the script
+      state.level = 1; state.score = 0; state.cards = []; state.timeLeft = 0;
+      state.matchedCount = 0; state.flippedIndices = []; state.paused = false;
+      state.soundOn = true; state.vibrationOn = true;
+      return false; // Indicate failed load
+    }
+  }
+  return false;
+}
+
+// EVENT HANDLERS FOR TOGGLES AND PAUSE (moved from bottom)
+
+if (soundToggle) {
+  soundToggle.onchange = () => {
+    state.soundOn = soundToggle.checked;
+    localStorage.setItem('memorymatch_soundOn', state.soundOn); // Persist preference
+    saveGameState(); // Save overall game state which includes this setting
+  };
+}
+
+if (vibrationToggle) {
+  vibrationToggle.onchange = () => {
+    state.vibrationOn = vibrationToggle.checked;
+    localStorage.setItem('memorymatch_vibrationOn', state.vibrationOn); // Persist preference
+    saveGameState(); // Save overall game state
+  };
+}
+
+if (pauseBtn) {
+  pauseBtn.onclick = () => {
+    state.paused = !state.paused;
+    pauseBtn.textContent = state.paused ? "▶" : "||";
+    if (state.soundOn && audioPause) audioPause.play();
+    // Timer logic already handles state.paused in its interval
+    updateHUD(); // Might update a visual indicator for pause
+    saveGameState(); // Save pause state
+  };
+}
+
+// WIN POPUP BUTTON HANDLERS
+if (nextLevelBtn) {
+  nextLevelBtn.onclick = () => {
+    state.level++;
+    if (state.level > MAX_LEVEL) {
+      console.log("CONGRATULATIONS! Game Completed! Restarting from level 1.");
+      clearFullGameState(); // Reset everything for a true fresh start
+      // state.level is set to 1 in clearFullGameState
+    }
+    hideWinPopup();
+    initializeNewLevel();
+    saveGameState();
+  };
+}
+
+if (winPlayAgainBtn) {
+  winPlayAgainBtn.onclick = () => {
+    hideWinPopup();
+    // Score is preserved, current level is replayed
+    // state.timeLeft will be reset by initializeNewLevel
+    initializeNewLevel();
+    saveGameState();
+  };
+}
+
+if (homeBtn1) { // Home button in Win Popup
+  homeBtn1.onclick = () => {
+    hideWinPopup();
+    showHome();
+    // Game state is already saved from winLevel or other actions.
+    // No need to save again unless specific changes were made by this action.
+  };
+}
+
+// LOSE POPUP BUTTON HANDLERS
+if (playAgainBtn) { // Play Again button in Lose Popup (ID: playAgainBtn)
+  playAgainBtn.onclick = () => {
+    hideLosePopup();
+    // Score is preserved, current level is replayed
+    initializeNewLevel();
+    saveGameState();
+  };
+}
+
+if (loseWatchAdBtn) {
+  loseWatchAdBtn.onclick = () => {
+    hideLosePopup();
+    showCustomRewardScreen('losePopup'); // Call the reward screen
+  };
+}
+
+if (loseRestartHomeBtn) { // Home button in Lose Popup
+  loseRestartHomeBtn.onclick = () => {
+    hideLosePopup();
+    showHome();
+    // Game state already saved from loseLevel.
+  };
+}
+
+// CONTINUE POPUP BUTTON HANDLERS
+if (continueGameBtn) {
+  continueGameBtn.onclick = () => {
+    hideContinuePopup();
+    state.paused = false; // Explicitly unpause
+    if (pauseBtn) pauseBtn.textContent = "||";
+
+    rebuildBoardFromState(); // Render the loaded cards
+    updateHUD(); // Show loaded stats
+    showGame(true); // Show the game screen with existing state
+    startTimer(); // Resume timer with loaded timeLeft
+    // saveGameState(); // State is already loaded, timer starting will update timeLeft and save if needed
+  };
+}
+
+if (startFromLevel1Btn) {
+  startFromLevel1Btn.onclick = () => {
+    hideContinuePopup();
+    clearFullGameState(); // Reset state
+    initializeNewLevel(); // Setup Level 1
+    showGame(); // Show game screen for new L1 game
+    // saveGameState(); // initializeNewLevel calls saveGameState
+  };
+}
+
+if (continueHomeBtn) {
+  continueHomeBtn.onclick = () => {
+    hideContinuePopup();
+    showHome();
+    // No specific state change here that needs immediate saving,
+    // game state remains as loaded.
+  };
+}
