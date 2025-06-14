@@ -153,7 +153,7 @@ width: 90px; height: 140px;
 background: linear-gradient(135deg, #6a11cb, #2575fc); / Purple gradient consistent with card back */
 border-radius: 20px;
 box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.4), 0 2px 16px rgba(0,0,0,0.2);
-animation: splashFlip 1.5s infinite alternate;
+animation: splashFlip 2.5s ease-in-out infinite alternate;
 transition: transform 0.5s;
 }
 @keyframes splashFlip {
@@ -507,12 +507,9 @@ margin-top: 30px; / Lowered slightly */
 
 #immediateAdPlaceholder {
 width: 468px;
+max-width: 100%; /* Ensures it shrinks on small screens */
 height: 60px;
-background-color: rgba(0,0,0,0.1); /* Placeholder visual /
-/ display: inline-block; / / Not needed if parent is flex centering /
-/ color: #ccc; / / Text content removed, so not needed /
-/ display: flex; align-items: center; justify-content: center; / / Not needed for ad iframe /
-/ font-size: 0.8em; / / Not needed */
+background-color: rgba(0,0,0,0.1); /* Placeholder visual */
 }
 
 #rewardTopLeftContainer {
@@ -578,6 +575,7 @@ z-index: 100; / Ensure it's above other content */
 
 #rewardAdBannerContainer_468x60 {
 width: 468px;
+max-width: 100%; /* Ensures it shrinks on small screens */
 height: 60px;
 margin-top: 10px;
 background-color: rgba(0,0,0,0.1);
@@ -585,6 +583,7 @@ background-color: rgba(0,0,0,0.1);
 
 #rewardAdBannerContainer_300x250 {
 width: 300px;
+max-width: 100%; /* Ensures it shrinks on small screens */
 height: 250px;
 margin-top: 10px;
 background-color: rgba(0,0,0,0.1);
