@@ -282,9 +282,7 @@ function initializeNewLevel() {
 
   // Any other level-specific setup would go here
   console.log(`Initializing level ${state.level} with ${state.cards.length} cards (${state.cards.length / 2} pairs).`);
-  // saveGameState(); // Game state is saved at the end of this function in the previous version.
-                  // It's better to save after all initialization is complete.
-                  // However, startBtn.onclick and other callers of initializeNewLevel handle saving.
+  saveGameState(); // Save the state of the newly initialized level
 }
 
 // GAME BOARD/LOGIC HELPERS
