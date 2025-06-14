@@ -486,3 +486,7 @@ game.classList.remove('hidden');
 winPopup.classList.add('hidden');
 losePopup.classList.add('hidden');
 if (continuePopup) continuePopup.classList.add('hidden')
+
+document.addEventListener('DOMContentLoaded', () => {
+  showSplash();
+});
