@@ -328,19 +328,42 @@ function showCustomRewardScreen(originalContext) {
 
 // Splash: 3 blank gradient cards, flip animation
 function showSplash() {
-  showFooterAndBanner(); // Show footer on splash screen
-  splash.classList.remove('hidden');
-  home.classList.add('hidden');
-  game.classList.add('hidden');
-  auth.classList.add('hidden');
-  splashCards.innerHTML = '';
-  for (let i = 0; i < 3; i++) {
-    const card = document.createElement('div');
-    card.className = 'splash-card';
-    splashCards.appendChild(card);
+  showFooterAndBanner(); // Existing null check for stickyFooter is fine.
+
+  if (!splash) {
+    console.error('CRITICAL: Splash element not found!');
+    try {
+      // Attempt to indicate a critical error if console is not visible.
+      const errorDiv = document.createElement('div');
+      errorDiv.innerHTML = '<h1 style="color:red; text-align:center; padding-top: 50px; position:fixed; top:0; left:0; width:100%; background:white; z-index:9999;">CRITICAL ERROR: Splash element missing. Game cannot start.</h1>';
+      if (document.body) { // Check if body exists before appending
+        document.body.appendChild(errorDiv);
+      }
+    } catch(e) {
+      console.error('Failed to display critical error on body:', e);
+      /* ignore if body itself is somehow problematic */
+    }
+    return; // Stop if splash element is missing
   }
+  splash.classList.remove('hidden');
+
+  if (home) home.classList.add('hidden'); else console.error('Home element not found in showSplash');
+  if (game) game.classList.add('hidden'); else console.error('Game element not found in showSplash');
+  if (auth) auth.classList.add('hidden'); else console.error('Auth element not found in showSplash');
+
+  if (splashCards) {
+    splashCards.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const card = document.createElement('div');
+      card.className = 'splash-card';
+      splashCards.appendChild(card);
+    }
+  } else {
+    console.error('SplashCards element not found in showSplash');
+  }
+
   setTimeout(() => {
-    splash.classList.add('hidden');
+    if (splash) splash.classList.add('hidden'); else console.error('Splash element not found in showSplash timeout');
     checkLogin();
   }, 3000);
 }
