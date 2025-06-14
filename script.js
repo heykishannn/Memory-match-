@@ -1,351 +1,524 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Screens and Popups
-    const splashScreen = document.getElementById('splash-screen');
-    const gameScreen = document.getElementById('game-screen');
-    const continuePopup = document.getElementById('continue-popup');
-    const winPopup = document.getElementById('win-popup');
-    const losePopup = document.getElementById('lose-popup');
-    const rewardedAdScreen = document.getElementById('rewarded-ad-screen');
+// ==== Memory Match Game JS ====
 
-    // Buttons
-    const continueYesBtn = document.getElementById('continue-yes');
-    const continueNoBtn = document.getElementById('continue-no');
-    const nextLevelBtn = document.getElementById('next-level');
-    const playAgainLoseBtn = document.getElementById('play-again-lose');
-    const watchAdContinueBtn = document.getElementById('watch-ad-continue');
-    const adBackBtn = document.getElementById('ad-back-button');
+// EMOJIS & sound mapping
+const EMOJIS = [
+  "🍎", "🍌", "🍇", "🍓", "🍉", "🍍", "🥝", "🍒", "🍑", "🍋",
+  "🥥", "🥭", "🍐", "🍊", "🍈", "🍏", "🥑", "🍅", "🥕", "🌽",
+  "🌷", "🪷", "🌸", "🪻", "🌺", "🌼", "🐼", "🦄", "🍂", "🍄", "🌿",
+  "🐥", "🐔", "🦜", "🕊️", "🦢", "🦋", "🍨", "🍧", "🍭",
+  "🍬", "☕", "🗿", "🎂", "🧸", "🎹", "💎", "🔮", "🐱",
+  "🦚", "🪿"
+];
+const MATCH_SOUNDS = {
+  "🍌": "sound_gwak",
+  "🍅": "sound_tamatar",
+  "🗿": "sound_sigma",
+  "🎂": "sound_birthday",
+  "🦚": "sound_mor",
+  "🐱": "sound_bell"
+};
 
-    // Game Elements
-    const levelDisplay = document.getElementById('level');
-    const timerDisplay = document.getElementById('timer');
-    const gameBoard = document.getElementById('game-board');
+// DOM
+const splash = document.getElementById('splash');
+const splashCards = document.querySelector('.splash-cards');
+const auth = document.getElementById('auth');
+const home = document.getElementById('home');
+const game = document.getElementById('game');
+const backBtn = document.getElementById('backBtn');
+const board = document.getElementById('board');
+const signupBtn = document.getElementById('signupBtn');
+const startBtn = document.getElementById('startBtn');
+const soundToggle = document.getElementById('soundToggle');
+const vibrationToggle = document.getElementById('vibrationToggle');
+const pauseBtn = document.getElementById('pauseBtn');
+const levelDisplay = document.getElementById('levelDisplay');
+const timerDisplay = document.getElementById('timerDisplay');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const winPopup = document.getElementById('winPopup');
+const losePopup = document.getElementById('losePopup');
+const adPopup = document.getElementById('adPopup');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
+const homeBtn1 = document.getElementById('homeBtn1');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const loseHomeBtn = document.getElementById('loseHomeBtn');
+const watchAdBtn = document.getElementById('watchAdBtn');
+const resultLevel = document.getElementById('resultLevel');
+const resultScore = document.getElementById('resultScore');
+const resultTime = document.getElementById('resultTime');
+const resultLevelL = document.getElementById('resultLevelL');
+const resultScoreL = document.getElementById('resultScoreL');
+const resultTimeL = document.getElementById('resultTimeL');
 
-    // Ad Screen Elements
-    const adTimerDisplay = document.getElementById('ad-timer');
-    const adRewardGuaranteed = document.getElementById('ad-reward-guaranteed');
+// Continue Popup
+const continuePopup = document.getElementById('continuePopup');
+const continueLevel1Btn = document.getElementById('continueLevel1Btn');
+const continueHomeBtn = document.getElementById('continueHomeBtn');
+const continueWatchAdBtn = document.getElementById('continueWatchAdBtn');
+const continueResult = document.getElementById('continueResult');
 
-    // Game State Variables
-    let currentLevel = 1;
-    let cards = [];
-    let flippedCards = [];
-    let matchedPairs = 0;
-    let totalPairs = 0;
-    let gameTimerInterval = null;
-    let timeLeft = 0;
-    let lockBoard = false;
-    const MAX_LEVEL = 100;
-    let adCountdownInterval = null;
+// Ad Popup
+const adTimer = document.getElementById('adTimer');
+const adBackBtn = document.getElementById('adBackBtn');
+const adReward = document.querySelector('.ad-reward');
 
+// Audio
+const winSound = document.getElementById('winSound');
+const loseSound = document.getElementById('loseSound');
+const pauseSound = document.getElementById('pauseSound');
+const restartSound = document.getElementById('restartSound');
+const flipSound = document.getElementById('flipSound');
+const sound_gwak = document.getElementById('sound_gwak');
+const sound_tamatar = document.getElementById('sound_tamatar');
+const sound_sigma = document.getElementById('sound_sigma');
+const sound_birthday = document.getElementById('sound_birthday');
+const sound_mor = document.getElementById('sound_mor');
+const sound_bell = document.getElementById('sound_bell');
 
-    const cardEmojis = ['🍎', '🍌', '🍒', '🍇', '🍓', '🍉', '🍍', '🥝', '🥭', '🍑', '🥥', '🍋', '🍊', '🍈', '🍐', '🍅', '🍆', '🌽', '🥕', '🌶️', '🍄', '🥦', '🥑', '🥒', '🥬', '🍞', '🥐', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '핫도그', '샌드위치', '타코', '부리토', '샐러드', '팝콘', '버터', '소금', '사탕', '막대사탕', '초콜릿 바', '아이스크림', '도넛', '쿠키', '케이크', '컵케이크', '파이', '푸딩', '아이스크림', '음료수', '주스', '우유', '커피', '차', '샴페인', '와인', '맥주', '위스키'];
-    const SAVED_LEVEL_KEY = 'memoryMatch_currentLevel';
+let state = {
+  user: null,
+  level: 1,
+  score: 0,
+  timeLeft: 0,
+  timerId: null,
+  paused: false,
+  soundOn: true,
+  vibrationOn: true,
+  cards: [],
+  flippedIndices: [],
+  matchedCount: 0,
+  busy: false,
+  isReturning: false,
+  lastLevel: 1,
+  lastScore: 0,
+  lastMatchEmoji: null
+};
 
-    // --- SOUND PLACEHOLDER FUNCTIONS ---
-    function playSound(soundName) {
-        console.log(`Placeholder: Play sound - ${soundName}`);
+// ==== Sound Management ====
+function stopAllSounds() {
+  [winSound, loseSound, pauseSound, restartSound, flipSound, sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell].forEach(a=>{
+    if (a) { a.pause(); a.currentTime = 0; }
+  });
+}
+
+// ==== NAVIGATION FUNCTIONS ====
+
+function showSplash() {
+  splash.classList.remove('hidden');
+  auth.classList.add('hidden');
+  home.classList.add('hidden');
+  game.classList.add('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  adPopup.classList.add('hidden');
+  continuePopup.classList.add('hidden');
+  splashCards.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const card = document.createElement('div');
+    card.className = 'splash-card';
+    splashCards.appendChild(card);
+  }
+  setTimeout(() => {
+    splash.classList.add('hidden');
+    showAuth();
+  }, 2000);
+}
+
+function showAuth() {
+  auth.classList.remove('hidden');
+  home.classList.add('hidden');
+  game.classList.add('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  adPopup.classList.add('hidden');
+  continuePopup.classList.add('hidden');
+}
+
+function showHome() {
+  auth.classList.add('hidden');
+  home.classList.remove('hidden');
+  game.classList.add('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  adPopup.classList.add('hidden');
+  continuePopup.classList.add('hidden');
+}
+
+function showGame() {
+  auth.classList.add('hidden');
+  home.classList.add('hidden');
+  game.classList.remove('hidden');
+  winPopup.classList.add('hidden');
+  losePopup.classList.add('hidden');
+  adPopup.classList.add('hidden');
+  continuePopup.classList.add('hidden');
+  setupSwitches();
+  startLevel(state.level);
+}
+
+// ==== BUTTON EVENTS ====
+
+signupBtn.onclick = () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if (!email || !password) { alert('Enter email and password'); return; }
+  state.user = { email, password };
+  state.level = 1;
+  state.score = 0;
+  saveUserData();
+  showHome();
+};
+
+startBtn.onclick = () => {
+  let userData = getUserData();
+  if (userData && userData.email) {
+    state.isReturning = true;
+    state.level = userData.level || 1;
+    state.score = userData.score || 0;
+    state.lastLevel = state.level;
+    state.lastScore = state.score;
+    showContinuePopup();
+  } else {
+    state.isReturning = false;
+    state.level = 1;
+    state.score = 0;
+    showGame();
+  }
+};
+
+function showContinuePopup() {
+  continueResult.innerHTML = `<span>Last Level: ${state.lastLevel}</span><span>Last Score: ${state.lastScore}</span>`;
+  continuePopup.classList.remove('hidden');
+  home.classList.add('hidden');
+}
+
+continueLevel1Btn.onclick = () => {
+  continuePopup.classList.add('hidden');
+  state.level = 1;
+  state.score = 0;
+  showGame();
+};
+continueHomeBtn.onclick = () => {
+  continuePopup.classList.add('hidden');
+  showHome();
+};
+continueWatchAdBtn.onclick = () => {
+  continuePopup.classList.add('hidden');
+  showAdPopup('continue');
+};
+
+backBtn.onclick = () => {
+  clearInterval(state.timerId);
+  showHome();
+};
+
+watchAdBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  showAdPopup('lose');
+};
+
+nextLevelBtn.onclick = () => {
+  winPopup.classList.add('hidden');
+  state.level++;
+  showGame();
+};
+
+homeBtn1.onclick = () => {
+  winPopup.classList.add('hidden');
+  showHome();
+};
+
+playAgainBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  stopAllSounds();
+  if(state.soundOn) restartSound.play();
+  showGame();
+};
+
+loseHomeBtn.onclick = () => {
+  losePopup.classList.add('hidden');
+  showHome();
+};
+
+adBackBtn.onclick = () => {
+  adPopup.classList.add('hidden');
+  if (state.adContext === 'continue') {
+    state.level = state.lastLevel;
+    state.score = state.lastScore;
+    showGame();
+  } else {
+    state.timeLeft += 10;
+    updateHUD();
+    startTimer();
+  }
+};
+
+// ==== GAME CONTROLS ====
+
+function setupSwitches() {
+  soundToggle.checked = state.soundOn;
+  vibrationToggle.checked = state.vibrationOn;
+  soundToggle.onchange = ()=>{ state.soundOn=soundToggle.checked; };
+  vibrationToggle.onchange = ()=>{ state.vibrationOn=vibrationToggle.checked; };
+  pauseBtn.onclick = ()=>{
+    state.paused = !state.paused;
+    pauseBtn.textContent = state.paused ? "▶" : "||";
+    stopAllSounds();
+    if (!state.paused) {
+      if (state.soundOn) restartSound.play();
+    } else {
+      if (state.soundOn) pauseSound.play();
     }
+  };
+}
 
-    // --- VIBRATION FUNCTIONS ---
-    function vibrateShort() {
-        if (navigator.vibrate) navigator.vibrate(50);
-    }
+// ==== GAME LOGIC ====
 
-    function vibrateGameOver() {
-        if (navigator.vibrate) navigator.vibrate([200, 50, 200]);
-    }
+function getLevelConfig(level) {
+  let pairs = 1 + Math.floor((level-1)/2);
+  let totalCards = pairs * 2;
+  let maxCols = window.innerWidth > 600 ? 6 : 4;
+  let cols = Math.min(maxCols, totalCards);
+  let rows = Math.ceil(totalCards / cols);
+  let boardHeight = 0.6 * window.innerHeight;
+  let cardSize = Math.min(80, Math.floor((0.95 * window.innerWidth) / cols), Math.floor(boardHeight / rows));
+  let timePerCard = (cardSize < 50) ? 2 : 3;
+  let time = totalCards * timePerCard;
+  return { pairs, totalCards, cols, rows, cardSize, time };
+}
 
-    // --- UTILITY FUNCTIONS ---
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
+function startLevel(level) {
+  clearInterval(state.timerId);
+  state.paused = false;
+  pauseBtn.textContent = "||";
+  state.flippedIndices = [];
+  state.matchedCount = 0;
+  state.busy = false;
+  state.lastMatchEmoji = null;
 
-    function getNumPairsForLevel(level) {
-        return Math.floor((level - 1) / 2) + 1;
-    }
+  const {pairs, totalCards, cols, rows, cardSize, time} = getLevelConfig(level);
+  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  board.style.height = `${Math.max(rows * cardSize + (rows-1)*12, 220)}px`;
 
-    function getCardContentForLevel(level) {
-        const numPairs = getNumPairsForLevel(level);
-        totalPairs = numPairs;
+  let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
+  let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
 
-        if (numPairs > cardEmojis.length) {
-            let extendedEmojis = [...cardEmojis];
-            while (extendedEmojis.length < numPairs) {
-                extendedEmojis = extendedEmojis.concat(cardEmojis);
-            }
-            const availableEmojis = shuffleArray(extendedEmojis);
-            const levelEmojis = availableEmojis.slice(0, numPairs);
-            const gameCards = [...levelEmojis, ...levelEmojis];
-            return shuffleArray(gameCards);
-        } else {
-            const availableEmojis = shuffleArray([...cardEmojis]);
-            const levelEmojis = availableEmojis.slice(0, numPairs);
-            const gameCards = [...levelEmojis, ...levelEmojis];
-            return shuffleArray(gameCards);
-        }
-    }
+  state.cards = cardsArray.map((emoji,idx)=>({
+    emoji, flipped:false, matched:false, idx
+  }));
 
-    // --- TIMER FUNCTIONS ---
-    function getDurationForLevel(level) {
-        const numPairs = getNumPairsForLevel(level);
-        let duration = 10 + numPairs * 5;
-        if (numPairs <= 2) duration = Math.max(15, 10 + numPairs * 4);
-        if (numPairs > 10) duration = 10 + numPairs * 6;
-        return Math.min(duration, 180);
-    }
-
-    function startTimer() {
-        clearInterval(gameTimerInterval);
-        timeLeft = getDurationForLevel(currentLevel);
-        timerDisplay.textContent = `Time: ${timeLeft}s`;
-        gameTimerInterval = setInterval(() => {
-            timeLeft--;
-            timerDisplay.textContent = `Time: ${timeLeft}s`;
-            if (timeLeft <= 0) {
-                clearInterval(gameTimerInterval);
-                if (!winPopup.classList.contains('active') && !losePopup.classList.contains('active')) {
-                    endLevel(false);
-                }
-            }
-        }, 1000);
-    }
-
-    function stopTimer() {
-        clearInterval(gameTimerInterval);
-        gameTimerInterval = null;
-    }
-
-    // --- SCREEN MANAGEMENT ---
-    function showScreen(screenElement) {
-        [splashScreen, gameScreen, rewardedAdScreen].forEach(s => s.classList.remove('active'));
-        [continuePopup, winPopup, losePopup].forEach(p => p.classList.remove('active'));
-        if (screenElement) screenElement.classList.add('active');
-    }
-
-    function showPopup(popupElement) {
-        if (popupElement) popupElement.classList.add('active');
-    }
-
-    function hidePopup(popupElement) {
-        if (popupElement) popupElement.classList.remove('active');
-    }
-
-    // --- LOCALSTORAGE ---
-    function saveLevel(level) {
-        localStorage.setItem(SAVED_LEVEL_KEY, level.toString());
-    }
-
-    function getSavedLevel() {
-        const savedLevel = localStorage.getItem(SAVED_LEVEL_KEY);
-        return savedLevel ? parseInt(savedLevel, 10) : null;
-    }
-
-    function clearSavedLevel() {
-        localStorage.removeItem(SAVED_LEVEL_KEY);
-    }
-
-    // --- GAME BOARD ---
-    function createGameBoard() {
-        gameBoard.innerHTML = '';
-        matchedPairs = 0;
-        flippedCards = [];
-        lockBoard = false;
-        const cardValues = getCardContentForLevel(currentLevel);
-        let columns = 2;
-        if (cardValues.length > 4) columns = 3;
-        if (cardValues.length > 6) columns = 4;
-        if (cardValues.length > 12) columns = 4;
-        if (cardValues.length > 16) columns = 5;
-        if (cardValues.length > 20) columns = 5;
-        if (cardValues.length > 25) columns = 6;
-        gameBoard.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        cardValues.forEach(value => {
-            const cardElement = document.createElement('div');
-            cardElement.classList.add('card');
-            cardElement.dataset.value = value;
-            const cardFront = document.createElement('div');
-            cardFront.classList.add('card-face', 'card-front');
-            cardFront.textContent = value;
-            const cardBack = document.createElement('div');
-            cardBack.classList.add('card-face', 'card-back');
-            cardElement.appendChild(cardFront);
-            cardElement.appendChild(cardBack);
-            cardElement.addEventListener('click', () => handleCardClick(cardElement));
-            gameBoard.appendChild(cardElement);
-        });
-        cards = document.querySelectorAll('.card');
-    }
-
-    function handleCardClick(clickedCard) {
-        if (lockBoard || timeLeft <= 0) return;
-        if (clickedCard.classList.contains('is-flipped') || clickedCard.classList.contains('is-matched')) {
-            return;
-        }
-        playSound('tap');
-        vibrateShort();
-        clickedCard.classList.add('is-flipped');
-        flippedCards.push(clickedCard);
-        if (flippedCards.length === 2) {
-            lockBoard = true;
-            checkForMatch();
-        }
-    }
-
-    function checkForMatch() {
-        const [card1, card2] = flippedCards;
-        if (card1.dataset.value === card2.dataset.value) {
-            card1.classList.add('is-matched');
-            card2.classList.add('is-matched');
-            matchedPairs++;
-            flippedCards = [];
-            lockBoard = false;
-            if (matchedPairs === totalPairs) {
-                endLevel(true);
-            }
-        } else {
-            setTimeout(() => {
-                card1.classList.remove('is-flipped');
-                card2.classList.remove('is-flipped');
-                flippedCards = [];
-                lockBoard = false;
-            }, 1000);
-        }
-    }
-
-    // --- REWARDED AD SCREEN LOGIC ---
-    function startAdCountdown() {
-        clearInterval(adCountdownInterval); // Clear any existing interval
-        let adTimeLeft = 5;
-
-        adTimerDisplay.textContent = adTimeLeft;
-        adTimerDisplay.style.display = 'block'; // Or 'inline' or 'inline-block' depending on desired layout
-        adBackBtn.style.display = 'none';
-        adRewardGuaranteed.style.display = 'none';
-
-        adCountdownInterval = setInterval(() => {
-            adTimeLeft--;
-            adTimerDisplay.textContent = adTimeLeft;
-            if (adTimeLeft <= 0) {
-                clearInterval(adCountdownInterval);
-                adTimerDisplay.style.display = 'none';
-                adBackBtn.style.display = 'block'; // Or 'inline-block' based on CSS
-                adRewardGuaranteed.style.display = 'block'; // Or 'inline-block'
-            }
-        }, 1000);
-    }
-
-    watchAdContinueBtn.addEventListener('click', () => {
-        hidePopup(losePopup);
-        showScreen(rewardedAdScreen);
-        startAdCountdown();
+  board.innerHTML = '';
+  state.cards.forEach((card,i)=>{
+    const cardEl = document.createElement('div');
+    cardEl.className = 'card';
+    cardEl.tabIndex = 0;
+    cardEl.dataset.index = i;
+    cardEl.style.maxWidth = cardEl.style.maxHeight = cardSize+"px";
+    cardEl.innerHTML = `
+      <div class="front"><span class="emoji">${card.emoji}</span></div>
+      <div class="back"></div>
+    `;
+    cardEl.addEventListener('click',()=>onCardClick(i));
+    cardEl.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' ') { e.preventDefault(); onCardClick(i);}
     });
+    board.appendChild(cardEl);
+  });
 
-    // --- GAME FLOW & LEVEL MANAGEMENT ---
-    function startGame(level, resetProgress = false, fromAd = false) {
-        if (level > MAX_LEVEL) {
-            alert("Congratulations! You've completed all levels!");
-            currentLevel = 1;
-            clearSavedLevel();
-        } else {
-            currentLevel = level;
-        }
+  // Emoji size responsive
+  document.querySelectorAll('.emoji').forEach(el=>{
+    el.style.fontSize = (Math.max(32, Math.floor(cardSize*0.7)))+"px";
+    el.style.lineHeight = "1";
+    el.style.display = "block";
+    el.style.width = "100%";
+    el.style.textAlign = "center";
+  });
 
-        if (resetProgress) {
-            clearSavedLevel();
-        }
+  state.timeLeft = time;
+  updateHUD();
+  startTimer();
+}
 
-        levelDisplay.textContent = `Level: ${currentLevel}`;
-        createGameBoard(); // This also resets matchedPairs, flippedCards
-
-        // If continuing from an ad, we don't want to penalize the player for the ad time.
-        // So, we restart the timer fully.
-        startTimer();
-        showScreen(gameScreen);
-        lockBoard = false; // Ensure board is not locked if returning from ad
+function onCardClick(index) {
+  if(state.busy||state.paused) return;
+  const card = state.cards[index];
+  if(card.flipped||card.matched) return;
+  flipCard(index);
+  state.flippedIndices.push(index);
+  if(state.flippedIndices.length===2) {
+    state.busy = true;
+    setTimeout(checkMatch, 500);
+  }
+}
+function flipCard(index) {
+  const card = state.cards[index];
+  card.flipped = true;
+  const cardEl = board.children[index];
+  cardEl.classList.add('flipped');
+  stopAllSounds();
+  if(state.soundOn) flipSound.play();
+}
+function unflipCard(index) {
+  const card = state.cards[index];
+  card.flipped = false;
+  const cardEl = board.children[index];
+  cardEl.classList.remove('flipped');
+}
+function checkMatch() {
+  const [i1,i2] = state.flippedIndices;
+  const card1 = state.cards[i1], card2 = state.cards[i2];
+  let isLastMatch = false;
+  if(card1.emoji===card2.emoji) {
+    card1.matched = card2.matched = true;
+    board.children[i1].classList.add('matched');
+    board.children[i2].classList.add('matched');
+    state.matchedCount++;
+    state.score += 10+state.timeLeft;
+    updateHUD();
+    vibrate(80);
+    if(state.matchedCount===Math.floor(state.cards.length/2)) isLastMatch = true;
+    stopAllSounds();
+    if(state.soundOn && MATCH_SOUNDS[card1.emoji]) {
+      let audio = document.getElementById(MATCH_SOUNDS[card1.emoji]);
+      if(audio) { audio.currentTime = 0; audio.play(); }
+      if(isLastMatch) {
+        state.lastMatchEmoji = card1.emoji;
+        return setTimeout(winLevel, 400);
+      }
+    } else if(isLastMatch) {
+      state.lastMatchEmoji = null;
+      setTimeout(winLevel, 400);
+      return;
     }
+    if(isLastMatch) setTimeout(winLevel, 400);
+  } else {
+    setTimeout(()=>{
+      unflipCard(i1); unflipCard(i2);
+    }, 400);
+  }
+  state.flippedIndices = [];
+  state.busy = false;
+}
 
-    function endLevel(isWin) {
-        stopTimer();
-        if (isWin) {
-            playSound('win');
-            playSound('celebration');
-            if (currentLevel < MAX_LEVEL) {
-                saveLevel(currentLevel + 1);
-                showPopup(winPopup);
-            } else {
-                alert("Congratulations! You've completed all levels!");
-                clearSavedLevel();
-                showScreen(null);
-                splashScreen.classList.add('active');
-            }
-        } else {
-            playSound('lose');
-            vibrateGameOver();
-            showPopup(losePopup);
-        }
+function winLevel() {
+  clearInterval(state.timerId);
+  state.score += state.timeLeft*2;
+  updateHUD();
+  vibrate(1000);
+  resultLevel.textContent = "Level: " + state.level;
+  resultScore.textContent = "Score: " + state.score;
+  resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
+  winPopup.classList.remove('hidden');
+  // अगर last match emoji का sound play हुआ है, तो win sound नहीं बजेगा
+  if(state.soundOn && (!state.lastMatchEmoji || !MATCH_SOUNDS[state.lastMatchEmoji])) {
+    stopAllSounds();
+    winSound.play();
+  }
+  saveUserData();
+}
+function loseLevel() {
+  clearInterval(state.timerId);
+  resultLevelL.textContent = "Level: " + state.level;
+  resultScoreL.textContent = "Score: " + state.score;
+  resultTimeL.textContent = "Time Left: 0s";
+  losePopup.classList.remove('hidden');
+  stopAllSounds();
+  if(state.soundOn) loseSound.play();
+  saveUserData();
+}
+
+// ==== AD POPUP LOGIC ====
+
+let adCountdown = 5;
+let adInterval = null;
+
+function showAdPopup(context) {
+  state.adContext = context; // 'continue' or 'lose'
+  adPopup.classList.remove('hidden');
+  adPopup.style.display = "flex";
+  let count = adCountdown;
+  adTimer.textContent = count + "s";
+  adTimer.style.display = "inline";
+  adBackBtn.classList.add('hidden');
+  adBackBtn.disabled = true;
+  adReward.style.visibility = "hidden";
+  adInterval = setInterval(()=>{
+    count--;
+    if(count > 0) {
+      adTimer.textContent = count + "s";
+    } else {
+      clearInterval(adInterval);
+      adTimer.textContent = "";
+      adBackBtn.classList.remove('hidden');
+      adBackBtn.disabled = false;
+      adReward.style.visibility = "visible";
     }
+  },1000);
+}
 
-    // --- EVENT LISTENERS FOR POPUP BUTTONS ---
-    nextLevelBtn.addEventListener('click', () => {
-        hidePopup(winPopup);
-        if (currentLevel < MAX_LEVEL) {
-            startGame(currentLevel + 1);
-        } else {
-            alert("You've finished all levels!");
-            showScreen(null);
-            splashScreen.classList.add('active');
-        }
-    });
+function updateHUD() {
+  levelDisplay.textContent = `Level: ${state.level}`;
+  timerDisplay.textContent = `Time: ${state.timeLeft < 10 ? '0' + Math.round(state.timeLeft) : Math.round(state.timeLeft)}`;
+  scoreDisplay.textContent = `Score: ${state.score}`;
+}
 
-    playAgainLoseBtn.addEventListener('click', () => {
-        hidePopup(losePopup);
-        startGame(currentLevel); // Restart current level
-    });
-
-    continueYesBtn.addEventListener('click', () => {
-        hidePopup(continuePopup);
-        const savedLevel = getSavedLevel();
-        if (savedLevel && savedLevel > 0 && savedLevel <= MAX_LEVEL) {
-            startGame(savedLevel);
-        } else {
-            startGame(1);
-        }
-    });
-
-    continueNoBtn.addEventListener('click', () => {
-        hidePopup(continuePopup);
-        startGame(1, true);
-    });
-
-    // adBackBtn listener will be added in the next step (Integrate Rewarded Ad Flow)
-
-    // --- INITIALIZATION ---
-    function init() {
-        showScreen(splashScreen);
-        setTimeout(() => {
-            const savedLevel = getSavedLevel();
-            if (savedLevel && savedLevel > 1 && savedLevel <= MAX_LEVEL) {
-                showPopup(continuePopup);
-            } else {
-                startGame(1);
-            }
-        }, 1500);
+function startTimer() {
+  clearInterval(state.timerId);
+  state.timerId = setInterval(()=>{
+    if(!state.paused) {
+      state.timeLeft--;
+      updateHUD();
+      if(state.timeLeft<=0) {
+        clearInterval(state.timerId);
+        loseLevel();
+      }
     }
+  },1000);
+}
 
-    // Test buttons
-    const testWinBtn = document.getElementById('test-win');
-    const testLoseBtn = document.getElementById('test-lose');
-    if(testWinBtn) testWinBtn.addEventListener('click', () => endLevel(true));
-    if(testLoseBtn) testLoseBtn.addEventListener('click', () => {
-        timeLeft = 0;
-        timerDisplay.textContent = `Time: ${timeLeft}s`;
-        if (!winPopup.classList.contains('active') && !losePopup.classList.contains('active')) {
-             endLevel(false);
-        }
-    });
+function shuffle(arr) {
+  let a = arr.slice();
+  for(let i=a.length-1;i>0;i--) {
+    let j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
 
-    init();
-});
+function vibrate(ms) {
+  if (state.vibrationOn && navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
+
+// ==== USER DATA LOCAL STORAGE ====
+
+function saveUserData() {
+  if(state.user && state.user.email) {
+    let data = {
+      email: state.user.email,
+      level: state.level,
+      score: state.score
+    };
+    localStorage.setItem('memorymatch_user_' + state.user.email, JSON.stringify(data));
+  }
+}
+function getUserData() {
+  let email = null;
+  try {
+    let lastUser = localStorage.getItem('memorymatch_user');
+    if(lastUser) {
+      let obj = JSON.parse(lastUser);
+      email = obj.email;
+    }
+  } catch(e) {}
+  if(email) {
+    let data = localStorage.getItem('memorymatch_user_' + email);
+    if(data) return JSON.parse(data);
+  }
+  return null;
+}
+
+// ==== INIT ====
+
+showSplash();
+    
