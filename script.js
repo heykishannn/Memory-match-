@@ -90,7 +90,8 @@ let state = {
   isReturning: false,
   lastLevel: 1,
   lastScore: 0,
-  lastMatchEmoji: null
+  lastMatchEmoji: null,
+  soundWasPlayingBeforeHidden: false
 };
 
 // ==== Sound Management ====
@@ -521,4 +522,21 @@ function getUserData() {
 // ==== INIT ====
 
 showSplash();
-    
+
+// ==== Visibility Change Handler ====
+function handleVisibilityChange() {
+  if (document.hidden) {
+    if (state.soundOn) {
+      state.soundWasPlayingBeforeHidden = true;
+      stopAllSounds();
+    }
+  } else {
+    if (state.soundWasPlayingBeforeHidden) {
+      state.soundWasPlayingBeforeHidden = false;
+      // Sounds are event-driven, so no need to auto-resume a specific sound.
+      // state.soundOn will ensure they play if toggled on.
+    }
+  }
+}
+
+document.addEventListener('visibilitychange', handleVisibilityChange);
