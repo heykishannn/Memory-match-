@@ -39,7 +39,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 .btn:active, .orange-btn:active { transform: scale(0.97);}
 .start-btn { font-size:1.2rem; padding:16px 0; border-radius:16px; width: 80vw; max-width: 250px; margin: 0 auto;}
 .home-title { font-family:'Fredoka One', 'Poppins', Arial, sans-serif; font-size:1.7rem; margin-bottom:1.2rem; margin-top: 1.3rem; text-shadow:0 0 18px #fff,0 0 24px #8e2de2; color:#fff; font-weight:700; text-align:center;}
-.home-content { width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.home-content { width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 30px; }
 .game-header { width: 100vw; display: flex; flex-direction: column; align-items: center; margin-top: 0.6rem; position: relative;}
 .game-title { font-family:'Fredoka One', 'Poppins', Arial, sans-serif; font-size:1.1rem; font-weight:700; text-align:center; margin-bottom:0.2rem; color:#fff; letter-spacing:2px;}
 .back-btn { position: absolute; left: 10px; top: 0px; background: #fff; color: #43e97b; border: none; border-radius: 8px; font-size: 1rem; padding: 4px 10px; font-weight: bold; box-shadow: 0 2px 8px #0002; cursor: pointer; z-index: 10; margin-top: 6px;}
@@ -136,24 +136,32 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   justify-content: center;
 }
 .ad-popup-content {
-  width: 100vw;
-  height: 100vh;
+  background: #f4f4f4; /* Lighter background for page feel */
+  padding: 0; /* Remove padding, handle with inner elements */
+  border-radius: 8px;
+  width: 90vw;
+  max-width: 650px; /* Max width for larger screens */
+  height: auto; /* Auto height based on content */
+  min-height: 75vh; /* Minimum height */
+  max-height: 90vh; /* Maximum height */
+  overflow-y: auto; /* Allow scrolling for content overflow */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  position: relative;
-  background: none;
-  box-shadow: none;
-  border-radius: 0;
-  padding: 0;
+  /* Removed align-items: center; justify-content: center; */
+  /* align-items: stretch; is effectively overridden by width/max-width */
+  position: relative; /* Keep position relative if needed for children */
+  border: 1px solid #ddd;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
+
 .ad-popup-header {
-  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 18px 22px 0 18px;
+  align-items: center;
+  width: 100%;
+  padding: 15px 20px; /* Add padding */
+  background-color: #fff; /* Distinct header background */
+  border-bottom: 1px solid #ddd;
   box-sizing: border-box;
 }
 .ad-timer {
@@ -179,18 +187,24 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 }
 .ad-popup-body {
   flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
+  padding: 20px; /* Add padding around body content */
+  display: flex; /* Keep flex if needed for centering ad, or remove */
+  flex-direction: column; /* Ad and its title stack */
+  align-items: center; /* Center the ad block */
+  /* justify-content: center; Removed to allow natural flow from top */
+  text-align: center; /* For the h2 and ad iframe's container */
+  min-height: auto; /* Remove fixed min-height if not needed, let content define */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto; /* Scroll if ad + other content is too tall */
 }
+
 .ad-popup-body h2 {
-  font-size: 2.2rem;
-  color: #fff;
-  margin-bottom: 0.6rem;
   margin-top: 0;
-  text-shadow: 0 0 8px #2193b0, 0 0 14px #6dd5ed;
+  color: #333;
+  /* Removed other properties, assuming they are not needed or will be reset by theme */
+  font-size: 2.2rem; /* Retained from original for consistency */
+  margin-bottom: 0.6rem; /* Retained from original */
 }
 .ad-popup-body p {
   color: #e0f7fa;

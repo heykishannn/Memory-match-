@@ -162,6 +162,10 @@ signupBtn.onclick = () => {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   if (!email || !password) { alert('Enter email and password'); return; }
+
+  // Store the email in localStorage
+  localStorage.setItem('user_email', email);
+
   state.user = { email, password };
   state.level = 1;
   state.score = 0;
