@@ -10,8 +10,8 @@ const MAX_LEVEL = 100;
 const MAX_CARDS_BEFORE_TIMER_DIFFICULTY = 30;
 
 // Ad Keys
-const IMMEDIATE_TOP_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b'; // For immediate top-center 468x60 ad
-const TOP_RIGHT_AD_KEY_468x60 = 'PLEASE_REPLACE_WITH_ACTUAL_KEY_468x60'; // Placeholder for the 468x60 ad in top-right stack
+const IMMEDIATE_TOP_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b';
+const TOP_RIGHT_AD_KEY_468x60 = 'f3980c7d80f3803dbaf4228f02da605b';
 const MIDDLE_AD_KEY_300x250 = '3606c322c11ecc95fb215e54122b24b9';
 const RESPONSIVE_AD_SCRIPT_SRC = '//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js';
 const RESPONSIVE_AD_CONTAINER_ID = 'container-ce2d3cde4fcc3769cce04418ad7b7d93';
