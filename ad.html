@@ -34,8 +34,14 @@
   <script type='text/javascript' src='//pl26859944.profitableratecpm.com/0d/45/39/0d4539f09727c641fc77330a16feaa38.js'></script>
   <div class="bg-gradient"></div>
   <div class="top-bar">
-    <div id="timerOrBack" class="timer">5</div>
-    <div id="rewardLabel" class="reward-label">reward guaranteed</div>
+    <div id="timerOrBack" class="timer">
+      <button class="back-btn" onclick="window.history.back()" aria-label="Back">
+        <svg viewBox="0 0 24 24">
+          <polyline points="15 18 9 12 15 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div id="rewardLabel" class="reward-label show">Timer running in background...</div>
   </div>
   <!-- Centered Banner Ad Wrapper -->
   <div class="center-ad-wrapper">
@@ -44,26 +50,5 @@
       <div id="container-ce2d3cde4fcc3769cce04418ad7b7d93"></div>
     </div>
   </div>
-  <script>
-    let timer = 5;
-    const timerDiv = document.getElementById('timerOrBack');
-    const rewardLabel = document.getElementById('rewardLabel');
-    const interval = setInterval(() => {
-      timer--;
-      if (timer > 0) {
-        timerDiv.textContent = timer;
-      } else {
-        clearInterval(interval);
-        timerDiv.innerHTML = `
-          <button class="back-btn" onclick="window.history.back()" aria-label="Back">
-            <svg viewBox="0 0 24 24">
-              <polyline points="15 18 9 12 15 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        `;
-        rewardLabel.classList.add('show');
-      }
-    }, 1000);
-  </script>
 </body>
 </html>

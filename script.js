@@ -239,6 +239,7 @@ continueHomeBtn.onclick = () => {
 continueWatchAdBtn.onclick = () => {
   localStorage.setItem('adRewardContext', JSON.stringify({ type: 'startup_continue', levelToStart: state.lastLevel, scoreToStart: state.lastScore }));
   localStorage.setItem('returningFromAd', 'true');
+  localStorage.setItem('adTimerStartTime', Date.now());
   window.location.href = 'ad.html';
 };
 backBtn.onclick = () => {
@@ -248,6 +249,7 @@ backBtn.onclick = () => {
 watchAdBtn.onclick = () => {
   localStorage.setItem('adRewardContext', JSON.stringify({ type: 'lose_continue', level: state.level, score: state.score }));
   localStorage.setItem('returningFromAd', 'true');
+  localStorage.setItem('adTimerStartTime', Date.now());
   window.location.href = 'ad.html';
 };
 nextLevelBtn.onclick = () => {
@@ -460,11 +462,33 @@ function loseLevel() {
 
 // ==== AD REWARD LOGIC ====
 function checkAndApplyAdReward() {
-  if (localStorage.getItem('returningFromAd') === 'true') {
+  const adTimerStartTime = localStorage.getItem('adTimerStartTime');
+  if (adTimerStartTime) {
+    const elapsedTime = Date.now() - parseInt(adTimerStartTime);
+    if (elapsedTime >= 5000) {
+      localStorage.removeItem('adTimerStartTime');
+      localStorage.setItem('adRewardReady', 'true');
+      // Ensure 'returningFromAd' is still set if we just completed the timer,
+      // so the reward logic below can pick it up.
+      // This assumes the user is returning to the page where the ad was initiated.
+      if (!localStorage.getItem('returningFromAd')) {
+          localStorage.setItem('returningFromAd', 'true');
+      }
+    } else {
+      // Timer started but not yet complete.
+      // Do not process reward. Clear context to avoid issues if user navigates away and back.
+      // Do not clear 'adTimerStartTime' itself.
+      localStorage.removeItem('adRewardContext'); // Prevent using stale context
+      localStorage.removeItem('returningFromAd'); // Prevent premature trigger of reward logic
+      return; // Exit early, reward not ready
+    }
+  }
+  if (localStorage.getItem('returningFromAd') === 'true' && localStorage.getItem('adRewardReady') === 'true') {
     localStorage.removeItem('returningFromAd');
     const contextStr = localStorage.getItem('adRewardContext');
     if (contextStr) {
       localStorage.removeItem('adRewardContext');
+      localStorage.removeItem('adRewardReady');
       const context = JSON.parse(contextStr);
       if (context.type === 'lose_continue') {
         if (losePopup && !losePopup.classList.contains('hidden')) {
