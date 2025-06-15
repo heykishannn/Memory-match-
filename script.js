@@ -550,11 +550,15 @@ function getUserData() {
   return null;
 }
 
-// ==== AUTO START ====
-window.onload = function() {
-  showSplash();
+// ==== AUTO START / PAGE LOAD HANDLING ====
+window.addEventListener('pageshow', function(event) {
+  // If the page is loading for the first time (not from bfcache), show splash.
+  if (!event.persisted) {
+    showSplash();
+  }
+  // Always check for ad rewards when the page is shown.
   checkAndApplyAdReward();
-};
+});
 // हर बार popup बंद या next level/home पर sound बंद
 function stopSoundOnPopupClose() { stopAllSounds(); }
 [nextLevelBtn, homeBtn1, playAgainBtn, loseHomeBtn].forEach(btn=>{
