@@ -295,100 +295,40 @@ function setupSwitches() {
 
 // ==== GAME LOGIC ====
 function getLevelConfig(level) {
-  // Constants from original function
+  const mobileBreakpoint = 600; // window.innerWidth threshold
+  const defaultCardGap = window.innerWidth <= mobileBreakpoint ? 6 : 12;
+  const minCardGap = 4;      // Minimum gap when dynamically adjusting
+  const desktopCardMaxWidth = 80;
+  const mobileCardMaxWidth = 48;
+  // const mobileBreakpoint = 600; // window.innerWidth threshold // Duplicate removed by context
   const boardPaddingBottom = 30;
   const boardMinHeight = 220;
   const boardCssMaxWidth = 440;
 
-  // Determine available board space
-  const availableWidth = board.clientWidth || Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
-  const availableHeight = board.clientHeight || Math.max(window.innerHeight * 0.6, boardMinHeight);
+  let actualCardWidth = window.innerWidth <= mobileBreakpoint ? mobileCardMaxWidth : desktopCardMaxWidth;
 
-  let pairs = 1 + Math.floor((level - 1) / 2);
-  if (pairs <= 0) pairs = 1;
+  let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
+  let maxCols = window.innerWidth > 600 ? 6 : 4; // This could also use mobileBreakpoint
+  let cols = Math.min(maxCols, totalCards);
+  let rows = Math.ceil(totalCards / cols);
 
-  // Optimal layout calculation
-  const minCardSize = 30; // px
-  const maxCardSize = 100; // px
-  const baseGap = 10;     // px, gap between cards
+  let currentGap = defaultCardGap;
+  const requiredWidthForDefaultGap = (cols * actualCardWidth) + ((cols - 1) * defaultCardGap);
+  const availableBoardWidth = Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
 
-  let bestLayout = { cols: 0, rows: 0, cardSize: 0 };
-
-  if (totalCards > 0) {
-      for (let numCols = 1; numCols <= totalCards; numCols++) {
-          let numRows = Math.ceil(totalCards / numCols);
-
-          let gapSpaceX = (numCols - 1) * baseGap;
-          let gapSpaceY = (numRows - 1) * baseGap;
-
-          let potentialCardWidth = (availableWidth > gapSpaceX) ? (availableWidth - gapSpaceX) / numCols : 0;
-          let potentialCardHeight = (availableHeight > gapSpaceY) ? (availableHeight - gapSpaceY) / numRows : 0;
-
-          let currentCardSize = Math.floor(Math.min(potentialCardWidth, potentialCardHeight));
-
-          if (currentCardSize >= minCardSize) { // Only consider if it meets minimum size
-              if (currentCardSize > bestLayout.cardSize ||
-                  (currentCardSize === bestLayout.cardSize && numCols * numRows < bestLayout.cols * bestLayout.rows)) {
-                bestLayout.cols = numCols;
-                bestLayout.rows = numRows;
-                bestLayout.cardSize = Math.min(currentCardSize, maxCardSize);
-              }
-          }
-      }
+  if (cols > 1 && requiredWidthForDefaultGap > availableBoardWidth) {
+      let calculatedDynamicGap = Math.floor((availableBoardWidth - (cols * actualCardWidth)) / (cols - 1));
+      currentGap = Math.max(minCardGap, calculatedDynamicGap);
+  } else if (cols === 1) {
+      currentGap = 0; // No gap needed for a single column
   }
+  // Ensure currentGap is not negative
+  if (currentGap < 0) currentGap = 0;
 
-  if (bestLayout.cardSize === 0 && totalCards > 0) {
-      let fallbackAttempted = false;
-      for (let numColsFallback = 1; numColsFallback <= Math.min(totalCards, 6) ; numColsFallback++) {
-          let numRowsFallback = Math.ceil(totalCards / numColsFallback);
-          let gapSpaceX = (numColsFallback - 1) * baseGap;
-          let gapSpaceY = (numRowsFallback - 1) * baseGap;
-
-          let cardW = (availableWidth > gapSpaceX) ? (availableWidth - gapSpaceX) / numColsFallback : 0;
-          let cardH = (availableHeight > gapSpaceY) ? (availableHeight - gapSpaceY) / numRowsFallback : 0;
-
-          let fallbackCardSizeCandidate = Math.floor(Math.min(cardW, cardH));
-
-          if (fallbackCardSizeCandidate > bestLayout.cardSize) {
-            bestLayout.cols = numColsFallback;
-            bestLayout.rows = numRowsFallback;
-            bestLayout.cardSize = Math.min(fallbackCardSizeCandidate, maxCardSize);
-            fallbackAttempted = true;
-          }
-      }
-      if (bestLayout.cardSize === 0) { // If still no size after fallback attempts
-          bestLayout.cols = totalCards > 0 ? Math.min(totalCards, 4) : 1;
-          bestLayout.rows = totalCards > 0 ? Math.ceil(totalCards / bestLayout.cols) : 1;
-          bestLayout.cardSize = 10; // Absolute minimum if all else fails
-      }
-  } else if (totalCards === 0) {
-      bestLayout.cols = 1;
-      bestLayout.rows = 1;
-      bestLayout.cardSize = minCardSize;
-  }
-
-  if (bestLayout.cols === 0) bestLayout.cols = 1;
-  if (bestLayout.rows === 0) bestLayout.rows = 1;
-  if (bestLayout.cardSize === 0 && totalCards > 0) {
-      bestLayout.cardSize = minCardSize;
-  }
-
-  let timePerCard = (bestLayout.cardSize < 50 && bestLayout.cardSize > 0) ? 2 : 3;
+  let timePerCard = (actualCardWidth < 50) ? 2 : 3; // Use actualCardWidth
   let time = totalCards * timePerCard;
-  if (time <= 0 && totalCards > 0) time = totalCards * 2;
-
-  return {
-    pairs,
-    totalCards,
-    cols: bestLayout.cols,
-    rows: bestLayout.rows,
-    cardRenderWidth: bestLayout.cardSize,
-    time,
-    currentGap: baseGap,
-    boardPaddingBottom,
-    boardMinHeight
-  };
+  return { pairs, totalCards, cols, rows, cardRenderWidth: actualCardWidth, time, currentGap, boardPaddingBottom, boardMinHeight };
 }
 function startLevel(level) {
   clearInterval(state.timerId);
@@ -401,30 +341,12 @@ function startLevel(level) {
   state.lastMatchEmoji = null;
 
   const { pairs, totalCards, cols, rows, cardRenderWidth, time, currentGap, boardPaddingBottom, boardMinHeight } = getLevelConfig(level);
+  board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-  // NEW board styling based on dynamic calculations from getLevelConfig
-  board.style.gridTemplateColumns = `repeat(${cols}, ${cardRenderWidth}px)`;
-  board.style.gridTemplateRows = `repeat(${rows}, ${cardRenderWidth}px)`;
-  board.style.gap = `${currentGap}px`;
-
-  // Board height calculation using dynamic values
-  // Ensure cardRenderWidth is positive to avoid issues if getLevelConfig had extreme fallbacks
-  let effectiveCardRenderWidth = cardRenderWidth > 0 ? cardRenderWidth : 10; // Use a small default if 0
-  let effectiveRows = rows > 0 ? rows : 1;
-  let effectiveCols = cols > 0 ? cols : 1;
-
-
-  let gridContentHeight = (effectiveRows * effectiveCardRenderWidth) + ((effectiveRows - 1) * currentGap);
-  // If cols is 0 or 1, there are no horizontal gaps in the content itself affecting width, board width is sum of cardRenderWidths
-  // However, the board's overall width will be implicitly set by the sum of gridTemplateColumns and gaps.
-  // We might want to explicitly set board width as well for consistency, or let it be natural.
-  // Let's try setting it explicitly to ensure the board itself is sized correctly.
-  let gridContentWidth = (effectiveCols * effectiveCardRenderWidth) + ((effectiveCols - 1) * currentGap);
-  board.style.width = `${gridContentWidth}px`;
-
-
+  let gridContentHeight = (rows * cardRenderWidth) + ((rows - 1) * currentGap);
   let finalBoardDynamicHeight = gridContentHeight + boardPaddingBottom;
   board.style.height = `${Math.max(finalBoardDynamicHeight, boardMinHeight)}px`;
+  board.style.gap = `${currentGap}px`;
 
   let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
@@ -687,4 +609,3 @@ function stopSoundOnPopupClose() { stopAllSounds(); }
 [nextLevelBtn, homeBtn1, playAgainBtn, loseHomeBtn].forEach(btn=>{
   if(btn) btn.addEventListener('click', stopSoundOnPopupClose);
 });
-                         
