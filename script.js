@@ -7,7 +7,7 @@ const EMOJIS = [
   "🌷", "🪷", "🌸", "🪻", "🌺", "🌼", "🐼", "🦄", "🍂", "🍄", "🌿",
   "🐥", "🐔", "🦜", "🕊️", "🦢", "🦋", "🍨", "🍧", "🍭",
   "🍬", "☕", "🗿", "🎂", "🧸", "🎹", "💎", "🔮", "🐱",
-  "🦚", "🪿","🪕"
+  "🦚", "🪿", "🪕" // ✅ नया emoji जोड़ा
 ];
 const MATCH_SOUNDS = {
   "🍌": "sound_gwak",
@@ -16,7 +16,7 @@ const MATCH_SOUNDS = {
   "🎂": "sound_birthday",
   "🦚": "sound_mor",
   "🐱": "sound_bell",
-  "🪕": "sound_sitar"
+  "🪕": "sound_sitar" // ✅ नया sound mapping
 };
 
 // DOM
@@ -65,6 +65,7 @@ const sound_sigma = document.getElementById('sound_sigma');
 const sound_birthday = document.getElementById('sound_birthday');
 const sound_mor = document.getElementById('sound_mor');
 const sound_bell = document.getElementById('sound_bell');
+const sound_sitar = document.getElementById('sound_sitar'); // ✅ नया audio element
 
 let state = {
   user: null,
@@ -90,7 +91,7 @@ let state = {
 // ==== SOUND MANAGEMENT ====
 const allSounds = [
   winSound, loseSound, pauseSound, restartSound, flipSound,
-  sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell
+  sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell, sound_sitar // ✅ नया sound
 ];
 function stopAllSounds() {
   allSounds.forEach(a => {
@@ -99,6 +100,8 @@ function stopAllSounds() {
 }
 
 // ==== NAVIGATION FUNCTIONS ====
+// (No changes here)
+
 function showSplash() {
   splash.classList.remove('hidden');
   auth.classList.add('hidden');
@@ -157,6 +160,8 @@ function showGame() {
 }
 
 // ==== BUTTON EVENTS ====
+// (No changes here)
+
 loginBtn.onclick = () => {
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -240,25 +245,30 @@ continueHomeBtn.onclick = () => {
 };
 
 // ==== AD WATCH LOGIC (5 sec timer on button click, not on ad.html) ====
+// (No changes)
 let adRewardActive = false;
 let adRewardTimeout = null;
 
 function startAdWatch(adType) {
-  sessionStorage.setItem('adWatchType', adType);
-  localStorage.setItem('adStartTime', Date.now());
+  localStorage.setItem('adWatchType', adType);
+  localStorage.setItem('adStartedAt', Date.now());
+  localStorage.setItem('adRewardReady', 'false');
+  setTimeout(() => {
+    localStorage.setItem('adRewardReady', 'true');
+  }, 5000);
   window.location.href = 'ad.html';
 }
 function checkAdReward() {
-  const adStartTime = localStorage.getItem('adStartTime');
-  const adType = sessionStorage.getItem('adWatchType'); // Keep this to know action after reward
-
-  if (adStartTime) {
-    const elapsedTime = Date.now() - parseInt(adStartTime);
-    if (elapsedTime >= 5000) {
-      localStorage.removeItem('adStartTime');
-      sessionStorage.removeItem('adWatchType'); // Processed adWatchType
-      // adStartedAt and adTimerDone are already removed from sessionStorage by this point or never set
-
+  const adType = localStorage.getItem('adWatchType');
+  const adStartedAt = localStorage.getItem('adStartedAt');
+  const adRewardReady = localStorage.getItem('adRewardReady');
+  if (adType && adStartedAt) {
+    const now = Date.now();
+    const elapsed = now - parseInt(adStartedAt, 10);
+    if (elapsed >= 5000 || adRewardReady === 'true') {
+      localStorage.removeItem('adStartedAt');
+      localStorage.removeItem('adWatchType');
+      localStorage.removeItem('adRewardReady');
       if (adType === 'retry') {
         adRewardActive = true;
         adRewardTimeout = setTimeout(() => {
@@ -267,23 +277,18 @@ function checkAdReward() {
         losePopup.classList.add('hidden');
         showGame();
         lockGameUntilCardTapOrTimeout();
-        return 'retry'; // Return type for onload check
+        return 'retry';
       }
       if (adType === 'continue') {
         continuePopup.classList.add('hidden');
         showGame();
-        return 'continue'; // Return type for onload check
+        return 'continue';
       }
     } else {
-      alert("Please watch the ad for at least 5 seconds to get the reward!");
-      // Do not remove adStartTime or adWatchType, allow user to go back to ad.html
+      alert("Please watch the ad for at least 5 seconds to get reward!");
       return null;
     }
   }
-  // No adStartTime means no ad was started or it was already processed.
-  // Clean up any legacy items if they somehow persist, though they shouldn't be set by new logic.
-  sessionStorage.removeItem('adStartedAt');
-  sessionStorage.removeItem('adTimerDone');
   return null;
 }
 function lockGameUntilCardTapOrTimeout() {
@@ -329,6 +334,7 @@ loseHomeBtn.onclick = () => {
 };
 
 // ==== GAME CONTROLS ====
+// (No changes)
 function setupSwitches() {
   soundToggle.checked = state.soundOn;
   vibrationToggle.checked = state.vibrationOn;
@@ -347,6 +353,7 @@ function setupSwitches() {
 }
 
 // ==== GAME LOGIC ====
+// (No changes except for stats color in CSS)
 function getLevelConfig(level) {
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
@@ -374,8 +381,15 @@ function startLevel(level) {
   state.lastMatchEmoji = null;
 
   const {pairs, totalCards, cols, rows, cardSize, time} = getLevelConfig(level);
+
+  const boardTopMargin = 24;
+  const boardBottomMargin = 24;
+  const availableHeight = window.innerHeight - 160;
+  const boardHeight = Math.min(Math.max(rows * cardSize + (rows-1)*12, 220), availableHeight);
   board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  board.style.height = `${Math.max(rows * cardSize + (rows-1)*12, 220)}px`;
+  board.style.height = `${boardHeight}px`;
+  board.style.marginTop = `${boardTopMargin}px`;
+  board.style.marginBottom = `${boardBottomMargin}px`;
 
   let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
@@ -541,6 +555,7 @@ function vibrate(ms) {
 }
 
 // ==== USER DATA LOCAL STORAGE ====
+// (No changes)
 function saveUserData() {
   if (state.user && state.user.email) {
     let dataToSave = {
@@ -574,6 +589,7 @@ function getUserData() {
 }
 
 // ==== SOUND CONTROL ON TAB/WINDOW VISIBILITY & GAME SCREEN ====
+// (No changes)
 document.addEventListener("visibilitychange", () => {
   if (document.hidden || !state.gameActive) {
     stopAllSounds();
@@ -581,15 +597,19 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // ==== AUTO START ====
+// (No changes)
 window.onload = function() {
-  const adRewardResult = checkAdReward(); // Call checkAdReward
-  // The function checkAdReward now directly handles navigation/showing game for 'continue' and 'retry'.
-  // If adRewardResult is null (no active ad, or timer not met), it will fall through to showSplash.
-  // If ad was rewarded, game is already shown.
-  if (adRewardResult === null) {
-    showSplash();
+  const reward = checkAdReward();
+  if (reward === 'continue') {
+    continuePopup.classList.add('hidden');
+    showGame();
+    return;
+  } else if (reward === 'retry') {
+    losePopup.classList.add('hidden');
+    showGame();
+    return;
   }
-  // If adRewardResult is 'continue' or 'retry', the game is already handled by checkAdReward.
+  showSplash();
 };
 window.addEventListener("resize",()=>{
   if(state.gameActive) {
