@@ -245,21 +245,20 @@ let adRewardTimeout = null;
 
 function startAdWatch(adType) {
   sessionStorage.setItem('adWatchType', adType);
-  sessionStorage.setItem('adStartedAt', Date.now());
-  sessionStorage.setItem('adTimerDone', 'false');
-  setTimeout(() => {
-    sessionStorage.setItem('adTimerDone', 'true');
-  }, 5000);
+  localStorage.setItem('adStartTime', Date.now());
   window.location.href = 'ad.html';
 }
 function checkAdReward() {
-  const adType = sessionStorage.getItem('adWatchType');
-  const adTimerDone = sessionStorage.getItem('adTimerDone');
-  if (adType) {
-    if (adTimerDone === 'true') {
-      sessionStorage.removeItem('adStartedAt');
-      sessionStorage.removeItem('adWatchType');
-      sessionStorage.removeItem('adTimerDone');
+  const adStartTime = localStorage.getItem('adStartTime');
+  const adType = sessionStorage.getItem('adWatchType'); // Keep this to know action after reward
+
+  if (adStartTime) {
+    const elapsedTime = Date.now() - parseInt(adStartTime);
+    if (elapsedTime >= 5000) {
+      localStorage.removeItem('adStartTime');
+      sessionStorage.removeItem('adWatchType'); // Processed adWatchType
+      // adStartedAt and adTimerDone are already removed from sessionStorage by this point or never set
+
       if (adType === 'retry') {
         adRewardActive = true;
         adRewardTimeout = setTimeout(() => {
@@ -268,18 +267,23 @@ function checkAdReward() {
         losePopup.classList.add('hidden');
         showGame();
         lockGameUntilCardTapOrTimeout();
-        return null;
+        return 'retry'; // Return type for onload check
       }
       if (adType === 'continue') {
         continuePopup.classList.add('hidden');
         showGame();
-        return null;
+        return 'continue'; // Return type for onload check
       }
     } else {
-      alert("Please watch the ad for at least 5 seconds to get reward!");
+      alert("Please watch the ad for at least 5 seconds to get the reward!");
+      // Do not remove adStartTime or adWatchType, allow user to go back to ad.html
       return null;
     }
   }
+  // No adStartTime means no ad was started or it was already processed.
+  // Clean up any legacy items if they somehow persist, though they shouldn't be set by new logic.
+  sessionStorage.removeItem('adStartedAt');
+  sessionStorage.removeItem('adTimerDone');
   return null;
 }
 function lockGameUntilCardTapOrTimeout() {
@@ -578,17 +582,14 @@ document.addEventListener("visibilitychange", () => {
 
 // ==== AUTO START ====
 window.onload = function() {
-  const reward = checkAdReward();
-  if (reward === 'continue') {
-    continuePopup.classList.add('hidden');
-    showGame();
-    return;
-  } else if (reward === 'retry') {
-    losePopup.classList.add('hidden');
-    showGame();
-    return;
+  const adRewardResult = checkAdReward(); // Call checkAdReward
+  // The function checkAdReward now directly handles navigation/showing game for 'continue' and 'retry'.
+  // If adRewardResult is null (no active ad, or timer not met), it will fall through to showSplash.
+  // If ad was rewarded, game is already shown.
+  if (adRewardResult === null) {
+    showSplash();
   }
-  showSplash();
+  // If adRewardResult is 'continue' or 'retry', the game is already handled by checkAdReward.
 };
 window.addEventListener("resize",()=>{
   if(state.gameActive) {

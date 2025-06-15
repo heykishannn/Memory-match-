@@ -329,7 +329,9 @@ footer .powered span {
   max-width: 440px;
   min-height: 220px;
   box-sizing: border-box;
-  padding-bottom: 30px;
+  margin-top: 15px;
+  padding-bottom: 10px;
+  margin-bottom: 50px;
   transition: height 0.3s;
 }
 
@@ -410,11 +412,11 @@ footer .powered span {
 .popup-content {
   background: linear-gradient(135deg, #a770ef 0%, #7f53ac 100%);
   border-radius: 18px;
-  padding: 1.2rem 0.8rem;
+  padding: 1.5rem; /* Changed for more square shape */
   text-align: center;
   color: #fff;
   min-width: 120px;
-  max-width: 260px;
+  max-width: 220px; /* Made smaller */
   width: 90vw;
   animation: popupZoom 0.38s cubic-bezier(.4,2,.6,1);
 }
