@@ -39,22 +39,24 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 .btn:active, .orange-btn:active { transform: scale(0.97);}
 .start-btn { font-size:1.2rem; padding:16px 0; border-radius:16px; width: 80vw; max-width: 250px; margin: 0 auto;}
 .home-title { font-family:'Fredoka One', 'Poppins', Arial, sans-serif; font-size:1.7rem; margin-bottom:1.2rem; margin-top: 1.3rem; text-shadow:0 0 18px #fff,0 0 24px #8e2de2; color:#fff; font-weight:700; text-align:center;}
-#home .center-inner.home-content { /* More specific selector */
-  width: 100%; /* Ensure it takes full width of parent .center-outer */
-  height: 100%; /* Fill parent height */
+#home .center-inner.home-content {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Keep items centered horizontally */
-  justify-content: flex-start; /* Align items to the start (top) */
-  padding-bottom: 70px; /* Space for the fixed global footer */
-  box-sizing: border-box; /* Include padding in height calculation */
+  align-items: center;
+  justify-content: flex-start;
+  padding-bottom: 70px;
+  box-sizing: border-box;
 }
-.home-banner-ad {
-  margin-top: auto; /* Push to the bottom of the flex container */
-  width: 100%;
-  text-align: center;
-  padding-bottom: 5px; /* Small gap at the very bottom */
+.home-ad {
+  margin: 12px 0;
+  display: flex;
+  justify-content: center;
 }
+.home-ad-top { margin-bottom: 16px; }
+.home-ad-bottom { margin-top: 16px; }
+.home-banner-ad { display: none; } /* पुराना ad hidden */
 .game-header { width: 100vw; display: flex; flex-direction: column; align-items: center; margin-top: 0.6rem; position: relative;}
 .game-title { font-family:'Fredoka One', 'Poppins', Arial, sans-serif; font-size:1.1rem; font-weight:700; text-align:center; margin-bottom:0.2rem; color:#fff; letter-spacing:2px;}
 .back-btn { position: absolute; left: 10px; top: 0px; background: #fff; color: #43e97b; border: none; border-radius: 8px; font-size: 1rem; padding: 4px 10px; font-weight: bold; box-shadow: 0 2px 8px #0002; cursor: pointer; z-index: 10; margin-top: 6px;}
@@ -88,6 +90,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2.5px solid #111;
 }
 .card .back {
   background: linear-gradient(135deg, #a770ef 0%, #7f53ac 100%) !important;
@@ -113,7 +116,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.7rem;
+  font-size: 2.5rem;
   backface-visibility: hidden;
   transform: rotateY(180deg);
   transition: font-size 0.2s;
@@ -125,12 +128,12 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   display: block;
   width: 100%;
   text-align: center;
-  font-size: 2.7rem;
+  font-size: 2.5rem !important;
   line-height: 1;
 }
 @media (max-width: 600px) {
   .card { max-width: 48px; min-width: 32px; }
-  .card .front, .emoji { font-size: 1.6rem; }
+  .card .front, .emoji { font-size: 1.7rem !important; }
 }
 
 /* ==== END UPDATED CARD SECTION ==== */
@@ -146,7 +149,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 @media (max-width: 600px) {
   .popup-content { max-width: 95vw; min-width: 120px; }
   .card { max-width: 48px; min-width: 32px; }
-  .card .front, .emoji { font-size: 1.6rem; }
+  .card .front, .emoji { font-size: 1.7rem !important; }
   #board { max-width: 98vw; gap: 6px; }
   .center-inner { max-width: 98vw; }
-    }
+}
