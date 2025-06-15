@@ -300,7 +300,6 @@ function getLevelConfig(level) {
   const minCardGap = 4;      // Minimum gap when dynamically adjusting
   const desktopCardMaxWidth = 80;
   const mobileCardMaxWidth = 48;
-  // const mobileBreakpoint = 600; // window.innerWidth threshold // Duplicate removed by context
   const boardPaddingBottom = 30;
   const boardMinHeight = 220;
   const boardCssMaxWidth = 440;
@@ -309,7 +308,7 @@ function getLevelConfig(level) {
 
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
-  let maxCols = window.innerWidth > 600 ? 6 : 4; // This could also use mobileBreakpoint
+  let maxCols = window.innerWidth > 600 ? 6 : 4;
   let cols = Math.min(maxCols, totalCards);
   let rows = Math.ceil(totalCards / cols);
 
@@ -321,12 +320,11 @@ function getLevelConfig(level) {
       let calculatedDynamicGap = Math.floor((availableBoardWidth - (cols * actualCardWidth)) / (cols - 1));
       currentGap = Math.max(minCardGap, calculatedDynamicGap);
   } else if (cols === 1) {
-      currentGap = 0; // No gap needed for a single column
+      currentGap = 0;
   }
-  // Ensure currentGap is not negative
   if (currentGap < 0) currentGap = 0;
 
-  let timePerCard = (actualCardWidth < 50) ? 2 : 3; // Use actualCardWidth
+  let timePerCard = (actualCardWidth < 50) ? 2 : 3;
   let time = totalCards * timePerCard;
   return { pairs, totalCards, cols, rows, cardRenderWidth: actualCardWidth, time, currentGap, boardPaddingBottom, boardMinHeight };
 }
@@ -361,7 +359,6 @@ function startLevel(level) {
     cardEl.className = 'card';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
-    // Card dimensions are now controlled by CSS
     cardEl.innerHTML = `
       <div class="front"><span class="emoji">${card.emoji}</span></div>
       <div class="back"></div>
@@ -372,8 +369,6 @@ function startLevel(level) {
     });
     board.appendChild(cardEl);
   });
-
-  // Emoji size is now controlled by CSS
 
   state.timeLeft = time;
   updateHUD();
@@ -419,7 +414,7 @@ function checkMatch() {
     state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
-    vibrate(120); // match पर vibration
+    vibrate(120);
     if(state.matchedCount===Math.floor(state.cards.length/2)) isLastMatch = true;
     stopAllSounds();
     if(state.soundOn && !document.hidden && MATCH_SOUNDS[card1.emoji]) {
@@ -452,7 +447,7 @@ function winLevel() {
   clearInterval(state.timerId);
   state.score += state.timeLeft*2;
   updateHUD();
-  vibrate(1000); // 1s vibration on win
+  vibrate(1000);
   resultLevel.textContent = "Level: " + state.level;
   resultScore.textContent = "Score: " + state.score;
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
@@ -471,7 +466,7 @@ function loseLevel() {
   resultScoreL.textContent = "Score: " + state.score;
   resultTimeL.textContent = "Time Left: 0s";
   losePopup.classList.remove('hidden');
-  vibrate(400); // lose पर 0.4s vibration
+  vibrate(400);
   stopAllSounds();
   if(state.soundOn && !document.hidden) {
     loseSound.currentTime = 0;
@@ -489,19 +484,13 @@ function checkAndApplyAdReward() {
     if (elapsedTime >= 5000) {
       localStorage.removeItem('adTimerStartTime');
       localStorage.setItem('adRewardReady', 'true');
-      // Ensure 'returningFromAd' is still set if we just completed the timer,
-      // so the reward logic below can pick it up.
-      // This assumes the user is returning to the page where the ad was initiated.
       if (!localStorage.getItem('returningFromAd')) {
           localStorage.setItem('returningFromAd', 'true');
       }
     } else {
-      // Timer started but not yet complete.
-      // Do not process reward. Clear context to avoid issues if user navigates away and back.
-      // Do not clear 'adTimerStartTime' itself.
-      localStorage.removeItem('adRewardContext'); // Prevent using stale context
-      localStorage.removeItem('returningFromAd'); // Prevent premature trigger of reward logic
-      return; // Exit early, reward not ready
+      localStorage.removeItem('adRewardContext');
+      localStorage.removeItem('returningFromAd');
+      return;
     }
   }
   if (localStorage.getItem('returningFromAd') === 'true' && localStorage.getItem('adRewardReady') === 'true') {
@@ -586,26 +575,18 @@ function getUserData() {
       };
       state.level = parsedData.level || 1;
       state.score = parsedData.score || 0;
-      return parsedData;
+      return state.user;
     }
   }
-  state.user = null;
-  state.level = 1;
-  state.score = 0;
   return null;
 }
 
-// ==== AUTO START / PAGE LOAD HANDLING ====
-window.addEventListener('pageshow', function(event) {
-  // If the page is loading for the first time (not from bfcache), show splash.
-  if (!event.persisted) {
-    showSplash();
-  }
-  // Always check for ad rewards when the page is shown.
+// ==== INIT ====
+window.onload = function() {
+  showSplash();
   checkAndApplyAdReward();
-});
-// हर बार popup बंद या next level/home पर sound बंद
-function stopSoundOnPopupClose() { stopAllSounds(); }
-[nextLevelBtn, homeBtn1, playAgainBtn, loseHomeBtn].forEach(btn=>{
-  if(btn) btn.addEventListener('click', stopSoundOnPopupClose);
-});
+};
+window.onfocus = function() {
+  checkAndApplyAdReward();
+};
+  
