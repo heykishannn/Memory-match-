@@ -482,30 +482,39 @@ function checkAndApplyAdReward() {
       const context = JSON.parse(contextStr);
 
       if (context.type === 'lose_continue') {
-        if (losePopup && !losePopup.classList.contains('hidden')) {
+        // Ensure losePopup exists and is visible before trying to hide it
+        if (losePopup && typeof losePopup.classList !== 'undefined' && !losePopup.classList.contains('hidden')) {
           losePopup.classList.add('hidden');
         }
         state.timeLeft = 15; // Grant 15 seconds
         state.paused = false;
-        if (pauseBtn) pauseBtn.textContent = "||";
-        updateHUD();
-        startTimer();
-        // If game screen isn't active, this relies on history.back() returning to a usable state.
-        // A more robust solution might navigate explicitly to game if needed, e.g., showGame().
-        // However, if losePopup was visible, game screen should be the one underneath.
+        // Ensure pauseBtn exists before modifying its textContent
+        if (pauseBtn) {
+          pauseBtn.textContent = "||";
+        }
+        updateHUD(); // Assumes updateHUD has its own internal checks or is safe to call
+        startTimer(); // Assumes startTimer is safe or context implies game is ready
+
+        // Check for game element if specific actions are needed on it
+        // For now, the logic relies on the game screen being the one returned to,
+        // or showGame() being called appropriately by other logic paths.
+        // if (game && game.classList.contains('hidden')) {
+        //   showGame(); // Example: if game screen needs to be explicitly shown
+        // }
+
       } else if (context.type === 'startup_continue') {
-        if (continuePopup && !continuePopup.classList.contains('hidden')) {
+        // Ensure continuePopup exists and is visible
+        if (continuePopup && typeof continuePopup.classList !== 'undefined' && !continuePopup.classList.contains('hidden')) {
           continuePopup.classList.add('hidden');
         }
         state.level = context.levelToStart;
         state.score = context.scoreToStart;
-        saveUserData(); // Save this continued state
-        showGame(); // Starts game with restored level/score
+        saveUserData();
+        showGame(); // This will set up the game screen
       }
     }
   }
 }
-
 
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
@@ -604,4 +613,6 @@ function handleVisibilityChange() {
 
 document.addEventListener('visibilitychange', handleVisibilityChange);
 
-checkAndApplyAdReward();
+document.addEventListener('DOMContentLoaded', function() {
+  checkAndApplyAdReward();
+});
