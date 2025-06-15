@@ -295,16 +295,32 @@ function setupSwitches() {
 
 // ==== GAME LOGIC ====
 function getLevelConfig(level) {
+  const cardGap = 12;
+  const boardPaddingBottom = 30;
+  const cardMinWidth = 40;
+  const cardMaxWidth = 80;
+  const boardMinHeight = 220;
+  const boardCssMaxWidth = 440; // CSS max-width for #board
+
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
   let maxCols = window.innerWidth > 600 ? 6 : 4;
   let cols = Math.min(maxCols, totalCards);
   let rows = Math.ceil(totalCards / cols);
-  let boardHeight = 0.6 * window.innerHeight;
-  let cardSize = Math.min(80, Math.floor((0.95 * window.innerWidth) / cols), Math.floor(boardHeight / rows));
+
+  let effectiveBoardWidth = Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
+  let effectiveBoardHeight = Math.max(0.6 * window.innerHeight, boardMinHeight) - boardPaddingBottom;
+
+  let cardWidthTry = (effectiveBoardWidth - (cols - 1) * cardGap) / cols;
+  let cardHeightTry = (effectiveBoardHeight - (rows - 1) * cardGap) / rows;
+  let calculatedSize = Math.floor(Math.min(cardWidthTry, cardHeightTry));
+
+  let cardSize = Math.max(cardMinWidth, Math.min(cardMaxWidth, calculatedSize));
+  cardSize = Math.max(10, cardSize); // Ensure cardSize is at least 10px
+
   let timePerCard = (cardSize < 50) ? 2 : 3;
   let time = totalCards * timePerCard;
-  return { pairs, totalCards, cols, rows, cardSize, time };
+  return { pairs, totalCards, cols, rows, cardSize, time, cardGap, boardPaddingBottom, boardMinHeight };
 }
 function startLevel(level) {
   clearInterval(state.timerId);
@@ -316,9 +332,13 @@ function startLevel(level) {
   state.busy = false;
   state.lastMatchEmoji = null;
 
-  const {pairs, totalCards, cols, rows, cardSize, time} = getLevelConfig(level);
+  const { pairs, totalCards, cols, rows, cardSize, time, cardGap, boardPaddingBottom, boardMinHeight } = getLevelConfig(level);
   board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  board.style.height = `${Math.max(rows * cardSize + (rows-1)*12, 220)}px`;
+
+  let gridContentHeight = rows * cardSize + (rows - 1) * cardGap;
+  let finalBoardDynamicHeight = gridContentHeight + boardPaddingBottom;
+  board.style.height = `${Math.max(finalBoardDynamicHeight, boardMinHeight)}px`;
+  board.style.gap = `${cardGap}px`;
 
   let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
@@ -333,7 +353,8 @@ function startLevel(level) {
     cardEl.className = 'card';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
-    cardEl.style.maxWidth = cardEl.style.maxHeight = cardSize+"px";
+    cardEl.style.width = cardSize + "px";
+    cardEl.style.height = cardSize + "px";
     cardEl.innerHTML = `
       <div class="front"><span class="emoji">${card.emoji}</span></div>
       <div class="back"></div>
