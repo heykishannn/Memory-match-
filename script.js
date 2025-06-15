@@ -295,32 +295,40 @@ function setupSwitches() {
 
 // ==== GAME LOGIC ====
 function getLevelConfig(level) {
-  const cardGap = 12;
+  const mobileBreakpoint = 600; // window.innerWidth threshold
+  const defaultCardGap = window.innerWidth <= mobileBreakpoint ? 6 : 12;
+  const minCardGap = 4;      // Minimum gap when dynamically adjusting
+  const desktopCardMaxWidth = 80;
+  const mobileCardMaxWidth = 48;
+  // const mobileBreakpoint = 600; // window.innerWidth threshold // Duplicate removed by context
   const boardPaddingBottom = 30;
-  const cardMinWidth = 40;
-  const cardMaxWidth = 80;
   const boardMinHeight = 220;
-  const boardCssMaxWidth = 440; // CSS max-width for #board
+  const boardCssMaxWidth = 440;
+
+  let actualCardWidth = window.innerWidth <= mobileBreakpoint ? mobileCardMaxWidth : desktopCardMaxWidth;
 
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
-  let maxCols = window.innerWidth > 600 ? 6 : 4;
+  let maxCols = window.innerWidth > 600 ? 6 : 4; // This could also use mobileBreakpoint
   let cols = Math.min(maxCols, totalCards);
   let rows = Math.ceil(totalCards / cols);
 
-  let effectiveBoardWidth = Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
-  let effectiveBoardHeight = Math.max(0.6 * window.innerHeight, boardMinHeight) - boardPaddingBottom;
+  let currentGap = defaultCardGap;
+  const requiredWidthForDefaultGap = (cols * actualCardWidth) + ((cols - 1) * defaultCardGap);
+  const availableBoardWidth = Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
 
-  let cardWidthTry = (effectiveBoardWidth - (cols - 1) * cardGap) / cols;
-  let cardHeightTry = (effectiveBoardHeight - (rows - 1) * cardGap) / rows;
-  let calculatedSize = Math.floor(Math.min(cardWidthTry, cardHeightTry));
+  if (cols > 1 && requiredWidthForDefaultGap > availableBoardWidth) {
+      let calculatedDynamicGap = Math.floor((availableBoardWidth - (cols * actualCardWidth)) / (cols - 1));
+      currentGap = Math.max(minCardGap, calculatedDynamicGap);
+  } else if (cols === 1) {
+      currentGap = 0; // No gap needed for a single column
+  }
+  // Ensure currentGap is not negative
+  if (currentGap < 0) currentGap = 0;
 
-  let cardSize = Math.max(cardMinWidth, Math.min(cardMaxWidth, calculatedSize));
-  cardSize = Math.max(10, cardSize); // Ensure cardSize is at least 10px
-
-  let timePerCard = (cardSize < 50) ? 2 : 3;
+  let timePerCard = (actualCardWidth < 50) ? 2 : 3; // Use actualCardWidth
   let time = totalCards * timePerCard;
-  return { pairs, totalCards, cols, rows, cardSize, time, cardGap, boardPaddingBottom, boardMinHeight };
+  return { pairs, totalCards, cols, rows, cardRenderWidth: actualCardWidth, time, currentGap, boardPaddingBottom, boardMinHeight };
 }
 function startLevel(level) {
   clearInterval(state.timerId);
@@ -332,13 +340,13 @@ function startLevel(level) {
   state.busy = false;
   state.lastMatchEmoji = null;
 
-  const { pairs, totalCards, cols, rows, cardSize, time, cardGap, boardPaddingBottom, boardMinHeight } = getLevelConfig(level);
+  const { pairs, totalCards, cols, rows, cardRenderWidth, time, currentGap, boardPaddingBottom, boardMinHeight } = getLevelConfig(level);
   board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-  let gridContentHeight = rows * cardSize + (rows - 1) * cardGap;
+  let gridContentHeight = (rows * cardRenderWidth) + ((rows - 1) * currentGap);
   let finalBoardDynamicHeight = gridContentHeight + boardPaddingBottom;
   board.style.height = `${Math.max(finalBoardDynamicHeight, boardMinHeight)}px`;
-  board.style.gap = `${cardGap}px`;
+  board.style.gap = `${currentGap}px`;
 
   let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
@@ -353,8 +361,7 @@ function startLevel(level) {
     cardEl.className = 'card';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
-    cardEl.style.width = cardSize + "px";
-    cardEl.style.height = cardSize + "px";
+    // Card dimensions are now controlled by CSS
     cardEl.innerHTML = `
       <div class="front"><span class="emoji">${card.emoji}</span></div>
       <div class="back"></div>
@@ -366,14 +373,7 @@ function startLevel(level) {
     board.appendChild(cardEl);
   });
 
-  // Emoji size responsive (बड़ा और fit)
-  document.querySelectorAll('.emoji').forEach(el=>{
-    el.style.fontSize = (Math.max(32, Math.floor(cardSize*0.8)))+"px";
-    el.style.lineHeight = "1";
-    el.style.display = "block";
-    el.style.width = "100%";
-    el.style.textAlign = "center";
-  });
+  // Emoji size is now controlled by CSS
 
   state.timeLeft = time;
   updateHUD();
