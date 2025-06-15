@@ -23,6 +23,7 @@ const splash = document.getElementById('splash');
 const splashCards = document.querySelector('.splash-cards');
 const auth = document.getElementById('auth');
 const home = document.getElementById('home');
+const loginBtn = document.getElementById('loginBtn');
 const game = document.getElementById('game');
 const backBtn = document.getElementById('backBtn');
 const board = document.getElementById('board');
@@ -120,7 +121,14 @@ function showSplash() {
   }
   setTimeout(() => {
     splash.classList.add('hidden');
-    showAuth();
+    let userData = getUserData(); // getUserData will now set state.user, state.level, and state.score
+    if (userData && userData.email) {
+      // state.user, state.level, and state.score are already set by getUserData.
+      showHome(); // Go to home if user data exists
+    } else {
+      // If no user data, getUserData sets state.user to null.
+      showAuth(); // Else, go to auth
+    }
   }, 2000);
 }
 
@@ -158,34 +166,76 @@ function showGame() {
 
 // ==== BUTTON EVENTS ====
 
+loginBtn.onclick = () => {
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password'); // Added for completeness, though not used for validation yet
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim(); // Added for completeness
+
+  if (!email) { // Password not mandatory for login as per current plan
+    alert('Please enter your email.');
+    return;
+  }
+
+  let userDataString = localStorage.getItem('memorymatch_user_' + email);
+  if (userDataString) {
+    const userData = JSON.parse(userDataString);
+    // We'll consider the user logged in if the email exists.
+    // Password is not validated as it's not stored.
+    state.user = {
+      email: userData.email,
+      level: userData.level || 1,
+      score: userData.score || 0
+    };
+    state.level = userData.level || 1;
+    state.score = userData.score || 0;
+
+    localStorage.setItem('memorymatch_last_user_email', email); // Save last logged in email
+
+    showHome();
+  } else {
+    alert('Login failed: User not found. Please sign up if you are a new user.');
+  }
+};
+
 signupBtn.onclick = () => {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   if (!email || !password) { alert('Enter email and password'); return; }
 
-  // Store the email in localStorage
-  localStorage.setItem('user_email', email);
-
-  state.user = { email, password };
+  state.user = { email: email, level: 1, score: 0 };
   state.level = 1;
   state.score = 0;
-  saveUserData();
+  // Save user-specific data under a key that includes their email
+  localStorage.setItem('memorymatch_user_' + email, JSON.stringify({
+    email: email,
+    level: state.level, // or state.user.level
+    score: state.score  // or state.user.score
+  }));
+  localStorage.setItem('memorymatch_last_user_email', email); // Save last signed up/logged in email
   showHome();
 };
 
 startBtn.onclick = () => {
+  // Try to load data for the last user
   let userData = getUserData();
-  if (userData && userData.email) {
+  if (userData && userData.email) { // Check if userData and email exist
     state.isReturning = true;
     state.level = userData.level || 1;
     state.score = userData.score || 0;
     state.lastLevel = state.level;
     state.lastScore = state.score;
+    // state.user is already set by getUserData if a user was found
     showContinuePopup();
   } else {
     state.isReturning = false;
+    state.user = null; // Explicitly set user to null if no last user
     state.level = 1;
     state.score = 0;
+    // showGame(); // This should probably go to showAuth if no user, or handle appropriately
+                       // Current flow: startBtn is on Home, implies user is somewhat authenticated or past auth.
+                       // For now, if no user data, it starts a fresh game. This seems okay.
+                       // Let's stick to the original logic of showing game if no user data for now.
     showGame();
   }
 };
@@ -207,8 +257,10 @@ continueHomeBtn.onclick = () => {
   showHome();
 };
 continueWatchAdBtn.onclick = () => {
-  continuePopup.classList.add('hidden');
-  showAdPopup('continue');
+  // continuePopup.classList.add('hidden'); // Keep popup until page redirects
+  localStorage.setItem('adRewardContext', JSON.stringify({ type: 'startup_continue', levelToStart: state.lastLevel, scoreToStart: state.lastScore }));
+  localStorage.setItem('returningFromAd', 'true');
+  window.location.href = 'ad.html';
 };
 
 backBtn.onclick = () => {
@@ -217,8 +269,10 @@ backBtn.onclick = () => {
 };
 
 watchAdBtn.onclick = () => {
-  losePopup.classList.add('hidden');
-  showAdPopup('lose');
+  // losePopup.classList.add('hidden'); // Keep popup until page redirects
+  localStorage.setItem('adRewardContext', JSON.stringify({ type: 'lose_continue' }));
+  localStorage.setItem('returningFromAd', 'true');
+  window.location.href = 'ad.html';
 };
 
 nextLevelBtn.onclick = () => {
@@ -235,26 +289,13 @@ homeBtn1.onclick = () => {
 playAgainBtn.onclick = () => {
   losePopup.classList.add('hidden');
   stopAllSounds();
-  if(state.soundOn) restartSound.play();
+  if(state.soundOn && !document.hidden) restartSound.play();
   showGame();
 };
 
 loseHomeBtn.onclick = () => {
   losePopup.classList.add('hidden');
   showHome();
-};
-
-adBackBtn.onclick = () => {
-  adPopup.classList.add('hidden');
-  if (state.adContext === 'continue') {
-    state.level = state.lastLevel;
-    state.score = state.lastScore;
-    showGame();
-  } else {
-    state.timeLeft += 10;
-    updateHUD();
-    startTimer();
-  }
 };
 
 // ==== GAME CONTROLS ====
@@ -269,9 +310,9 @@ function setupSwitches() {
     pauseBtn.textContent = state.paused ? "▶" : "||";
     stopAllSounds();
     if (!state.paused) {
-      if (state.soundOn) restartSound.play();
+      if (state.soundOn && !document.hidden) restartSound.play();
     } else {
-      if (state.soundOn) pauseSound.play();
+      if (state.soundOn && !document.hidden) pauseSound.play();
     }
   };
 }
@@ -360,7 +401,7 @@ function flipCard(index) {
   const cardEl = board.children[index];
   cardEl.classList.add('flipped');
   stopAllSounds();
-  if(state.soundOn) flipSound.play();
+  if(state.soundOn && !document.hidden) flipSound.play();
 }
 function unflipCard(index) {
   const card = state.cards[index];
@@ -382,9 +423,9 @@ function checkMatch() {
     vibrate(80);
     if(state.matchedCount===Math.floor(state.cards.length/2)) isLastMatch = true;
     stopAllSounds();
-    if(state.soundOn && MATCH_SOUNDS[card1.emoji]) {
+    if(state.soundOn && !document.hidden && MATCH_SOUNDS[card1.emoji]) {
       let audio = document.getElementById(MATCH_SOUNDS[card1.emoji]);
-      if(audio) { audio.currentTime = 0; audio.play(); }
+      if(audio) { audio.currentTime = 0; audio.play(); } // Play is conditional on soundOn and !document.hidden
       if(isLastMatch) {
         state.lastMatchEmoji = card1.emoji;
         return setTimeout(winLevel, 400);
@@ -414,7 +455,7 @@ function winLevel() {
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
   winPopup.classList.remove('hidden');
   // अगर last match emoji का sound play हुआ है, तो win sound नहीं बजेगा
-  if(state.soundOn && (!state.lastMatchEmoji || !MATCH_SOUNDS[state.lastMatchEmoji])) {
+  if(state.soundOn && !document.hidden && (!state.lastMatchEmoji || !MATCH_SOUNDS[state.lastMatchEmoji])) {
     stopAllSounds();
     winSound.play();
   }
@@ -427,38 +468,44 @@ function loseLevel() {
   resultTimeL.textContent = "Time Left: 0s";
   losePopup.classList.remove('hidden');
   stopAllSounds();
-  if(state.soundOn) loseSound.play();
+  if(state.soundOn && !document.hidden) loseSound.play();
   saveUserData();
 }
 
-// ==== AD POPUP LOGIC ====
+// ==== AD REWARD LOGIC ====
+function checkAndApplyAdReward() {
+  if (localStorage.getItem('returningFromAd') === 'true') {
+    localStorage.removeItem('returningFromAd'); // Clear flag immediately
+    const contextStr = localStorage.getItem('adRewardContext');
+    if (contextStr) {
+      localStorage.removeItem('adRewardContext'); // Clear context after use
+      const context = JSON.parse(contextStr);
 
-let adCountdown = 5;
-let adInterval = null;
-
-function showAdPopup(context) {
-  state.adContext = context; // 'continue' or 'lose'
-  adPopup.classList.remove('hidden');
-  adPopup.style.display = "flex";
-  let count = adCountdown;
-  adTimer.textContent = count + "s";
-  adTimer.style.display = "inline";
-  adBackBtn.classList.add('hidden');
-  adBackBtn.disabled = true;
-  adReward.style.visibility = "hidden";
-  adInterval = setInterval(()=>{
-    count--;
-    if(count > 0) {
-      adTimer.textContent = count + "s";
-    } else {
-      clearInterval(adInterval);
-      adTimer.textContent = "";
-      adBackBtn.classList.remove('hidden');
-      adBackBtn.disabled = false;
-      adReward.style.visibility = "visible";
+      if (context.type === 'lose_continue') {
+        if (losePopup && !losePopup.classList.contains('hidden')) {
+          losePopup.classList.add('hidden');
+        }
+        state.timeLeft = 15; // Grant 15 seconds
+        state.paused = false;
+        if (pauseBtn) pauseBtn.textContent = "||";
+        updateHUD();
+        startTimer();
+        // If game screen isn't active, this relies on history.back() returning to a usable state.
+        // A more robust solution might navigate explicitly to game if needed, e.g., showGame().
+        // However, if losePopup was visible, game screen should be the one underneath.
+      } else if (context.type === 'startup_continue') {
+        if (continuePopup && !continuePopup.classList.contains('hidden')) {
+          continuePopup.classList.add('hidden');
+        }
+        state.level = context.levelToStart;
+        state.score = context.scoreToStart;
+        saveUserData(); // Save this continued state
+        showGame(); // Starts game with restored level/score
+      }
     }
-  },1000);
+  }
 }
+
 
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
@@ -498,28 +545,35 @@ function vibrate(ms) {
 // ==== USER DATA LOCAL STORAGE ====
 
 function saveUserData() {
-  if(state.user && state.user.email) {
-    let data = {
+  if (state.user && state.user.email) {
+    let dataToSave = {
       email: state.user.email,
-      level: state.level,
-      score: state.score
+      level: state.level, // Ensure state.level is the source of truth for current level
+      score: state.score  // Ensure state.score is the source of truth for current score
     };
-    localStorage.setItem('memorymatch_user_' + state.user.email, JSON.stringify(data));
+    localStorage.setItem('memorymatch_user_' + state.user.email, JSON.stringify(dataToSave));
+    // No need to save memorymatch_last_user_email here as it's done on login/signup
   }
 }
+
 function getUserData() {
-  let email = null;
-  try {
-    let lastUser = localStorage.getItem('memorymatch_user');
-    if(lastUser) {
-      let obj = JSON.parse(lastUser);
-      email = obj.email;
+  let lastUserEmail = localStorage.getItem('memorymatch_last_user_email');
+  if (lastUserEmail) {
+    let dataString = localStorage.getItem('memorymatch_user_' + lastUserEmail);
+    if (dataString) {
+      const parsedData = JSON.parse(dataString);
+      // Initialize state.user fully, and also state.level and state.score
+      state.user = {
+        email: parsedData.email,
+        level: parsedData.level || 1,
+        score: parsedData.score || 0
+      };
+      state.level = parsedData.level || 1;
+      state.score = parsedData.score || 0;
+      return parsedData;
     }
-  } catch(e) {}
-  if(email) {
-    let data = localStorage.getItem('memorymatch_user_' + email);
-    if(data) return JSON.parse(data);
   }
+  state.user = null; // Ensure user is null if no data found
   return null;
 }
 
@@ -530,17 +584,24 @@ showSplash();
 // ==== Visibility Change Handler ====
 function handleVisibilityChange() {
   if (document.hidden) {
-    if (state.soundOn) {
+    // Window is hidden
+    if (state.soundOn) { // Only change state if sound was on
       state.soundWasPlayingBeforeHidden = true;
-      stopAllSounds();
     }
+    stopAllSounds();
+    state.soundOn = false; // Temporarily disable sound events
   } else {
+    // Window is visible again
     if (state.soundWasPlayingBeforeHidden) {
-      state.soundWasPlayingBeforeHidden = false;
-      // Sounds are event-driven, so no need to auto-resume a specific sound.
-      // state.soundOn will ensure they play if toggled on.
+      state.soundOn = true; // Restore sound preference
+      state.soundWasPlayingBeforeHidden = false; // Reset the flag
+    }
+    if (soundToggle) { // Ensure soundToggle exists
+        soundToggle.checked = state.soundOn; // Update UI
     }
   }
 }
 
 document.addEventListener('visibilitychange', handleVisibilityChange);
+
+checkAndApplyAdReward();
