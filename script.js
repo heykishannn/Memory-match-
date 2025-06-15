@@ -1,13 +1,13 @@
 // ==== Memory Match Game JS ====
-// (All your requested features implemented)
 
+// EMOJIS & sound mapping
 const EMOJIS = [
   "🍎", "🍌", "🍇", "🍓", "🍉", "🍍", "🥝", "🍒", "🍑", "🍋",
   "🥥", "🥭", "🍐", "🍊", "🍈", "🍏", "🥑", "🍅", "🥕", "🌽",
   "🌷", "🪷", "🌸", "🪻", "🌺", "🌼", "🐼", "🦄", "🍂", "🍄", "🌿",
   "🐥", "🐔", "🦜", "🕊️", "🦢", "🦋", "🍨", "🍧", "🍭",
   "🍬", "☕", "🗿", "🎂", "🧸", "🎹", "💎", "🔮", "🐱",
-  "🦚", "🪿"
+  "🦚", "🪿","🪕"
 ];
 const MATCH_SOUNDS = {
   "🍌": "sound_gwak",
@@ -15,7 +15,8 @@ const MATCH_SOUNDS = {
   "🗿": "sound_sigma",
   "🎂": "sound_birthday",
   "🦚": "sound_mor",
-  "🐱": "sound_bell"
+  "🐱": "sound_bell",
+  "🪕": "sound_sitar",
 };
 
 // DOM
@@ -53,8 +54,6 @@ const continueLevel1Btn = document.getElementById('continueLevel1Btn');
 const continueHomeBtn = document.getElementById('continueHomeBtn');
 const continueWatchAdBtn = document.getElementById('continueWatchAdBtn');
 const continueResult = document.getElementById('continueResult');
-
-// Audio
 const winSound = document.getElementById('winSound');
 const loseSound = document.getElementById('loseSound');
 const pauseSound = document.getElementById('pauseSound');
@@ -84,27 +83,21 @@ let state = {
   lastLevel: 1,
   lastScore: 0,
   lastMatchEmoji: null,
-  currentPlayingAudio: null
+  soundWasPlayingBeforeHidden: false,
+  gameActive: false
 };
 
 // ==== SOUND MANAGEMENT ====
+// सभी audio elements को एक Array में डालो
+const allSounds = [
+  winSound, loseSound, pauseSound, restartSound, flipSound,
+  sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell
+];
 function stopAllSounds() {
-  [winSound, loseSound, pauseSound, restartSound, flipSound, sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell].forEach(a=>{
+  allSounds.forEach(a => {
     if (a) { a.pause(); a.currentTime = 0; }
   });
-  if (state.currentPlayingAudio) {
-    state.currentPlayingAudio.pause();
-    state.currentPlayingAudio.currentTime = 0;
-    state.currentPlayingAudio = null;
-  }
 }
-
-// ==== PAGE VISIBILITY: Stop all sounds when app is not visible ====
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    stopAllSounds();
-  }
-});
 
 // ==== NAVIGATION FUNCTIONS ====
 function showSplash() {
@@ -132,6 +125,7 @@ function showSplash() {
   }, 2000);
 }
 function showAuth() {
+  state.gameActive = false;
   stopAllSounds();
   auth.classList.remove('hidden');
   home.classList.add('hidden');
@@ -141,6 +135,7 @@ function showAuth() {
   continuePopup.classList.add('hidden');
 }
 function showHome() {
+  state.gameActive = false;
   stopAllSounds();
   auth.classList.add('hidden');
   home.classList.remove('hidden');
@@ -150,6 +145,7 @@ function showHome() {
   continuePopup.classList.add('hidden');
 }
 function showGame() {
+  state.gameActive = true;
   stopAllSounds();
   auth.classList.add('hidden');
   home.classList.add('hidden');
@@ -183,16 +179,20 @@ loginBtn.onclick = () => {
     };
     state.level = userData.level || 1;
     state.score = userData.score || 0;
+
     localStorage.setItem('memorymatch_last_user_email', email);
+
     showHome();
   } else {
     alert('Login failed: User not found. Please sign up if you are a new user.');
   }
 };
+
 signupBtn.onclick = () => {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
   if (!email || !password) { alert('Enter email and password'); return; }
+
   state.user = { email: email, level: 1, score: 0 };
   state.level = 1;
   state.score = 0;
@@ -204,6 +204,7 @@ signupBtn.onclick = () => {
   localStorage.setItem('memorymatch_last_user_email', email);
   showHome();
 };
+
 startBtn.onclick = () => {
   let userData = getUserData();
   if (userData && userData.email) {
@@ -221,11 +222,13 @@ startBtn.onclick = () => {
     showGame();
   }
 };
+
 function showContinuePopup() {
   continueResult.innerHTML = `<span>Last Level: ${state.lastLevel}</span><span>Last Score: ${state.lastScore}</span>`;
   continuePopup.classList.remove('hidden');
   home.classList.add('hidden');
 }
+
 continueLevel1Btn.onclick = () => {
   continuePopup.classList.add('hidden');
   state.level = 1;
@@ -236,41 +239,86 @@ continueHomeBtn.onclick = () => {
   continuePopup.classList.add('hidden');
   showHome();
 };
-continueWatchAdBtn.onclick = () => {
-  localStorage.setItem('adRewardContext', JSON.stringify({ type: 'startup_continue', levelToStart: state.lastLevel, scoreToStart: state.lastScore }));
-  localStorage.setItem('returningFromAd', 'true');
-  localStorage.setItem('adTimerStartTime', Date.now());
+
+// ==== AD WATCH LOGIC ====
+let adRewardActive = false;
+let adRewardTimeout = null;
+
+function startAdWatch(adType) {
+  sessionStorage.setItem('adWatchType', adType);
+  sessionStorage.setItem('adStartedAt', Date.now());
   window.location.href = 'ad.html';
+}
+function checkAdReward() {
+  const adStartedAt = sessionStorage.getItem('adStartedAt');
+  const adType = sessionStorage.getItem('adWatchType');
+  if (adStartedAt && adType) {
+    const elapsed = Date.now() - parseInt(adStartedAt, 10);
+    if (elapsed >= 5000) {
+      sessionStorage.removeItem('adStartedAt');
+      sessionStorage.removeItem('adWatchType');
+      if (adType === 'retry') {
+        adRewardActive = true;
+        adRewardTimeout = setTimeout(() => {
+          adRewardActive = false;
+        }, 10000);
+        losePopup.classList.add('hidden');
+        showGame();
+        lockGameUntilCardTapOrTimeout();
+        return null;
+      }
+      if (adType === 'continue') {
+        continuePopup.classList.add('hidden');
+        showGame();
+        return null;
+      }
+    } else {
+      sessionStorage.removeItem('adStartedAt');
+      sessionStorage.removeItem('adWatchType');
+      alert("Please watch the ad for at least 5 seconds to get reward!");
+      return null;
+    }
+  }
+  return null;
+}
+function lockGameUntilCardTapOrTimeout() {
+  state.busy = true;
+  function unlockOnCardTap() {
+    if (adRewardActive) {
+      state.busy = false;
+      adRewardActive = false;
+      clearTimeout(adRewardTimeout);
+      board.removeEventListener('click', unlockOnCardTap, true);
+    }
+  }
+  board.addEventListener('click', unlockOnCardTap, true);
+}
+continueWatchAdBtn.onclick = () => {
+  startAdWatch('continue');
+};
+watchAdBtn.onclick = () => {
+  startAdWatch('retry');
 };
 backBtn.onclick = () => {
   clearInterval(state.timerId);
   showHome();
 };
-watchAdBtn.onclick = () => {
-  localStorage.setItem('adRewardContext', JSON.stringify({ type: 'lose_continue', level: state.level, score: state.score }));
-  localStorage.setItem('returningFromAd', 'true');
-  localStorage.setItem('adTimerStartTime', Date.now());
-  window.location.href = 'ad.html';
-};
 nextLevelBtn.onclick = () => {
-  stopAllSounds();
   winPopup.classList.add('hidden');
   state.level++;
   showGame();
 };
 homeBtn1.onclick = () => {
-  stopAllSounds();
   winPopup.classList.add('hidden');
   showHome();
 };
 playAgainBtn.onclick = () => {
-  stopAllSounds();
   losePopup.classList.add('hidden');
-  if(state.soundOn && !document.hidden) restartSound.play();
+  stopAllSounds();
+  if(state.soundOn && !document.hidden && state.gameActive) restartSound.play();
   showGame();
 };
 loseHomeBtn.onclick = () => {
-  stopAllSounds();
   losePopup.classList.add('hidden');
   showHome();
 };
@@ -286,51 +334,33 @@ function setupSwitches() {
     pauseBtn.textContent = state.paused ? "▶" : "||";
     stopAllSounds();
     if (!state.paused) {
-      if (state.soundOn && !document.hidden) restartSound.play();
+      if (state.soundOn && !document.hidden && state.gameActive) restartSound.play();
     } else {
-      if (state.soundOn && !document.hidden) pauseSound.play();
+      if (state.soundOn && !document.hidden && state.gameActive) pauseSound.play();
     }
   };
 }
 
 // ==== GAME LOGIC ====
 function getLevelConfig(level) {
-  const mobileBreakpoint = 600; // window.innerWidth threshold
-  const defaultCardGap = window.innerWidth <= mobileBreakpoint ? 6 : 12;
-  const minCardGap = 4;      // Minimum gap when dynamically adjusting
-  const desktopCardMaxWidth = 80;
-  const mobileCardMaxWidth = 48;
-  const boardPaddingBottom = 30;
-  const boardMinHeight = 220;
-  const boardCssMaxWidth = 440;
-
-  let actualCardWidth = window.innerWidth <= mobileBreakpoint ? mobileCardMaxWidth : desktopCardMaxWidth;
-
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
   let maxCols = window.innerWidth > 600 ? 6 : 4;
   let cols = Math.min(maxCols, totalCards);
   let rows = Math.ceil(totalCards / cols);
-
-  let currentGap = defaultCardGap;
-  const requiredWidthForDefaultGap = (cols * actualCardWidth) + ((cols - 1) * defaultCardGap);
-  const availableBoardWidth = Math.min(0.95 * window.innerWidth, boardCssMaxWidth);
-
-  if (cols > 1 && requiredWidthForDefaultGap > availableBoardWidth) {
-      let calculatedDynamicGap = Math.floor((availableBoardWidth - (cols * actualCardWidth)) / (cols - 1));
-      currentGap = Math.max(minCardGap, calculatedDynamicGap);
-  } else if (cols === 1) {
-      currentGap = 0;
-  }
-  if (currentGap < 0) currentGap = 0;
-
-  let timePerCard = (actualCardWidth < 50) ? 2 : 3;
+  let boardPadding = 30;
+  let boardWidth = Math.min(window.innerWidth * 0.95, 440);
+  let boardHeight = Math.max(window.innerHeight * 0.6, 220);
+  let cardW = Math.floor((boardWidth - (cols-1)*10) / cols);
+  let cardH = Math.floor((boardHeight - (rows-1)*10) / rows);
+  let cardSize = Math.max(32, Math.min(cardW, cardH, 90));
+  let timePerCard = (cardSize < 50) ? 2 : 3;
   let time = totalCards * timePerCard;
-  return { pairs, totalCards, cols, rows, cardRenderWidth: actualCardWidth, time, currentGap, boardPaddingBottom, boardMinHeight };
+  return { pairs, totalCards, cols, rows, cardSize, time };
 }
 function startLevel(level) {
+  stopAllSounds(); // हर लेवल स्टार्ट पर सभी sound बंद
   clearInterval(state.timerId);
-  stopAllSounds();
   state.paused = false;
   pauseBtn.textContent = "||";
   state.flippedIndices = [];
@@ -338,13 +368,9 @@ function startLevel(level) {
   state.busy = false;
   state.lastMatchEmoji = null;
 
-  const { pairs, totalCards, cols, rows, cardRenderWidth, time, currentGap, boardPaddingBottom, boardMinHeight } = getLevelConfig(level);
+  const {pairs, totalCards, cols, rows, cardSize, time} = getLevelConfig(level);
   board.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-  let gridContentHeight = (rows * cardRenderWidth) + ((rows - 1) * currentGap);
-  let finalBoardDynamicHeight = gridContentHeight + boardPaddingBottom;
-  board.style.height = `${Math.max(finalBoardDynamicHeight, boardMinHeight)}px`;
-  board.style.gap = `${currentGap}px`;
+  board.style.height = `${Math.max(rows * cardSize + (rows-1)*12, 220)}px`;
 
   let emojisForLevel = shuffle(EMOJIS).slice(0,pairs);
   let cardsArray = shuffle([...emojisForLevel,...emojisForLevel]).slice(0,totalCards);
@@ -359,6 +385,10 @@ function startLevel(level) {
     cardEl.className = 'card';
     cardEl.tabIndex = 0;
     cardEl.dataset.index = i;
+    cardEl.style.width = cardSize+"px";
+    cardEl.style.height = cardSize+"px";
+    cardEl.style.maxWidth = "100%";
+    cardEl.style.maxHeight = "100%";
     cardEl.innerHTML = `
       <div class="front"><span class="emoji">${card.emoji}</span></div>
       <div class="back"></div>
@@ -370,12 +400,26 @@ function startLevel(level) {
     board.appendChild(cardEl);
   });
 
+  document.querySelectorAll('.emoji').forEach(el=>{
+    el.style.fontSize = (Math.max(32, Math.floor(cardSize*0.7)))+"px";
+    el.style.lineHeight = "1";
+    el.style.display = "block";
+    el.style.width = "100%";
+    el.style.textAlign = "center";
+  });
+
   state.timeLeft = time;
   updateHUD();
   startTimer();
 }
 function onCardClick(index) {
-  if(state.busy||state.paused) return;
+  if(state.busy && !adRewardActive) return;
+  if(adRewardActive) {
+    state.busy = false;
+    adRewardActive = false;
+    clearTimeout(adRewardTimeout);
+    // आगे गेम नॉर्मल चलेगा
+  }
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
   flipCard(index);
@@ -391,11 +435,7 @@ function flipCard(index) {
   const cardEl = board.children[index];
   cardEl.classList.add('flipped');
   stopAllSounds();
-  if(state.soundOn && !document.hidden) {
-    flipSound.currentTime = 0;
-    flipSound.play();
-    state.currentPlayingAudio = flipSound;
-  }
+  if(state.soundOn && !document.hidden && state.gameActive) flipSound.play();
 }
 function unflipCard(index) {
   const card = state.cards[index];
@@ -414,20 +454,15 @@ function checkMatch() {
     state.matchedCount++;
     state.score += 10+state.timeLeft;
     updateHUD();
-    vibrate(120);
+    vibrate(80);
     if(state.matchedCount===Math.floor(state.cards.length/2)) isLastMatch = true;
     stopAllSounds();
-    if(state.soundOn && !document.hidden && MATCH_SOUNDS[card1.emoji]) {
+    if(state.soundOn && !document.hidden && state.gameActive && MATCH_SOUNDS[card1.emoji]) {
       let audio = document.getElementById(MATCH_SOUNDS[card1.emoji]);
-      if(audio) {
-        audio.currentTime = 0;
-        audio.play();
-        state.currentPlayingAudio = audio;
-      }
+      if(audio) { audio.currentTime = 0; audio.play(); }
       if(isLastMatch) {
         state.lastMatchEmoji = card1.emoji;
-        setTimeout(winLevel, 400);
-        return;
+        return setTimeout(winLevel, 400);
       }
     } else if(isLastMatch) {
       state.lastMatchEmoji = null;
@@ -452,11 +487,9 @@ function winLevel() {
   resultScore.textContent = "Score: " + state.score;
   resultTime.textContent = "Time Left: " + Math.round(state.timeLeft) + "s";
   winPopup.classList.remove('hidden');
-  if(state.soundOn && !document.hidden && (!state.lastMatchEmoji || !MATCH_SOUNDS[state.lastMatchEmoji])) {
+  if(state.soundOn && !document.hidden && state.gameActive && (!state.lastMatchEmoji || !MATCH_SOUNDS[state.lastMatchEmoji])) {
     stopAllSounds();
-    winSound.currentTime = 0;
     winSound.play();
-    state.currentPlayingAudio = winSound;
   }
   saveUserData();
 }
@@ -468,58 +501,8 @@ function loseLevel() {
   losePopup.classList.remove('hidden');
   vibrate(400);
   stopAllSounds();
-  if(state.soundOn && !document.hidden) {
-    loseSound.currentTime = 0;
-    loseSound.play();
-    state.currentPlayingAudio = loseSound;
-  }
+  if(state.soundOn && !document.hidden && state.gameActive) loseSound.play();
   saveUserData();
-}
-
-// ==== AD REWARD LOGIC ====
-function checkAndApplyAdReward() {
-  const adTimerStartTime = localStorage.getItem('adTimerStartTime');
-  if (adTimerStartTime) {
-    const elapsedTime = Date.now() - parseInt(adTimerStartTime);
-    if (elapsedTime >= 5000) {
-      localStorage.removeItem('adTimerStartTime');
-      localStorage.setItem('adRewardReady', 'true');
-      if (!localStorage.getItem('returningFromAd')) {
-          localStorage.setItem('returningFromAd', 'true');
-      }
-    } else {
-      localStorage.removeItem('adRewardContext');
-      localStorage.removeItem('returningFromAd');
-      return;
-    }
-  }
-  if (localStorage.getItem('returningFromAd') === 'true' && localStorage.getItem('adRewardReady') === 'true') {
-    localStorage.removeItem('returningFromAd');
-    const contextStr = localStorage.getItem('adRewardContext');
-    if (contextStr) {
-      localStorage.removeItem('adRewardContext');
-      localStorage.removeItem('adRewardReady');
-      const context = JSON.parse(contextStr);
-      if (context.type === 'lose_continue') {
-        if (losePopup && !losePopup.classList.contains('hidden')) {
-          losePopup.classList.add('hidden');
-        }
-        state.timeLeft = 15;
-        state.paused = false;
-        if (pauseBtn) pauseBtn.textContent = "||";
-        updateHUD();
-        startTimer();
-      } else if (context.type === 'startup_continue') {
-        if (continuePopup && !continuePopup.classList.contains('hidden')) {
-          continuePopup.classList.add('hidden');
-        }
-        state.level = context.levelToStart;
-        state.score = context.scoreToStart;
-        saveUserData();
-        showGame();
-      }
-    }
-  }
 }
 function updateHUD() {
   levelDisplay.textContent = `Level: ${state.level}`;
@@ -552,6 +535,8 @@ function vibrate(ms) {
     navigator.vibrate(ms);
   }
 }
+
+// ==== USER DATA LOCAL STORAGE ====
 function saveUserData() {
   if (state.user && state.user.email) {
     let dataToSave = {
@@ -575,18 +560,39 @@ function getUserData() {
       };
       state.level = parsedData.level || 1;
       state.score = parsedData.score || 0;
-      return state.user;
+      return parsedData;
     }
   }
+  state.user = null;
+  state.level = 1;
+  state.score = 0;
   return null;
 }
 
-// ==== INIT ====
+// ==== SOUND CONTROL ON TAB/WINDOW VISIBILITY & GAME SCREEN ====
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden || !state.gameActive) {
+    stopAllSounds();
+  }
+});
+
+// ==== AUTO START ====
 window.onload = function() {
+  const reward = checkAdReward();
+  if (reward === 'continue') {
+    continuePopup.classList.add('hidden');
+    showGame();
+    return;
+  } else if (reward === 'retry') {
+    losePopup.classList.add('hidden');
+    showGame();
+    return;
+  }
   showSplash();
-  checkAndApplyAdReward();
 };
-window.onfocus = function() {
-  checkAndApplyAdReward();
-};
+window.addEventListener("resize",()=>{
+  if(state.gameActive) {
+    startLevel(state.level);
+  }
+});
   
