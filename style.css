@@ -71,7 +71,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 .pause-btn { border: none; border-radius: 10px; width: 44px; height: 28px; color: white; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(255,128,8,0.13); margin: 0 6px; background: linear-gradient(90deg, #ff8008 0%, #ffc837 100%); transition: transform 0.1s;}
 .pause-btn:active { transform: scale(0.95);}
 .stats { margin: 0.4rem 0 0.1rem 0; width: 100vw; display: flex; justify-content: center; gap: 18px; font-size: 1rem; font-weight: bold; text-shadow: 0 0 6px #4a00e0;}
-#board { display: grid; justify-content: center; align-content: center; margin: 0 auto; gap: 12px; /* width: 95vw; */ /* max-width: 440px; */ height: 60vh; min-height: 220px; box-sizing: border-box; padding-bottom: 30px; transition: height 0.3s;}
+#board { display: grid; justify-content: center; align-content: center; margin: 0 auto; gap: 12px; width: 95vw; max-width: 440px; height: 60vh; min-height: 220px; box-sizing: border-box; padding-bottom: 30px; transition: height 0.3s;}
 
 /* ==== UPDATED CARD SECTION ==== */
 .card {
@@ -79,9 +79,9 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   width: 100%;
   aspect-ratio: 1/1;
   box-sizing: border-box; /* Added this line */
-  /* max-width: 80px; */
-  min-width: 30px;
-  min-height: 30px;
+  max-width: 80px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 16px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.13);
   perspective: 1000px;
@@ -133,7 +133,7 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
   line-height: 1;
 }
 @media (max-width: 600px) {
-  .card { /* max-width: 48px; */ /* min-width: 32px; */ }
+  .card { max-width: 48px; min-width: 32px; }
   .card .front, .emoji { font-size: 1.7rem !important; }
 }
 
@@ -149,8 +149,8 @@ footer .powered span { color: #fff; font-weight: bold; letter-spacing: 2px; }
 
 @media (max-width: 600px) {
   .popup-content { max-width: 95vw; min-width: 120px; }
-  .card { /* max-width: 48px; */ /* min-width: 32px; */ }
+  .card { max-width: 48px; min-width: 32px; }
   .card .front, .emoji { font-size: 1.7rem !important; }
-  #board { /* max-width: 98vw; */ gap: 6px; }
+  #board { max-width: 98vw; gap: 6px; }
   .center-inner { max-width: 98vw; }
 }
