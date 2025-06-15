@@ -16,7 +16,7 @@ const MATCH_SOUNDS = {
   "🎂": "sound_birthday",
   "🦚": "sound_mor",
   "🐱": "sound_bell",
-  "🪕": "sound_sitar",
+  "🪕": "sound_sitar"
 };
 
 // DOM
@@ -88,7 +88,6 @@ let state = {
 };
 
 // ==== SOUND MANAGEMENT ====
-// सभी audio elements को एक Array में डालो
 const allSounds = [
   winSound, loseSound, pauseSound, restartSound, flipSound,
   sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell
@@ -240,23 +239,27 @@ continueHomeBtn.onclick = () => {
   showHome();
 };
 
-// ==== AD WATCH LOGIC ====
+// ==== AD WATCH LOGIC (5 sec timer on button click, not on ad.html) ====
 let adRewardActive = false;
 let adRewardTimeout = null;
 
 function startAdWatch(adType) {
   sessionStorage.setItem('adWatchType', adType);
   sessionStorage.setItem('adStartedAt', Date.now());
+  sessionStorage.setItem('adTimerDone', 'false');
+  setTimeout(() => {
+    sessionStorage.setItem('adTimerDone', 'true');
+  }, 5000);
   window.location.href = 'ad.html';
 }
 function checkAdReward() {
-  const adStartedAt = sessionStorage.getItem('adStartedAt');
   const adType = sessionStorage.getItem('adWatchType');
-  if (adStartedAt && adType) {
-    const elapsed = Date.now() - parseInt(adStartedAt, 10);
-    if (elapsed >= 5000) {
+  const adTimerDone = sessionStorage.getItem('adTimerDone');
+  if (adType) {
+    if (adTimerDone === 'true') {
       sessionStorage.removeItem('adStartedAt');
       sessionStorage.removeItem('adWatchType');
+      sessionStorage.removeItem('adTimerDone');
       if (adType === 'retry') {
         adRewardActive = true;
         adRewardTimeout = setTimeout(() => {
@@ -273,8 +276,6 @@ function checkAdReward() {
         return null;
       }
     } else {
-      sessionStorage.removeItem('adStartedAt');
-      sessionStorage.removeItem('adWatchType');
       alert("Please watch the ad for at least 5 seconds to get reward!");
       return null;
     }
@@ -359,7 +360,7 @@ function getLevelConfig(level) {
   return { pairs, totalCards, cols, rows, cardSize, time };
 }
 function startLevel(level) {
-  stopAllSounds(); // हर लेवल स्टार्ट पर सभी sound बंद
+  stopAllSounds();
   clearInterval(state.timerId);
   state.paused = false;
   pauseBtn.textContent = "||";
@@ -418,7 +419,6 @@ function onCardClick(index) {
     state.busy = false;
     adRewardActive = false;
     clearTimeout(adRewardTimeout);
-    // आगे गेम नॉर्मल चलेगा
   }
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
@@ -595,4 +595,4 @@ window.addEventListener("resize",()=>{
     startLevel(state.level);
   }
 });
-  
+      
