@@ -163,7 +163,6 @@ footer .powered span {
 .home-ad-top { margin-bottom: 16px; }
 .home-ad-bottom { margin-top: 16px; }
 
-/* Home screen के बीच में banner ad */
 .home-banner-ad {
   width: 100%;
   max-width: 320px;
@@ -176,7 +175,6 @@ footer .powered span {
   border-radius: 12px;
   box-shadow: 0 2px 10px #0001;
 }
-/* Footer के ऊपर banner ad */
 .footer-banner-ad {
   width: 100vw;
   min-height: 50px;
@@ -309,30 +307,47 @@ footer .powered span {
 }
 .pause-btn:active { transform: scale(0.95); }
 
+/* ==== UPDATED: Stats (Level, Score, Time) ==== */
 .stats {
   margin: 0.4rem 0 0.1rem 0;
   width: 100vw;
   display: flex;
   justify-content: center;
   gap: 18px;
-  font-size: 1rem;
+  font-size: 0.82rem; /* छोटा किया */
   font-weight: bold;
   text-shadow: 0 0 6px #4a00e0;
 }
+#levelDisplay {
+  color: orange !important;
+}
+#scoreDisplay {
+  color: #fff !important;
+}
+#timerDisplay {
+  color: #00ff7f !important; /* हरा */
+}
+
+/* ==== UPDATED: Cards should not touch HUD or footer ==== */
 #board {
   display: grid;
   justify-content: center;
-  align-content: center;
-  margin: 0 auto;
+  align-content: flex-start;
+  margin: 24px auto 24px auto;
   gap: 10px;
   width: 95vw;
   max-width: 440px;
   min-height: 220px;
   box-sizing: border-box;
-  margin-top: 15px;
-  padding-bottom: 10px;
-  margin-bottom: 50px;
+  padding-bottom: 30px;
   transition: height 0.3s;
+}
+@media (max-width: 600px) {
+  #board {
+    margin: 14px auto 14px auto;
+    max-width: 98vw;
+    gap: 6px;
+  }
 }
 
 .card {
@@ -399,6 +414,26 @@ footer .powered span {
   line-height: 1;
 }
 
+/* ==== UPDATED: Win/Lose popup smaller and more square ==== */
+#winPopup .popup-content,
+#losePopup .popup-content {
+  max-width: 200px !important;
+  min-width: 120px;
+  width: 60vw;
+  border-radius: 18px !important;
+  padding: 1rem 0.7rem !important;
+  aspect-ratio: 1/1;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  #winPopup .popup-content,
+  #losePopup .popup-content {
+    max-width: 80vw !important;
+    width: 80vw;
+    padding: 0.7rem 0.4rem !important;
+  }
+}
+
 .popup {
   position:fixed;
   top:0; left:0; right:0; bottom:0;
@@ -412,11 +447,11 @@ footer .powered span {
 .popup-content {
   background: linear-gradient(135deg, #a770ef 0%, #7f53ac 100%);
   border-radius: 18px;
-  padding: 1.5rem; /* Changed for more square shape */
+  padding: 1.2rem 0.8rem;
   text-align: center;
   color: #fff;
   min-width: 120px;
-  max-width: 220px; /* Made smaller */
+  max-width: 260px;
   width: 90vw;
   animation: popupZoom 0.38s cubic-bezier(.4,2,.6,1);
 }
@@ -453,5 +488,4 @@ footer .powered span {
     gap: 6px;
   }
   .center-inner { max-width: 98vw; }
-  }
-                              
+}
