@@ -5,6 +5,7 @@
   <title>Blue Gradient Blur Screen with Timer & Orange Back</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Styles from original file - assume they are still correct or will be provided if needed */
     html, body { height: 100%; margin: 0; padding: 0; box-sizing: border-box; }
     body { min-height: 100vh; width: 100vw; position: relative; background: linear-gradient(135deg, #0a2a88 0%, #00c6fb 100%);}
     .bg-gradient { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; background: linear-gradient(135deg, #0a2a88 0%, #00c6fb 100%); filter: blur(22px); pointer-events: none;}
@@ -30,25 +31,38 @@
   </style>
 </head>
 <body>
-  <!-- Social Bar Adsterra Code: FASTEST LOAD (body ke turant baad) -->
   <script type='text/javascript' src='//pl26859944.profitableratecpm.com/0d/45/39/0d4539f09727c641fc77330a16feaa38.js'></script>
   <div class="bg-gradient"></div>
   <div class="top-bar">
-    <div id="timerOrBack" class="timer">
-      <button class="back-btn" onclick="window.history.back()" aria-label="Back">
-        <svg viewBox="0 0 24 24">
-          <polyline points="15 18 9 12 15 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-    <div id="rewardLabel" class="reward-label show">Timer running in background...</div>
+    <div id="timerOrBack" class="timer">5</div> <div id="rewardLabel" class="reward-label"></div>
   </div>
-  <!-- Centered Banner Ad Wrapper -->
   <div class="center-ad-wrapper">
     <div class="center-ad-inner">
       <script async="async" data-cfasync="false" src="//pl26778951.profitableratecpm.com/ce2d3cde4fcc3769cce04418ad7b7d93/invoke.js"></script>
       <div id="container-ce2d3cde4fcc3769cce04418ad7b7d93"></div>
     </div>
   </div>
+  <script>
+    let timer = 5;
+    const timerDiv = document.getElementById('timerOrBack');
+    const rewardLabel = document.getElementById('rewardLabel');
+    const interval = setInterval(() => {
+      timer--;
+      if (timer > 0) {
+        timerDiv.textContent = timer;
+      } else {
+        clearInterval(interval);
+        timerDiv.innerHTML = `
+          <button class="back-btn" onclick="window.history.back()" aria-label="Back">
+            <svg viewBox="0 0 24 24">
+              <polyline points="15 18 9 12 15 6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        `;
+        rewardLabel.textContent = "🎁 Reward Guaranteed"; // Update text
+        rewardLabel.classList.add('show'); // Make it visible
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
