@@ -246,63 +246,10 @@ let adRewardActive = false;
 let adRewardTimeout = null;
 
 function startAdWatch(adType) {
-  // Set backend timer and flags
-  localStorage.setItem('adWatchType', adType);
-  localStorage.setItem('adStartedAt', Date.now());
-  localStorage.setItem('adRewardReady', 'false');
-  setTimeout(() => {
-    localStorage.setItem('adRewardReady', 'true');
-  }, 5000);
-  // Go to ad.html
+  // Go to ad.html (timer/reward logic now handled via rewardReady flag)
   window.location.href = 'ad.html';
 }
 
-function checkAdReward() {
-  const adType = localStorage.getItem('adWatchType');
-  const adStartedAt = localStorage.getItem('adStartedAt');
-  const adRewardReady = localStorage.getItem('adRewardReady');
-  if (adType && adStartedAt) {
-    const now = Date.now();
-    const elapsed = now - parseInt(adStartedAt, 10);
-    if (elapsed >= 5000 || adRewardReady === 'true') {
-      // Reward is ready, clear flags
-      localStorage.removeItem('adStartedAt');
-      localStorage.removeItem('adWatchType');
-      localStorage.removeItem('adRewardReady');
-      if (adType === 'retry') {
-        adRewardActive = true;
-        adRewardTimeout = setTimeout(() => {
-          adRewardActive = false;
-        }, 10000);
-        losePopup.classList.add('hidden');
-        showGame();
-        lockGameUntilCardTapOrTimeout();
-        return 'retry';
-      }
-      if (adType === 'continue') {
-        continuePopup.classList.add('hidden');
-        showGame();
-        return 'continue';
-      }
-    } else {
-      alert("Please watch the ad for at least 5 seconds to get reward!");
-      return null;
-    }
-  }
-  return null;
-}
-function lockGameUntilCardTapOrTimeout() {
-  state.busy = true;
-  function unlockOnCardTap() {
-    if (adRewardActive) {
-      state.busy = false;
-      adRewardActive = false;
-      clearTimeout(adRewardTimeout);
-      board.removeEventListener('click', unlockOnCardTap, true);
-    }
-  }
-  board.addEventListener('click', unlockOnCardTap, true);
-}
 continueWatchAdBtn.onclick = () => {
   startAdWatch('continue');
 };
@@ -599,18 +546,28 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+// ==== REWARD AUTO-RESUME LOGIC (for ad.html return) ====
+window.addEventListener('pageshow', () => {
+  if (localStorage.getItem("rewardReady") === "yes") {
+    localStorage.removeItem("rewardReady");
+    resumeFromSavedLevel();
+  }
+});
+
+// Helper: Resume from saved level after ad reward
+function resumeFromSavedLevel() {
+  let userData = getUserData && typeof getUserData === "function" ? getUserData() : null;
+  if (userData && userData.level) {
+    showGame();
+    startLevel(userData.level);
+  } else {
+    showGame();
+    startLevel(1);
+  }
+}
+
 // ==== AUTO START ====
 window.onload = function() {
-  const reward = checkAdReward();
-  if (reward === 'continue') {
-    continuePopup.classList.add('hidden');
-    showGame();
-    return;
-  } else if (reward === 'retry') {
-    losePopup.classList.add('hidden');
-    showGame();
-    return;
-  }
   showSplash();
 };
 window.addEventListener("resize",()=>{
@@ -618,4 +575,4 @@ window.addEventListener("resize",()=>{
     startLevel(state.level);
   }
 });
-    
+               
