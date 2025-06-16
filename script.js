@@ -7,7 +7,7 @@ const EMOJIS = [
   "🌷", "🪷", "🌸", "🪻", "🌺", "🌼", "🐼", "🦄", "🍂", "🍄", "🌿",
   "🐥", "🐔", "🦜", "🕊️", "🦢", "🦋", "🍨", "🍧", "🍭",
   "🍬", "☕", "🗿", "🎂", "🧸", "🎹", "💎", "🔮", "🐱",
-  "🦚", "🪿", "🪕" // ✅ नया emoji जोड़ा
+  "🦚", "🪿", "🪕"
 ];
 const MATCH_SOUNDS = {
   "🍌": "sound_gwak",
@@ -16,7 +16,7 @@ const MATCH_SOUNDS = {
   "🎂": "sound_birthday",
   "🦚": "sound_mor",
   "🐱": "sound_bell",
-  "🪕": "sound_sitar" // ✅ नया sound mapping
+  "🪕": "sound_sitar"
 };
 
 // DOM
@@ -65,7 +65,7 @@ const sound_sigma = document.getElementById('sound_sigma');
 const sound_birthday = document.getElementById('sound_birthday');
 const sound_mor = document.getElementById('sound_mor');
 const sound_bell = document.getElementById('sound_bell');
-const sound_sitar = document.getElementById('sound_sitar'); // ✅ नया audio element
+const sound_sitar = document.getElementById('sound_sitar');
 
 let state = {
   user: null,
@@ -91,7 +91,7 @@ let state = {
 // ==== SOUND MANAGEMENT ====
 const allSounds = [
   winSound, loseSound, pauseSound, restartSound, flipSound,
-  sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell, sound_sitar // ✅ नया sound
+  sound_gwak, sound_tamatar, sound_sigma, sound_birthday, sound_mor, sound_bell, sound_sitar
 ];
 function stopAllSounds() {
   allSounds.forEach(a => {
@@ -100,8 +100,6 @@ function stopAllSounds() {
 }
 
 // ==== NAVIGATION FUNCTIONS ====
-// (No changes here)
-
 function showSplash() {
   splash.classList.remove('hidden');
   auth.classList.add('hidden');
@@ -160,8 +158,6 @@ function showGame() {
 }
 
 // ==== BUTTON EVENTS ====
-// (No changes here)
-
 loginBtn.onclick = () => {
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
@@ -245,19 +241,22 @@ continueHomeBtn.onclick = () => {
 };
 
 // ==== AD WATCH LOGIC (5 sec timer on button click, not on ad.html) ====
-// (No changes)
+// -- Updated as per your requirements --
 let adRewardActive = false;
 let adRewardTimeout = null;
 
 function startAdWatch(adType) {
+  // Set backend timer and flags
   localStorage.setItem('adWatchType', adType);
   localStorage.setItem('adStartedAt', Date.now());
   localStorage.setItem('adRewardReady', 'false');
   setTimeout(() => {
     localStorage.setItem('adRewardReady', 'true');
   }, 5000);
+  // Go to ad.html
   window.location.href = 'ad.html';
 }
+
 function checkAdReward() {
   const adType = localStorage.getItem('adWatchType');
   const adStartedAt = localStorage.getItem('adStartedAt');
@@ -266,6 +265,7 @@ function checkAdReward() {
     const now = Date.now();
     const elapsed = now - parseInt(adStartedAt, 10);
     if (elapsed >= 5000 || adRewardReady === 'true') {
+      // Reward is ready, clear flags
       localStorage.removeItem('adStartedAt');
       localStorage.removeItem('adWatchType');
       localStorage.removeItem('adRewardReady');
@@ -334,7 +334,7 @@ loseHomeBtn.onclick = () => {
 };
 
 // ==== GAME CONTROLS ====
-// (No changes)
+// -- Pause logic updated --
 function setupSwitches() {
   soundToggle.checked = state.soundOn;
   vibrationToggle.checked = state.vibrationOn;
@@ -344,16 +344,19 @@ function setupSwitches() {
     state.paused = !state.paused;
     pauseBtn.textContent = state.paused ? "▶" : "||";
     stopAllSounds();
-    if (!state.paused) {
-      if (state.soundOn && !document.hidden && state.gameActive) restartSound.play();
-    } else {
+    // Pause: Block all interaction when paused
+    if (state.paused) {
+      board.style.pointerEvents = "none";
       if (state.soundOn && !document.hidden && state.gameActive) pauseSound.play();
+    } else {
+      board.style.pointerEvents = "";
+      if (state.soundOn && !document.hidden && state.gameActive) restartSound.play();
     }
   };
 }
 
 // ==== GAME LOGIC ====
-// (No changes except for stats color in CSS)
+// -- Per card time changed to 2 sec --
 function getLevelConfig(level) {
   let pairs = 1 + Math.floor((level-1)/2);
   let totalCards = pairs * 2;
@@ -366,7 +369,7 @@ function getLevelConfig(level) {
   let cardW = Math.floor((boardWidth - (cols-1)*10) / cols);
   let cardH = Math.floor((boardHeight - (rows-1)*10) / rows);
   let cardSize = Math.max(32, Math.min(cardW, cardH, 90));
-  let timePerCard = (cardSize < 50) ? 2 : 3;
+  let timePerCard = 2; // <--- CHANGED FROM 3 TO 2
   let time = totalCards * timePerCard;
   return { pairs, totalCards, cols, rows, cardSize, time };
 }
@@ -375,6 +378,7 @@ function startLevel(level) {
   clearInterval(state.timerId);
   state.paused = false;
   pauseBtn.textContent = "||";
+  board.style.pointerEvents = ""; // Always enable on new level
   state.flippedIndices = [];
   state.matchedCount = 0;
   state.busy = false;
@@ -438,6 +442,7 @@ function onCardClick(index) {
     adRewardActive = false;
     clearTimeout(adRewardTimeout);
   }
+  if(state.paused) return; // Block card click if paused
   const card = state.cards[index];
   if(card.flipped||card.matched) return;
   flipCard(index);
@@ -555,7 +560,6 @@ function vibrate(ms) {
 }
 
 // ==== USER DATA LOCAL STORAGE ====
-// (No changes)
 function saveUserData() {
   if (state.user && state.user.email) {
     let dataToSave = {
@@ -589,7 +593,6 @@ function getUserData() {
 }
 
 // ==== SOUND CONTROL ON TAB/WINDOW VISIBILITY & GAME SCREEN ====
-// (No changes)
 document.addEventListener("visibilitychange", () => {
   if (document.hidden || !state.gameActive) {
     stopAllSounds();
@@ -597,7 +600,6 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // ==== AUTO START ====
-// (No changes)
 window.onload = function() {
   const reward = checkAdReward();
   if (reward === 'continue') {
@@ -616,4 +618,4 @@ window.addEventListener("resize",()=>{
     startLevel(state.level);
   }
 });
-      
+    
