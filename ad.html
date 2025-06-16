@@ -51,7 +51,7 @@
         timerDiv.textContent = timer;
       } else {
         clearInterval(interval);
-        // Set reward in localStorage
+        // Set reward in localStorage for the game to detect
         localStorage.setItem('adRewardReady', 'true');
         timerDiv.innerHTML = `
           <button class="back-btn" id="backBtn" aria-label="Back">
